@@ -1,0 +1,799 @@
+---
+title: "Mémoire – Tableaux 1 et 2a"
+subtitle: "Conjugalités bisexuelles dans Virage PG et LGBT"
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format:
+  docx:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+execute:
+  echo: false               # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup}
+#| include: false
+
+# Librairies ---------------------------------------------------------------
+library(tidyverse)   # manipulation
+library(labelled)    # variables labellisées
+library(haven)       # import SAS
+library(questionr)   # quelques fonctions utiles
+library(survey)      # données pondérées
+library(gtsummary)   # tableaux de synthèse
+library(flextable)   # export Word des tableaux
+
+# Préférences gtsummary
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+options(scipen = 999)
+
+# Import + préparation : on appelle les scripts existants -----------------
+source("01_PG_Import.R", encoding = "UTF-8")
+source("02_PG_Preparation.R", encoding = "UTF-8")
+source("03_LGBT_Import.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
+
+# Plans de pondération (PG uniquement) -----
+dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
+dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
+
+dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal,
+                          data = pgnf_conjugal)
+dwh_conjugal = svydesign(id = ~1, weights = pgnh_conjugal$poids_cal,
+                          data = pgnh_conjugal)
+```
+
+# Tableaux principaux
+
+## Tableau 1 : Le choix de la variable d'identification sexuelle
+
+**Significativité** Les trois critères étant mesurés sur les mêmes
+individus, aucun test d'indépendance n'est applicable ; les intervalles
+de confiance à 95% des proportions sont présentés en annexe.
+
+```{r}
+#| label: tbl-id-attir-prat
+#| tbl-cap: "Identification, attirances et pratiques sexuelles selon le genre. Virage PG (pondéré) et Virage LGBT (non pondéré)."
+
+# Designs pondérés (PG seulement)
+dw_aip_f = svydesign(~1, weights = pg_aip_f$poids_cal, data = pg_aip_f)
+dw_aip_h = svydesign(~1, weights = pg_aip_h$poids_cal, data = pg_aip_h)
+
+# Liste commune des variables à inclure et leurs labels
+vars_inc = c("idsexu", "attirance", "pratique")
+labs = list(idsexu ~ "Identification",
+            attirance ~ "Attirance",
+            pratique ~ "Pratique")
+
+# Virage PG, pondéré
+tab_id_pg_f = dw_aip_f %>%
+  tbl_svysummary(
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs, missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  bold_labels() %>%  
+  modify_header(stat_0 = "**Femmes**\n(n = {N_unweighted})") %>%
+  modify_spanning_header(stat_0 = "**Virage PG**")
+
+tab_id_pg_h = dw_aip_h %>%
+  tbl_svysummary(
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs, missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  bold_labels() %>% 
+  modify_header(stat_0 = "**Hommes**\n(n = {N_unweighted})") %>%
+  modify_spanning_header(stat_0 = "**Virage PG**")
+
+# Virage LGBT, non pondéré
+tab_id_lgbt_f = lgbt_aip_f %>%
+  tbl_summary(
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs, missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  bold_labels() %>%  
+  modify_header(stat_0 = "**Femmes**\n(n = {N})") %>%
+  modify_spanning_header(stat_0 = "**Virage LGBT**")
+
+tab_id_lgbt_h = lgbt_aip_h %>%
+  tbl_summary(
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs, missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  bold_labels() %>%  
+  modify_header(stat_0 = "**Hommes**\n(n = {N})") %>%
+  modify_spanning_header(stat_0 = "**Virage LGBT**")
+
+# Fusion des 4 sous-tableaux
+tab1 = tbl_merge(
+  list(tab_id_pg_f, tab_id_pg_h, tab_id_lgbt_f, tab_id_lgbt_h),
+  tab_spanner = FALSE
+) %>%
+  modify_column_hide(columns = starts_with("ci_")) %>% #décommenter pour masquer IC
+  as_flex_table()
+```
+
+**Comparaison des bisexualités selon le critère retenu**
+
+-   Les attirances bisexuelles sont supérieures aux pratiques
+    bisexuelles, elles-mêmes supérieures aux identifications bisexuelles
+    chez les femmes et les hommes.
+
+    -   *Chevauchement IC entre pratiques et attirances bisexuelles chez
+        les hommes dans PG*
+
+**Comparaison bisexualité / homosexualité selon critère retenu**
+
+[Virage PG]{.underline}
+
+-   Les attirances et pratiques bisexuelles sont plus fréquentes que les
+    attirances et pratiques strictement homosexuelles.
+
+-   Les hommes se disent plus souvent homosexuels que bisexuels.
+
+    -   *Chevauchement IC entre identification homosexuelle et
+        bisexuelle chez les femmes*
+
+[Virage LGBT]{.underline}
+
+-   Les identifications majoritaires sont les identifications
+    homosexuelles.
+
+-   Les pratiques et attirances homosexuelles sont plus fréquentes que
+    les pratiques et attirances bisexuelles chez les hommes.
+
+-   Les pratiques et attirances bisexuelles sont plus fréquentes que les
+    pratiques et attirances homosexuelles chez les femmes.
+
+    -   *Accès plus facile des hommes à une vie strictement homosexuelle
+        ? Contrainte à l'hétérosexualité plus forte chez les femmes ?*
+
+**Comparaison des hommes et des femmes selon le critère retenu**
+
+-   Les pratiques bisexuelles sont plus fréquentes chez les femmes que
+    chez les hommes.
+
+-   Les pratiques strictement homosexuelles sont plus fréquentes chez
+    les hommes que chez les femmes.
+
+-   Les attirances et identifications bisexuelles sont plus fréquentes
+    chez les femmes que chez les hommes.
+
+    -   *Chevauchement IC entre identification bisexuelle hommes et
+        femmes dans PG*
+
+**Limites**
+
+-   La part importante des réponses NSP/NVPD/Pas de rapport/Pas
+    d'attirance. Particulièrement vrai pour la question des pratiques.
+    On le sait, des pratiques, attirances ou identifications bisexuelles
+    ou homosexuelles sont moins dicibles car écartées de la norme
+    hétérosexuelle. On peut faire l'hypothèse qu'une partie au moins de
+    ces répondants sous-déclarent des attirances ou pratiques
+    homosexuelles ou bisexuelles, ce qui biaise les résultats à la
+    baisse.
+-   Le recodage des attirances bisexuelles englobe trois modalités,
+    effaçant la nuance qui existe entre déclarer des attirances surtout
+    pour le sexe opposé mais aussi pour le même sexe et inversement des
+    attirances surtout pour le même sexe mais aussi pour le sexe opposé.
+    Nous faisons le choix d'intégrer cette variation à la catégorie des
+    attirances bisexuelles.
+
+## Tableau 2 : caractéristiques sociodémographiques (Trachman, Lejbowicz, 2020)
+
+Ce tableau croise, pour les répondant·es **Virage PG** (Homo / Bi /
+Hétéro, pondéré) et **Virage LGBT** (Homo / Bi, non pondéré), les
+caractéristiques sociodémographiques selon le genre. Il revient sur les
+données traitées dans l'article de Mathieu Trachman et Tania Lejbowicz,
+[Lesbiennes, gays, bisexuel·le·s et trans (LGBT) : une catégorie
+hétérogène, des violences spécifiques]{.underline}.
+
+```{r}
+#| label: tbl-trachman
+#| tbl-cap: "Caractéristiques sociodémographiques des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)."
+
+# Liste commune des variables à inclure et leurs labels
+vars_inc = c("age", "diplome", "statut_act", "csp", "territoire", "mig")
+labs = list(
+  age        ~ "Groupe d'âges",
+  diplome    ~ "Diplôme le plus élevé obtenu",
+  statut_act ~ "Statut d'activité",
+  csp        ~ "Catégorie socioprofessionnelle",
+  territoire ~ "Territoire d'habitation", 
+  mig ~ "Statut migratoire"
+)
+
+# Tableau PG pondéré -- Femmes
+tab_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab_lgbt_f = lgbtnf %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab_lgbt_h = lgbtnh %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz
+tab2 = tbl_merge(
+  tbls = list(tab_pg_f, tab_pg_h, tab_lgbt_f, tab_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_caption(
+    "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés."
+  )
+
+# Version FINALE (IC masqués)
+tab2 %>% 
+  modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table()
+```
+
+**Questions et pistes d'analyse**
+
+-   Des femmes bies plus jeunes et des hommes bis plus âgés. Moins
+    clivant dans Virage LGBT où les hommes bis sont surreprésentés dans
+    la catégorie la plus jeune et la plus âgée par rapport aux gays.
+
+    -   effet de génération lié à un contexte plus favorable pour
+        déclarer une sexualité minoritaire (Trachman et Lejbowicz 2020)
+        ? Pas le cas pour les hommes bis dans PG ?
+
+    -   contexte politique et social qui permet plus facilement une
+        identification bisexuelle qu’une identification gay pour la
+        génération d'hommes qui a entre 50 et 69 ans au moment de
+        l'enquête (Trachman et Lejbowicz 2020) ? Pas le cas pour les
+        femmes ?
+
+-   Des hommes bisexuels moins surdiplômés que les gays, lesbiennes et
+    bisexuelles. Ils ont un niveau de diplôme proche des hétérosexuels.
+
+-   Concernant les PCS et le territoire d'habitation les IC se
+    chevauchent trop pour effectuer des comparaisons intéressantes entre
+    groupes sociaux.
+
+-   Les p-value ne permettent pas de commenter le lien entre
+    identification sexuelle et statut migratoire.
+
+-   Position sociale des bisexuel·les varie selon le genre
+
+## Tableau 3a : Situation matrimoniale et conjugale (sur l'ensemble)
+
+```{r}
+#| label: tbl-3a-situation-conjugale
+#| tbl-cap: "Situation matrimoniale et conjugale selon l'enquête, le genre et l'identification sexuelle"
+
+labels_3a = list(
+  etatmat       ~ "État matrimonial",
+  couple12mois  ~ "Couple > 4 mois (12 derniers mois)",
+  statutcouple  ~ "Statut conjugal à l'enquête",
+  enf_ego    ~ "Nombre d'enfants"
+)
+
+vars_3a = c("etatmat", "couple12mois", "statutcouple", "enf_ego")
+
+# PG femmes (pondéré)
+tbl_3a_pgf = dwf %>%
+  tbl_svysummary(by = idsexu, include = all_of(vars_3a),
+                 statistic = all_categorical() ~ "{p}",
+                 digits = all_categorical() ~ 1, missing = "no",
+                 label = labels_3a) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# PG hommes (pondéré)
+tbl_3a_pgh = dwh %>%
+  tbl_svysummary(by = idsexu, include = all_of(vars_3a),
+                 statistic = all_categorical() ~ "{p}",
+                 digits = all_categorical() ~ 1, missing = "no",
+                 label = labels_3a) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# LGBT femmes (non pondéré)
+tbl_3a_lgbtf = lgbtnf %>%
+  tbl_summary(by = idsexu, include = all_of(vars_3a),
+              statistic = all_categorical() ~ "{p}",
+              digits = all_categorical() ~ 1, missing = "no",
+              label = labels_3a) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# LGBT hommes (non pondéré)
+tbl_3a_lgbth = lgbtnh %>%
+  tbl_summary(by = idsexu, include = all_of(vars_3a),
+              statistic = all_categorical() ~ "{p}",
+              digits = all_categorical() ~ 1, missing = "no",
+              label = labels_3a) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)) %>%      bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+tbl_3a = tbl_merge(
+  tbls = list(tbl_3a_pgf, tbl_3a_pgh, tbl_3a_lgbtf, tbl_3a_lgbth),
+  tab_spanner = FALSE
+) %>%
+  modify_caption(
+    "**Situation matrimoniale et conjugale selon l'enquête,
+    le genre et l'identification sexuelle (%)**"
+  )
+
+# Version FINALE (IC masqués)
+tbl_3a %>% 
+  modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table()
+```
+
+**Questions et pistes d'analyse**
+
+-   Des lesbiennes et bies moins souvent mariées que les hétérosexuelles
+    (PG). Peut-être expliqué par le cadre légal au moment de l'enquête
+    pour les lesbiennes (mariage autorisé 2 ans auparavant) mais pas
+    pour les bisexuelles qui sont 90% en couple avec un homme. 2 pistes
+    explicatives.
+
+    -   Effet de structure d'âge : Elles sont plus jeunes que les
+        hétérosexuelles. En fait quand on contrôle par l'âge l'écart
+        avec les femmes hétérosexuelles reste important.
+
+    -   Elles sont moins souvent en couple que les hétérosexuelles
+
+-   Dans Virage LGBT l'écart entre lesbiennes et bisexuelles est plus
+    net : les bisexuelles sont moins souvent mariées et plus souvent
+    célibataires
+
+-   Des hommes bisexuels plus souvent divorcés que les hétéros
+
+    -   Effet de structure d'âge : Ils sont plus âgés, avec l'hypothèse
+        que l'avancée en âge augmente les chances d'être divorcé
+
+    -   Toutefois ils sont deux fois moins souvent mariés que les
+        hétéros.
+
+    -   Rapport distancié institution mariage ? Difficultés relations
+        conjugales ?
+
+    -   Des trajectoires avec une première partie de vie mariés, en
+        relation hétérosexuelle puis la découverte d'une bisexualité
+        tardive ou du moins d'autres formes de pratiques et
+        identification ?
+
+-   Des hommes bis majoritairement célibataires (au moment de l'enquête
+    et dans les 12 derniers mois) - moins net dans LGBT
+
+-   Les lesbiennes et bisexuelles plus souvent en union libre que les
+    hétérosexuelles
+
+-   Le pacs comme pratique plus homosexuelle que bisexuelle
+
+-   Des bisexuel·les moins souvent sans enfant que les homosexuel·les
+    mais plus souvent que les hétérosexuel·les - Population Virage LGBT
+    majoritairement sans enfant
+
+## Tableau 3b : Cohabitation et enfants du couple (sous-pop en couple \> 4 mois dans les 12 derniers mois)
+
+```{r}
+#| label: tbl-3b-cohab-enfants-couple
+#| tbl-cap: "Cohabitation et enfants du couple selon l'enquête, le genre et l'identification sexuelle"
+
+labels_3b = list(
+  cohabitation  ~ "Cohabitation",
+  enf_couple ~ "Nombre d'enfants du couple"
+)
+
+vars_3b = c("cohabitation", "enf_couple")
+
+# PG femmes en couple (pondéré)
+tbl_3b_pgf = dwf_conjugal %>%
+  tbl_svysummary(by = idsexu, include = all_of(vars_3b),
+                 statistic = all_categorical() ~ "{p}",
+                 digits = all_categorical() ~ 1, missing = "no",
+                 label = labels_3b) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# PG hommes en couple (pondéré)
+tbl_3b_pgh = dwh_conjugal %>%
+  tbl_svysummary(by = idsexu, include = all_of(vars_3b),
+                 statistic = all_categorical() ~ "{p}",
+                 digits = all_categorical() ~ 1, missing = "no",
+                 label = labels_3b) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# LGBT femmes en couple (non pondéré)
+tbl_3b_lgbtf = lgbtnf_conjugal %>%
+  tbl_summary(by = idsexu, include = all_of(vars_3b),
+              statistic = all_categorical() ~ "{p}",
+              digits = all_categorical() ~ 1, missing = "no",
+              label = labels_3b) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)) %>% 
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# LGBT hommes en couple (non pondéré)
+tbl_3b_lgbth = lgbtnh_conjugal %>%
+  tbl_summary(by = idsexu, include = all_of(vars_3b),
+              statistic = all_categorical() ~ "{p}",
+              digits = all_categorical() ~ 1, missing = "no",
+              label = labels_3b) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)) %>% 
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+tbl_3b = tbl_merge(
+  tbls = list(tbl_3b_pgf, tbl_3b_pgh, tbl_3b_lgbtf, tbl_3b_lgbth),
+  tab_spanner = FALSE
+) %>%
+  modify_caption(
+    "**Cohabitation et enfants du couple — parmi les personnes en couple > 4
+    mois dans les 12 derniers mois, selon l'enquête, le genre et l'identification
+    sexuelle (%)**"
+  )
+
+# Version FINALE (IC masqués)
+tbl_3b %>% 
+  modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table()
+```
+
+**Questions et pistes d'analyse**
+
+-   Les bisexuel·les sont moins souvent en couple cohabitant que les
+    hétérosexuel·les - Virage PG
+
+-   Les bisexuel·les semblent moins souvent en couple cohabitant que les
+    homosexuel·les dans Virage LGBT
+
+    -   *Les IC se chevauchent très légèrement et les p-value ne sont
+        pas très bonnes*
+
+-   Les bisexuel·les sont plus souvent sans enfant que les
+    hétérosexuel·les. - Virage PG
+
+    -   Effet d'âge pour les femmes ?
+
+-   Les bisexuelles ont plus souvent des enfants que les
+    homosexuelles. - Virage PG
+
+-   Dans Virage LGBT les hommes bisexuels sont moins souvent sans enfant
+    que les hommes gays.
+
+<!-- # Annexes -->
+
+<!-- ## Tableau 1 avec IC -->
+
+<!-- ```{r} -->
+<!-- tab1 %>% as_flex_table() -->
+<!-- ``` -->
+
+<!-- ## Tableau 2 avec IC -->
+
+<!-- ```{r} -->
+<!-- tab2 %>% as_flex_table() -->
+<!-- ``` -->
+
+<!-- ## Tableau 3a avec IC -->
+
+<!-- ```{r} -->
+<!-- tbl_3a %>% as_flex_table() -->
+<!-- ``` -->
+
+<!-- ## Tableau 3b avec IC -->
+
+<!-- ```{r} -->
+<!-- tbl_3b %>% as_flex_table() -->
+<!-- ``` -->
+
+<!-- ## Tests de Fisher (p-values exactes) -->
+
+<!-- ```{r} -->
+<!-- #| label: fisher-tests-conjugal -->
+<!-- #| eval: false -->
+
+<!-- # Tableau 3a — PG -->
+<!-- fisher.test(pgnf$etatmat,      pgnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnf$couple12mois, pgnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnf$statutcouple, pgnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnf$nb_enf_ego,   pgnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnh$etatmat,      pgnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnh$couple12mois, pgnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnh$statutcouple, pgnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnh$nb_enf_ego,   pgnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+
+<!-- # Tableau 3a — LGBT -->
+<!-- fisher.test(lgbtnf$etatmat,      lgbtnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnf$couple12mois, lgbtnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnf$statutcouple, lgbtnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnf$nb_enf_ego,   lgbtnf$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnh$etatmat,      lgbtnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnh$couple12mois, lgbtnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnh$statutcouple, lgbtnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnh$nb_enf_ego,   lgbtnh$idsexu, simulate.p.value = TRUE, B = 10000) -->
+
+<!-- # Tableau 3b — PG (sous-pop en couple) -->
+<!-- fisher.test(pgnf_conjugal$cohabitation,  pgnf_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnf_conjugal$nb_enf_couple, pgnf_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnh_conjugal$cohabitation,  pgnh_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(pgnh_conjugal$nb_enf_couple, pgnh_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+
+<!-- # Tableau 3b — LGBT (sous-pop en couple) -->
+<!-- fisher.test(lgbtnf_conjugal$cohabitation,  lgbtnf_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnf_conjugal$nb_enf_couple, lgbtnf_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnh_conjugal$cohabitation,  lgbtnh_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- fisher.test(lgbtnh_conjugal$nb_enf_couple, lgbtnh_conjugal$idsexu, simulate.p.value = TRUE, B = 10000) -->
+<!-- ``` -->
+
+<!-- ## Bajos & Beltzer, reproduit sur Virage PG -->
+
+<!-- ::: callout-note -->
+<!-- **Note importante.** Le tableau s'inspire de celui réalisé par Bajos & -->
+<!-- Beltzer (chap. 12, *Enquête CSF*, 2008). Toutefois **Virage ne contient -->
+<!-- pas les mêmes variables**. En particulier, le sexe des partenaires des -->
+<!-- 12 derniers mois n'est pas disponible directement dans Virage PG (seul -->
+<!-- le sexe d'un éventuel *nouveau* partenaire l'est, via `SEX12b1`). La -->
+<!-- colonne *Pratique 12 mois (dont exclusif)* n'est donc pas reproduite -->
+<!-- ici. Les tranches d'âge utilisées sont celles de Virage (`Q19e_gragebis` -->
+<!-- : 20-29 / 30-39 / 40-49 / 50-69) et non celles de CSF. -->
+<!-- ::: -->
+
+<!-- Le tableau croise, pour les femmes et les hommes séparément, par âge -->
+<!-- puis par diplôme : -->
+
+<!-- -   la part de personnes ayant ressenti une attirance pour une personne -->
+<!--     du même sexe au cours de la vie ; -->
+<!-- -   la part ayant eu une pratique homosexuelle au cours de la vie (dont -->
+<!--     exclusivement homosexuelle) ; -->
+<!-- -   la part s'identifiant comme homosexuel·le ou bisexuel·le ; -->
+<!-- -   la part déclarant une attirance pour une personne de même sexe mais -->
+<!--     jamais de pratique homosexuelle. -->
+
+<!-- Les pourcentages sont **pondérés** (poids `poids_cal`), les effectifs -->
+<!-- restent non pondérés. Les intervalles de confiance à 95 % sur l'« -->
+<!-- Ensemble » sont calculés à partir du plan de sondage avec -->
+<!-- `survey::svyciprop()`. -->
+
+<!-- ```{r} -->
+<!-- #| label: tbl-bajos -->
+<!-- #| tbl-cap: "Attirances, pratiques et identification selon l'âge et le diplôme. Virage PG." -->
+
+<!-- # Petite fonction utilitaire : calcule pour un design pondéré et une variable -->
+<!-- # binaire (0/1) le pourcentage pondéré et son IC95% (méthode logit). -->
+<!-- prop_pond = function(design, varname) { -->
+<!--   f = as.formula(paste0("~", varname)) -->
+<!--   est = svyciprop(f, design, method = "logit", level = 0.95) -->
+<!--   c(p   = as.numeric(est) * 100, -->
+<!--     low = attr(est, "ci")[1] * 100, -->
+<!--     up  = attr(est, "ci")[2] * 100) -->
+<!-- } -->
+
+<!-- # Fonction qui calcule, pour une sous-population (df), tous les indicateurs -->
+<!-- # nécessaires au tableau Bajos. Renvoie un tibble avec n + % de chaque indic. -->
+<!-- calc_indics = function(df) { -->
+<!--   d = svydesign(~1, weights = df$poids_cal, data = df) -->
+<!--   ind = c("attire_ms", "pratique_vie", "pratique_vie_excl", -->
+<!--           "id_homo", "id_bi", "attire_jamais_prat") -->
+<!--   res = sapply(ind, function(v) prop_pond(d, v)["p"]) -->
+<!--   names(res) = ind -->
+<!--   c(n = nrow(df), res) -->
+<!-- } -->
+
+<!-- # Fonction qui applique calc_indics à chaque modalité d'une variable de -->
+<!-- # stratification (age ou diplome), pour un genre donné. -->
+<!-- make_block = function(df_genre, strat_var) { -->
+<!--   niveaux = levels(df_genre[[strat_var]]) -->
+<!--   niveaux = niveaux[!is.na(niveaux)] # sécurité -->
+
+<!--   lignes = lapply(niveaux, function(lev) { -->
+<!--     sub = df_genre %>% filter(.data[[strat_var]] == lev) -->
+<!--     if (nrow(sub) == 0) return(NULL) -->
+<!--     c(modalite = lev, calc_indics(sub)) -->
+<!--   }) -->
+<!--   # Ensemble (toutes modalités confondues) -->
+<!--   ens = c(modalite = "Ensemble", calc_indics(df_genre)) -->
+
+<!--   bind_rows(c(lignes, list(ens))) %>% -->
+<!--     mutate(across(-modalite, as.numeric)) -->
+<!-- } -->
+
+<!-- # On construit les 4 blocs : Femmes par âge, Hommes par âge, Femmes par -->
+<!-- # diplôme, Hommes par diplôme. -->
+<!-- bloc_fa = make_block(pg_aip_f, "age") -->
+<!-- bloc_ha = make_block(pg_aip_h, "age") -->
+<!-- bloc_fd = make_block(pg_aip_f, "diplome") -->
+<!-- bloc_hd = make_block(pg_aip_h, "diplome") -->
+
+<!-- # Mise en forme commune -->
+<!-- mise_en_forme = function(bloc, titre) { -->
+<!--   bloc %>% -->
+<!--     transmute( -->
+<!--       Modalité = modalite, -->
+<!--       Effectifs = format(round(n), big.mark = " "), -->
+<!--       `Attiré·e (%)`               = sprintf("%.1f", attire_ms), -->
+<!--       `Pratique vie (%)`           = sprintf("%.1f", pratique_vie), -->
+<!--       `Dont exclusif (%)`          = sprintf("%.1f", pratique_vie_excl), -->
+<!--       `Identifié·e Homo (%)`       = sprintf("%.1f", id_homo), -->
+<!--       `Identifié·e Bi (%)`         = sprintf("%.1f", id_bi), -->
+<!--       `Attiré·e jamais pratiqué (%)` = sprintf("%.1f", attire_jamais_prat) -->
+<!--     ) -->
+<!-- } -->
+
+<!-- tab_bajos = bind_rows( -->
+<!--   tibble(Modalité = "FEMMES — par âge"), mise_en_forme(bloc_fa), -->
+<!--   tibble(Modalité = "HOMMES — par âge"), mise_en_forme(bloc_ha), -->
+<!--   tibble(Modalité = "FEMMES — par diplôme"), mise_en_forme(bloc_fd), -->
+<!--   tibble(Modalité = "HOMMES — par diplôme"), mise_en_forme(bloc_hd) -->
+<!-- ) -->
+
+<!-- # Rendu flextable -> Word -->
+<!-- ft_bajos = flextable(tab_bajos) %>% -->
+<!--   bold(i = ~ is.na(Effectifs), j = "Modalité") %>%      # titres de section -->
+<!--   bg  (i = ~ is.na(Effectifs), bg = "#F2F2F2") %>% -->
+<!--   bold(i = ~ Modalité == "Ensemble") %>%                 # lignes Ensemble -->
+<!--   autofit() %>% -->
+<!--   fontsize(size = 9, part = "all") %>% -->
+<!--   set_caption( -->
+<!--     "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Source : Virage PG, Ined, 2015. Pourcentages pondérés, effectifs non pondérés." -->
+<!--   ) -->
+
+<!-- ft_bajos -->
+<!-- ``` -->
+
+<!-- ## Diagramme de Venn -->
+
+<!-- ```{r} -->
+<!-- #| label: fig-venn-bi -->
+<!-- #| fig-cap: "Les multiples facettes de la bisexualité chez les femmes et les hommes : attirance, pratique, identification. Virage PG, % pondérés." -->
+<!-- #| fig-width: 10 -->
+<!-- #| fig-height: 5 -->
+
+<!-- library(eulerr) -->
+
+<!-- make_venn = function(df) { -->
+<!--   df = df %>% -->
+<!--     mutate( -->
+<!--       a = attirance == "Bi", -->
+<!--       p = pratique  == "Bi", -->
+<!--       i = idsexu    == "Bi" -->
+<!--     ) -->
+
+<!--   total_pond = sum(df$poids_cal)   # ← dénominateur : tous les femmes/hommes -->
+
+<!-- combos = df %>% -->
+<!--   group_by(a, p, i) %>% -->
+<!--   summarise(pct = round(sum(poids_cal) / total_pond * 100, 2), .groups = "drop") %>% -->
+<!--   filter(a | p | i) # On retire la zone aucun critère  -->
+
+<!--   vec = setNames( -->
+<!--     combos$pct, -->
+<!--     paste0( -->
+<!--       ifelse(combos$a, "Attirance", ""), -->
+<!--       ifelse(combos$a & (combos$p | combos$i), "&", ""), -->
+<!--       ifelse(combos$p, "Pratique", ""), -->
+<!--       ifelse(combos$p & combos$i, "&", ""), -->
+<!--       ifelse(combos$i, "Identification", "") -->
+<!--     ) -->
+<!--   ) -->
+<!--   list(fit = euler(vec), hors_cercles = round(100 - sum(vec), 2)) -->
+<!-- } -->
+
+<!-- venn_f = make_venn(pg_aip_f) -->
+<!-- venn_h = make_venn(pg_aip_h) -->
+
+<!-- par(mfrow = c(1, 2)) -->
+<!-- plot(venn_f$fit, -->
+<!--      quantities = list(type = "counts"),   # affiche les valeurs (= % ici) -->
+<!--      fills = list(fill = c("#FFB6C1", "#ADD8E6", "#FFE4B5"), alpha = 0.6), -->
+<!--      main = sprintf("Femmes (hors cercles : %.1f %%)", venn_f$hors_cercles)) -->
+<!-- plot(venn_h$fit, -->
+<!--      quantities = list(type = "counts"), -->
+<!--      fills = list(fill = c("#FFB6C1", "#ADD8E6", "#FFE4B5"), alpha = 0.6), -->
+<!--      main = sprintf("Hommes (hors cercles : %.1f %%)", venn_h$hors_cercles)) -->
+<!-- ``` -->
+

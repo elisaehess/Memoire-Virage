@@ -1,0 +1,18 @@
+# Historique et configurations locales de R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# --- DONNÉES SENSIBLES ---
+# Exclure tout le dossier de données 
+Data/
+
+
+# Exclure des formats de fichiers spécifiques s'ils traînent à la racine
+*.csv
+*.xlsx
+*.rds
+*.RData
+*.sav
+*.dta
