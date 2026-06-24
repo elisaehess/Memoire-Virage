@@ -1,0 +1,238 @@
+---
+title: "Mémoire – Partie I"
+subtitle: "Les situations conjugales bisexuelles"
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format: html
+execute:
+  echo: false               # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup}
+#| include: false
+
+# Librairies ---------------------------------------------------------------
+library(tidyverse)   # manipulation
+library(labelled)    # variables labellisées
+library(haven)       # import SAS
+library(questionr)   # quelques fonctions utiles
+library(survey)      # données pondérées
+library(gtsummary)   # tableaux de synthèse
+library(flextable)   # export Word des tableaux
+library(GGally)      # graphiques 
+
+# Préférences gtsummary
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+options(scipen = 999)
+
+# Import + préparation : on appelle les scripts existants -----------------
+source("02_PG_Preparation.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
+
+# Plans de pondération (PG uniquement) -----
+dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
+dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
+```
+
+## I. Caractéristiques socio-démo & conjugales
+
+L'article de Mathieu Trachman et Tania Lejbowicz, [Lesbiennes, gays,
+bisexuel·le·s et trans (LGBT) : une catégorie hétérogène, des violences
+spécifiques]{.underline}, tente de saisir et définir les populations
+LGBT dans l'enquête Virage. Nous allons exposer les conclusions de cet
+article avant de les discuter et d'en affiner certains aspects. On y
+apprend tout d'abord que les lesbiennes, gays et bisexuelles y sont plus
+jeunes que les hétérosexuel·les. Plus de la moitié on moins de 40 ans,
+voire moins de 30 ans dans le cas des bisexuelles. Ce premier constat se
+discute dans le cas des gays, dont l'intervalle de confiance chevauche
+celui des hétérosexuels. La jeunesse statistique des minorités sexuelles
+s'observe plus chez les femmes. Cette jeunesse par rapport aux hétéros
+est expliquée dans l'article par un effet de génération, qui offre aux
+plus jeunes un contexte plus favorable pour déclarer une sexualité
+minoritaire. De ce point de vue, les hommes bisexuels se distinguent,
+plus de la moitié d'entre eux ont plus de 50 ans. Ici, c'est le contexte
+politique et social qui est invoqué pour supposer qu'une part des
+bisexuels de plus de 50 ans déclarent plus facilement une bisexualité
+qu'une homosexualité.
+
+On peut s'étonner que l'effet générationnel ne touche pas les jeunes
+bisexuels, d'une part. L'affirmation d'une homosexualité stricte
+est-elle plus accessible aux jeunes hommes qu'aux jeunes femmes ?
+(reprendre Envie) Et que l'effet contextuel et politique ne touche pas
+les vieilles bisexuelles d'autre part. L'identification minoritaire
+est-elle simplement moins accessible aux femmes qu'aux hommes ?
+
+Une proposition de réponse à cette deuxième question se trouve dans
+l'article. La probabilité de se dire bisexuelle ou lesbienne réduit avec
+l'avancée en âge. On trouve ici un effet du genre, expliqué pour les
+bisexuelles comme le résultat d'une meilleure acceptabilité de la
+bisexualité féminine chez les jeunes femmes, contraintes d'abandonner
+cette identification avec l'avancée en âge. L'article ne propose pas
+d'interprétation pour les lesbiennes, elles aussi moins nombreuses dans
+la catégorie 50 - 69 ans. Il semble globalement que les identifications
+minoritaires sont moins accessibles pour les femmes âgées que pour les
+hommes âgés.
+
+Dans la suite de l'article les gays sont présentés comme une population
+plutôt urbaine, plus diplômée et plus présente dans les catégories
+socioprofessionnelles supérieures, confirmant de précédentes enquêtes
+(Bajos, 2008). Ici encore, le constat est à nuancer. Si les gays sont
+effectivement plus souvent diplômés du 2e niveau et plus que les
+hétérosexuels et les bisexuels, leur surreprésentation chez les cadres
+et professions intellectuelles supérieures est effective par rapport aux
+hétérosexuels mais pas par rapport aux bisexuels. Enfin leur
+sous-représentation dans la ruralité par rapport aux bisexuels et
+hétérosexuels n'est pas statistiquement significative au regard des
+intervalles de confiance. Les bisexuels eux sont proches des
+hétérosexuels, la moitié étant ouvriers ou employés. Les lesbiennes et
+bisexuelles sont deux fois plus souvent ouvrières que les
+hétérosexuelles. Les bisexuels résident autant que les hétérosexuels
+dans les territoires ruraux, résultat à nuancer on l'a vu, les
+intervalles avec les gays se chevauchent, tandis que les lesbiennes
+vivent pour plus de moitié dans des agglomérations hors Île-de-France.
+
+Il n'est pas ici question de remettre en cause toutes les conclusions de
+l'article mais d'en montrer le caractère fragile. Les modalités étant
+calculés sur de très petits effectifs, les tests statistiques nous
+invitent à la prudence. Si le lien entre l'âge et l'identification
+sexuelle est statistiquement pertinent, c'est moins le cas du lien entre
+territoire d'habitation et identification sexuelle. De plus, dans toutes
+ces variables et modalités, les intervalles de confiance des minorités
+sexuelles sont larges, rendant la comparaison entre groupes délicate.
+
+Pour approfondir certains aspects liés à la classe et à la
+territorialité, nous allons observer d'autres variables, présentées dans
+le tableau suivant. La race est difficilement approchable dans cette
+enquête, les effectifs de personnes immigrées, issues de l'immigration
+ou des DROM et déclarant appartenir à une minorité sexuelle étant trop
+faibles.
+
+Quelques points interprétatifs :
+
+```{r}
+#| label: tbl-sociodémo
+#| tbl-cap: "Caractéristiques sociodémographiques et conjuagles des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)."
+
+# Liste commune des variables à inclure et leurs labels
+vars_inc = c("age", "revenu", "revenu_sub",  "taille_agglo", "couple_enq", "couple12mois", "enf_ego")
+labs = list(
+  age        ~ "Groupe d'âges",
+  revenu ~ "Revenu individuel", 
+  revenu_sub ~ "Situation financière", 
+  taille_agglo ~ "Taille d'agglomération", 
+  couple_enq ~ "En couple au moment de l'enquête", 
+  couple12mois ~ "En couple au cours des 12 derniers mois (> 4 mois)", 
+  enf_ego ~ "A des enfants"
+)
+
+# Tableau PG pondéré -- Femmes
+tab_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab_lgbt_f = lgbtnf %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab_lgbt_h = lgbtnh %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(vars_inc),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    label = labs,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz
+tab3bis = tbl_merge(
+  tbls = list(tab_pg_f, tab_pg_h, tab_lgbt_f, tab_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_caption(
+    "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés."
+  )
+
+# Version FINALE (IC masqués)
+tab3bis %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>%
+  as_flex_table() %>%
+  mise_en_forme_ft()
+```
+
+Pour poursuivre il est intéressant de contrôler le fait d'être en couple
+par l'âge et la classe. On choisit la variable "en couple supérieur à 4
+mois dans les 12 derniers mois" car c'est celle qui est utilisée dans la
+suite du questionnaire pour les modules couples. Cela comporte
+évidemment des limites : à expliciter.
+
+```{r}
+test = pg_base |> 
+  select(couple12mois, genre, idsexu, age, revenu, revenu_sub, taille_agglo, 
+         enf_ego)
+
+graph_test = tets |> 
+  ggbivariate(, "couple12mois")
+```
+
+On voit (graphique) que les Bi sont les moins souvent en couple. On voit
+aussi que les catégories d'âge les moins souvent en couple sont les
+20-29 et les 50-69. La surreprésentation des bis dans ces catégories
+explique-t-elle le fait qu'iels sont moins couple ? Idem, la classe a un
+effet sur la mise en couple : tester l'effet de la classe.
