@@ -14,7 +14,7 @@ library(haven) # importer des données SAS
 
 ## Chemin vers le dossier contenant les bases (<!> à adapter <!>)
 
-path = "~/Documents/MASTER EHESS/DONNEES/LGBT/SAS/"
+path = "Data/"
 
 ## Nom des fichiers
 

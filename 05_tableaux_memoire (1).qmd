@@ -36,9 +36,7 @@ theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 options(scipen = 999)
 
 # Import + préparation : on appelle les scripts existants -----------------
-source("01_PG_Import.R", encoding = "UTF-8")
 source("02_PG_Preparation.R", encoding = "UTF-8")
-source("03_LGBT_Import.R", encoding = "UTF-8")
 source("04_LGBT_Preparation.R", encoding = "UTF-8")
 
 # Plans de pondération (PG uniquement) -----

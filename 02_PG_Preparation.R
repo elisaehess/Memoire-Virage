@@ -64,7 +64,7 @@ pg_base = pg %>%
     LGBT1e
   ) %>%
   mutate(
-    genre = fct_drop(as_factor(Q1)),
+    genre = fct_drop(as_factor(Q1)) %>%  set_variable_labels("Genre"),
     
     # ↓ Identification avec NSP/NVPD conservés en modalité distincte
     idsexu = fct_recode(
@@ -72,7 +72,8 @@ pg_base = pg %>%
       "NSP/NVPD" = "NSP",
       "NSP/NVPD" = "NVPD"
     ) %>%
-      fct_relevel("Homo", "Bi", "Hétéro", "NSP/NVPD"),
+      fct_relevel("Hétéro", "Bi", "Homo", "NSP/NVPD") %>% 
+      set_variable_labels("Identification sexuelle"), 
     
     # ↓ Nouvelle variable idsexu présumé·es hétéros
     idsexu2 = case_when(
@@ -121,7 +122,8 @@ pg_base = pg %>%
     attire_jamais_prat = as.integer(attire_ms == 1 & pratique_vie == 0), 
     
     # ↓ Recodage âge 
-    age = as_factor(Q19e_gragebis),
+    age = as_factor(Q19e_gragebis) %>% 
+      set_variable_labels("Groupe d'âge"),
     
     # ↓ Recodage diplôme 
     diplome = fct_recode(
@@ -139,7 +141,8 @@ pg_base = pg %>%
         "Bac / Bac+3",
         "Supérieur à Bac+3",
         "NVPD/NSP"
-      ),
+      ) %>% 
+      set_variable_labels("Diplôme"), 
     
     # ↓ Recodages classe 
     csp = fct_recode(
@@ -153,7 +156,8 @@ pg_base = pg %>%
       NULL = "Retraités",
       NULL = "Autres personnes sans activité professionnelle",
       NULL = "Indéterminé"
-    ),
+    ) %>% 
+      set_variable_labels("Catégorie socioprofessionnelle"),
     
     # Statut d'activité en 5 modalités (Trachman & Lejbowicz)
     statut_act = fct_recode(
@@ -191,7 +195,8 @@ pg_base = pg %>%
       "NSP/NVPD" = "NSP",
       "NSP/NVPD" = "NVPD"
     ) %>%
-      fct_relevel("Actif·ve", "Inactif·ve", "NSP/NVPD"),
+      fct_relevel("Actif·ve", "Inactif·ve", "NSP/NVPD") %>% 
+      set_variable_labels("En activité"), 
     
     
     # Revenu individuel 
@@ -208,7 +213,8 @@ pg_base = pg %>%
       "2 000€ et plus" = "Plus de 3000 euros",
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP"
-    ),
+    ) %>% 
+      set_variable_labels("Revenu individuel"), 
     
     # Revenu subjectif 
     revenu_sub = fct_recode(
@@ -221,7 +227,8 @@ pg_base = pg %>%
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP",
       NULL = ""
-    ),
+    ) %>% 
+      set_variable_labels("Situation financière"), 
     
     # ↓ territoire 
     taille_agglo = fct_recode(
@@ -236,7 +243,8 @@ pg_base = pg %>%
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP"
     ) |> 
-      fct_relevel("Moins de 20 000", "De 20 000 à 200 000", "200 000 et plus", "NVPD/NSP"),
+      fct_relevel("Moins de 20 000", "De 20 000 à 200 000", "200 000 et plus", "NVPD/NSP") %>% 
+      set_variable_labels("Taille d'agglomération"), 
     
     # ↓ statut migratoire 
     mig = fct_recode(
@@ -262,7 +270,9 @@ pg_base = pg %>%
       "Oui" = "Plus en couple, mais a vécu en couple, avec durée de 4 mois ou plus pendant ces 12 derniers mois et fin de relation due à une séparation (et non pas un décès)",
       "Non" = "Autres cas : a ou a eu au moins une relation de couple trop courte ou terminée depuis plus de 8 mois",
       "Non" = "Autres cas : jamais en couple ou non indiqué"
-    ),
+    ) %>% 
+      fct_relevel("Non", "Oui") %>% 
+      set_variable_labels("En couple au cours des 12 derniers mois (> 4 mois)"), 
     
     # ↓ Statut du couple au moment de l'enquête (sur l'ensemble)
     statutcouple = fct_recode(
@@ -281,7 +291,8 @@ pg_base = pg %>%
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP"
     ) |> 
-      fct_relevel("Oui", "Non"), 
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("En couple au moment de l'enquête"), 
     
     # ↓ Nombre d'enfants d'ego (sur l'ensemble)
     enf_ego = fct_recode(
@@ -300,7 +311,8 @@ pg_base = pg %>%
       "Oui" = "11",
       "Oui" = "12"
     ) |> 
-      fct_relevel("Oui", "Non"),
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("A des enfants"), 
     # ↓ Cohabitation (utile sur sous-pop en couple, mais on recode sur l'ensemble
     #   pour conserver la cohérence) — la modalité "Pas en couple" servira
     #   uniquement si on l'analyse sur l'ensemble ; vide une fois filtré sur

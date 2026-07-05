@@ -1,0 +1,32 @@
+---
+title: "Mémoire – Introduction"
+subtitle: "conjugalité bisexuelle et méthode"
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format: html
+execute:
+  echo: false               # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Revue littérature 
+
+-   conjugalité : de quoi on parle
+
+-   bisexualité
+
+-   enquêtes et conjugalité et minorités sexuelles
+
+## Méthode
+
+-   données : en lien avec sujet
+
+-   limites enquêtes : en lien avec le sujet
+
+-   présomption hétéro
