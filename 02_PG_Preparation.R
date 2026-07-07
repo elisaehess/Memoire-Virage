@@ -49,7 +49,11 @@ pg_base = pg %>%
     Q25E, # statut activité
     Q3, #taille agglo 
     Mig_e, #statut migratoire
-    Typecpl,
+    # ↓ Variables brutes pour reconstruire FSEXCJT et TYPECPL
+    FCPL, 
+    Q12, 
+    Q36, 
+    Q17,
     Etatmat,
     Situmat,
     FCPL,
@@ -64,7 +68,7 @@ pg_base = pg %>%
     LGBT1e
   ) %>%
   mutate(
-    genre = fct_drop(as_factor(Q1)) %>%  set_variable_labels("Genre"),
+    genre = fct_drop(as_factor(Q1)) %>% set_variable_labels("Genre"),
     
     # ↓ Identification avec NSP/NVPD conservés en modalité distincte
     idsexu = fct_recode(
@@ -72,7 +76,7 @@ pg_base = pg %>%
       "NSP/NVPD" = "NSP",
       "NSP/NVPD" = "NVPD"
     ) %>%
-      fct_relevel("Hétéro", "Bi", "Homo", "NSP/NVPD") %>% 
+      fct_relevel("Homo", "Bi", "Hétéro", "NSP/NVPD") %>% 
       set_variable_labels("Identification sexuelle"), 
     
     # ↓ Nouvelle variable idsexu présumé·es hétéros
@@ -198,7 +202,6 @@ pg_base = pg %>%
       fct_relevel("Actif·ve", "Inactif·ve", "NSP/NVPD") %>% 
       set_variable_labels("En activité"), 
     
-    
     # Revenu individuel 
     revenu = fct_recode(
       as_factor(REV2),
@@ -271,7 +274,7 @@ pg_base = pg %>%
       "Non" = "Autres cas : a ou a eu au moins une relation de couple trop courte ou terminée depuis plus de 8 mois",
       "Non" = "Autres cas : jamais en couple ou non indiqué"
     ) %>% 
-      fct_relevel("Non", "Oui") %>% 
+      fct_relevel("Oui", "Non") %>% 
       set_variable_labels("En couple au cours des 12 derniers mois (> 4 mois)"), 
     
     # ↓ Statut du couple au moment de l'enquête (sur l'ensemble)
@@ -294,6 +297,60 @@ pg_base = pg %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("En couple au moment de l'enquête"), 
     
+    # ↓ SEXCONJOINT reconstruite (sexe conjoint-e)
+    Sexcjt = case_when(
+      Q1 == "01" & FCPL %in% c("05", "06") ~ "Pas en couple",
+      
+      Q1 == "01" & FCPL == "01" & Q12 == "01" | 
+      Q1 == "01" & FCPL == "02" & Q12 == "01" |
+      Q1 == "01" & FCPL == "03" & Q36 == "01" |
+      Q1 == "01" & FCPL == "04" & Q17 == "01" ~ "Un homme",
+      
+      Q1 == "01" & FCPL == "01" & Q12 == "02" | 
+      Q1 == "01" & FCPL == "02" & Q12 == "02" |
+      Q1 == "01" & FCPL == "03" & Q36 == "02" |
+      Q1 == "01" & FCPL == "04" & Q17 == "02" ~ "Une femme", 
+      
+      Q1 == "01" & FCPL == "01" & Q12 %in% c("88", "99") | 
+      Q1 == "01" & FCPL == "02" & Q12 %in% c("88", "99") |
+      Q1 == "01" & FCPL == "03" & Q36 %in% c("88", "99") |
+      Q1 == "01" & FCPL == "04" & Q17 %in% c("88", "99") ~ "NSP/NVPD", 
+      
+      Q1 == "02" & FCPL %in% c("05", "06") ~ "Pas en couple",
+      
+      Q1 == "02" & FCPL == "01" & Q12 == "01" | 
+      Q1 == "02" & FCPL == "02" & Q12 == "01" |
+      Q1 == "02" & FCPL == "03" & Q36 == "01" |
+      Q1 == "02" & FCPL == "04" & Q17 == "01" ~ "Un homme",
+      
+      Q1 == "02" & FCPL == "01" & Q12 == "02" | 
+      Q1 == "02" & FCPL == "02" & Q12 == "02" |
+      Q1 == "02" & FCPL == "03" & Q36 == "02" |
+      Q1 == "02" & FCPL == "04" & Q17 == "02" ~ "Une femme",
+      
+      Q1 == "02" & FCPL == "01" & Q12 %in% c("88", "99") | 
+      Q1 == "02" & FCPL == "02" & Q12 %in% c("88", "99") |
+      Q1 == "02" & FCPL == "03" & Q36 %in% c("88", "99") |
+      Q1 == "02" & FCPL == "04" & Q17 %in% c("88", "99") ~ "NSP/NVPD"
+    ),
+    
+    # ↓ TYPECPL reconstruite (en couple homo ou hétéro, selon sexe ego)
+    typecpl = case_when(
+      Q1 == "01" & Sexcjt == "Un homme" ~ "En couple de même sexe", 
+      Q1 == "01" & Sexcjt == "Une femme" ~ "En couple de sexe différent", 
+      Q1 == "02" & Sexcjt == "Un homme" ~ "En couple de sexe différent", 
+      Q1 == "02" & Sexcjt == "Une femme" ~ "En couple de même sexe", 
+      Q1 == "01" & Sexcjt == "Pas en couple" |
+      Q1 == "02" & Sexcjt == "Pas en couple"~ "Pas en couple",
+      Q1 == "01" & Sexcjt == "NSP/NVPD" |
+      Q1 == "02" & Sexcjt == "NSP/NVPD"~ "NSP/NVPD",
+    ) %>% 
+      factor(levels = c("En couple de même sexe",
+                        "En couple de sexe différent",
+                        "Pas en couple",
+                        "NSP/NVPD")) %>%
+      set_variable_labels("Type de couple"),
+    
     # ↓ Nombre d'enfants d'ego (sur l'ensemble)
     enf_ego = fct_recode(
       as_factor(Enf1), 
@@ -313,6 +370,7 @@ pg_base = pg %>%
     ) |> 
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("A des enfants"), 
+    
     # ↓ Cohabitation (utile sur sous-pop en couple, mais on recode sur l'ensemble
     #   pour conserver la cohérence) — la modalité "Pas en couple" servira
     #   uniquement si on l'analyse sur l'ensemble ; vide une fois filtré sur
@@ -424,16 +482,24 @@ pgnf = pgn %>% # Création de la sous-population femmes
 pgnh = pgn %>% # Création de la sous-population hommes
   filter(genre == "Un homme")
 
+#### Sous-pop homme bi / femme bie ----
+
+pgnfbi = pgnf %>% 
+  filter(idsexu == "Bi")
+
+pgnhbi = pgnh %>% 
+  filter(idsexu == "Bi")
+
 #### Sous-pop sans filtre sur l'identification (Bajos et id-attir-prat) ----
 
 # pg_aip est l'alias de pg_base, conservé pour la lisibilité des chunks qui
 # l'appellent. Toutes les observations sont conservées, y compris celles dont
 # l'identification est NSP/NVPD, ce qui évite les biais sur attirance/pratique.
 
-pg_aip = pg_base
-
-pg_aip_f = pg_aip %>% filter(genre == "Une femme")
-pg_aip_h = pg_aip %>% filter(genre == "Un homme")
+# pg_aip = pg_base
+# 
+# pg_aip_f = pg_aip %>% filter(genre == "Une femme")
+# pg_aip_h = pg_aip %>% filter(genre == "Un homme")
 
 #### Sous-pop en couple > 4 mois 12 DERNIERS MOIS ----
 
@@ -443,17 +509,17 @@ pg_aip_h = pg_aip %>% filter(genre == "Un homme")
 # /!\ Distincte de pgn_couple : pgn_couple est plus restrictive ; on l'a gardée 
 # intacte pour les analyses existantes sur la satisfaction relationnelle.
 
-pgn_conjugal = pgn %>%
-  filter(FCPL %in% c("01", "02", "03", "04")) %>%
-  mutate(
-    cohabitation = fct_drop(cohabitation), # supprime "Pas en couple" (vide ici)
-  )
-
-pgnf_conjugal = pgn_conjugal %>% # sous-pop femmes en couple > 4 mois
-  filter(genre == "Une femme")
-
-pgnh_conjugal = pgn_conjugal %>% # sous-pop hommes en couple > 4 mois
-  filter(genre == "Un homme")
+# pgn_conjugal = pgn %>%
+#   filter(FCPL %in% c("01", "02", "03", "04")) %>%
+#   mutate(
+#     cohabitation = fct_drop(cohabitation), # supprime "Pas en couple" (vide ici)
+#   )
+# 
+# pgnf_conjugal = pgn_conjugal %>% # sous-pop femmes en couple > 4 mois
+#   filter(genre == "Une femme")
+# 
+# pgnh_conjugal = pgn_conjugal %>% # sous-pop hommes en couple > 4 mois
+#   filter(genre == "Un homme")
 
 #### Sous-pop personnes en couple (> 4 mois) AU MOMENT de l'enquête ----
 
@@ -463,44 +529,44 @@ pgnh_conjugal = pgn_conjugal %>% # sous-pop hommes en couple > 4 mois
 # /!\ On la conserve telle quelle pour ne pas casser les analyses existantes
 #     sur la satisfaction. 
 
-pgn_couple = pgn %>%
-  filter(FCPL %in% c("01", "02")) %>%
-  mutate(
-    satisfaction = fct_recode(
-      as_factor(C1),
-      "Oui" = "Très satisfaisante",
-      "Oui" = "Satisfaisante",
-      "Non" = "Peu satisfaisante",
-      "Non" = "Pas du tout satisfaisante",
-      NULL = "NVPD",
-      NULL = "NSP"
-    ),
-    amoureux = fct_recode(
-      as_factor(SEX14),
-      "Oui" = "Vous êtes très amoureux-se",
-      "Oui" = "Vous êtes amoureux-se",
-      "Non" = "Vous n’êtes plus amoureux-se",
-      "Non" = "Vous n’avez jamais été amoureux-se",
-      NULL = "NVPD",
-      NULL = "NSP"
-    ),
-    rupture = fct_recode(
-      as_factor(C1a),
-      "Oui" = "Oui vous-même",
-      "Oui" = "Oui votre conjoint",
-      "Oui" = "Oui les deux",
-      NULL = "NVPD",
-      NULL = "NSP"
-    ) %>%
-      fct_relevel("Oui", "Non")
-  ) %>%
-  filter(!is.na(satisfaction), !is.na(amoureux), !is.na(rupture))
-
-pgnf_couple = pgn_couple %>% # Création de la sous-population femmes
-  filter(genre == "Une femme")
-
-pgnh_couple = pgn_couple %>% # Création de la sous-population hommes
-  filter(genre == "Un homme")
+# pgn_couple = pgn %>%
+#   filter(FCPL %in% c("01", "02")) %>%
+#   mutate(
+#     satisfaction = fct_recode(
+#       as_factor(C1),
+#       "Oui" = "Très satisfaisante",
+#       "Oui" = "Satisfaisante",
+#       "Non" = "Peu satisfaisante",
+#       "Non" = "Pas du tout satisfaisante",
+#       NULL = "NVPD",
+#       NULL = "NSP"
+#     ),
+#     amoureux = fct_recode(
+#       as_factor(SEX14),
+#       "Oui" = "Vous êtes très amoureux-se",
+#       "Oui" = "Vous êtes amoureux-se",
+#       "Non" = "Vous n’êtes plus amoureux-se",
+#       "Non" = "Vous n’avez jamais été amoureux-se",
+#       NULL = "NVPD",
+#       NULL = "NSP"
+#     ),
+#     rupture = fct_recode(
+#       as_factor(C1a),
+#       "Oui" = "Oui vous-même",
+#       "Oui" = "Oui votre conjoint",
+#       "Oui" = "Oui les deux",
+#       NULL = "NVPD",
+#       NULL = "NSP"
+#     ) %>%
+#       fct_relevel("Oui", "Non")
+#   ) %>%
+#   filter(!is.na(satisfaction), !is.na(amoureux), !is.na(rupture))
+# 
+# pgnf_couple = pgn_couple %>% # Création de la sous-population femmes
+#   filter(genre == "Une femme")
+# 
+# pgnh_couple = pgn_couple %>% # Création de la sous-population hommes
+#   filter(genre == "Un homme")
 
 #### Sauvegarde des nouvelles bases ----
 

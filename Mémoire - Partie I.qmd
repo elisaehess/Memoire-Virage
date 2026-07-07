@@ -163,12 +163,14 @@ Ce que nous allons montrer est que si l'échantillon en population générale ca
 
 (reprendre les conclus dans tableaux mémoire et tableaux mémoire (1))
 
+### Tableau sociodémo 
+
 ```{r}
 #| label: tbl-sociodémo
 #| tbl-cap: "Caractéristiques sociodémographiques et conjuagles des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)."
 
 # Liste commune des variables à inclure
-tab1_vars = c("age", "revenu", "revenu_sub",  "taille_agglo", "couple_enq", "couple12mois", "enf_ego")
+tab1_vars = c("age", "revenu", "revenu_sub",  "taille_agglo", "couple_enq", "couple12mois", "enf_ego", "typecpl")
 
 # Tableau PG pondéré -- Femmes
 tab1_pg_f = dwf %>%
@@ -301,11 +303,17 @@ Une asymétrie genrée de la bisexualité vis-à-vis du couple. Les femmes bisex
 semblent canalisées vers des couples de sexe différent, non mariés tandis que les hommes sont
 surtout célibataires, parfois après un mariage.
 
+*type couple*
+Raison différence de résultat // article MT et TL : ils ont pris en couple au moment de l'enquête. Je prends en couple dans les 12 derniers mois > 4 mois : qui est la variable utilisée pour le reste du questionnaire sur le couple. 
+Nous permet de dire que les couples de même sexe sont minoritaires dans Virage PG. 
+
 ### Hypothèses
 Pour vérifier ces rapports spécifiques des bisexuels au couple il est nécessaire de réfléchir aux autres variables qui ont des conséquences sur la conjugalité. 
 - Hypothèse 1 : l'âge est un déterminant d'accès à la conjugalité et de formes de conjugalité (Bozon, Bergström : voir si j'ai pas déjà cherché les refs qqpart ou dans doc revue litté)
 - Hypothèse 2 : la classe est un déterminant d'accès à la conjugalité et des formes de conjugalité (idem)
 - Hypothèse 3 : le fait d'être bi en couple de même sexe ou de sexe différent influence le type de conjugalité (ref sur conjugalité homosexuelle)
+- Hypothèse 4 : les deux échantillons captent des bisexualités différentes, leur comportement vis-à-vis du couple ne sont toutefois pas réductible à leur structure hétérosexuelle ou homosexuelle de ceux-ci. Nous utiliserons la base en PG pour des observations générales puis creuserons certains aspects, lorsque nécessaire, grâce à la base LGBT. De plus les observations de couples bisexuels de même sexe se feront plutôt sur la base LGBT. 
+- Hypothèse 5 : les personnes bisexuelles en couple de sexe différent seront étudiés via PG / les personnes bisexuelles en couple de même sexe seront étudiés via LGBT. 
 
 Pour poursuivre il est intéressant de contrôler le fait d'être en couple
 par l'âge et la classe. On choisit la variable "en couple supérieur à 4
@@ -419,11 +427,130 @@ Dans ce but qu'on fait un modèle mutlivarié comme une régression logistique :
 ### Régression logistique 
 
 ```{r}
+#| label: tbl-régression accès conjugalité 
+#| tbl-cap: "Déterminants sociaux d'accès au couple. Virage PG (pondéré)."
+
+pg_reg = pgn %>% 
+  mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
+         age = fct_relevel(age, "30-39"), 
+         csp = fct_relevel(csp, "Employé·e"), 
+         revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
+         enf_ego = fct_relevel(enf_ego, "Non")
+         )
+
+dw_reg = svydesign(id = ~1, weights = pg_reg$poids_cal, data = pg_reg)
+
 reg = svyglm(
   couple12mois ~ genre + idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo   + enf_ego, 
   family = binomial(), 
-  design = dw
+  design = dw_reg
 ) %>% 
   tbl_regression(intercept = TRUE)
 print(reg)
+
+# Reg hommes 
+pgh_reg = pgnh %>% 
+  mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
+         age = fct_relevel(age, "30-39"), 
+         csp = fct_relevel(csp, "Employé·e"), 
+         revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
+         enf_ego = fct_relevel(enf_ego, "Non")
+         )
+
+dwh_reg = svydesign(id = ~1, weights = pgh_reg$poids_cal, data = pgh_reg)
+
+regh = svyglm(
+  couple12mois ~ idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo + enf_ego, 
+  family = binomial(), 
+  design = dwh_reg
+) %>% 
+  tbl_regression(intercept = TRUE)
+print(regh)
+
+# Reg hommes 
+pgf_reg = pgnf %>% 
+  mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
+         age = fct_relevel(age, "30-39"), 
+         csp = fct_relevel(csp, "Employé·e"), 
+         revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
+         enf_ego = fct_relevel(enf_ego, "Non")
+         )
+
+dwf_reg = svydesign(id = ~1, weights = pgf_reg$poids_cal, data = pgf_reg)
+
+regf = svyglm(
+  couple12mois ~ idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo + enf_ego, 
+  family = binomial(), 
+  design = dwf_reg
+) %>% 
+  tbl_regression(intercept = TRUE)
+print(regf)
+```
+
+### Analyse régression 
+Le modèle présente les déterminants de l'accès à la conjugalité. Ici la variable de conjugalité est celle correspondant à "a été en couple d'au moins 4 mois au cours de 12 derniers mois". La modalité de référence est "non". On teste donc la proba d'un oui, en fonction de différents déterminants sociaux. 
+
+On peut voir que le modèle est globalement significatif. Concernant le lien entre le fait d'être en couple et l'identification sexuelle, qui nous intéresse particulièrement, on voit un lien significatif pour les bi. Ceux-ci, à groupe d'âge, diplome, csp, statut d'activité, revenu, situation financière, t'aille d'agglo et enfants égal ont moins de probabilité d'être en couple.  
+
+On observe bien un effet de l'âge : avoir plus de 40 ans est corrélé négativement avec le fait d'être en couple par rapport au fait d'avoir entre 30 et 39 ans. Qui a été choisi comme modalité de référence du fait de la présence de beaucoup d'étudiants dans la première catégorie ainsi que de son effectif moindre. 
+
+Avoir un niveau d'étude > bac +3 est correlé positivement avec le fait d'être en couple. 
+
+Aucun lien significatif pour la csp. 
+
+statut act : pb à revoir. 
+
+avoir un revenu > 2000e par mois est correlé positivement avec le fait d'être en couple. 
+
+Déclarer une situation financière difficile ou juste est corrélée négativement avec le fait d'être en couple. 
+
+Habiter dans une agglo de + 20 000 habitants est corrélée négativement avec le fait d'être en couple. 
+
+Enfin, avoir des enfants est corrélé très positivement avec le fait d'être en couple. 
+
+--> l'identification sexuelle, l'âge, la classe sont des déterminants de la conjugalité. cela fait écho aux résultats de travaux/ 
+
+--> trouver moyen de présenter joliment reg + commenter correctement (reprendre video larmarange + memoire ricardo p.47)
+
+On peut se demander ce qu'il se passe quand on est dans la population des hommes et dans la population des femmes. 
+*reg hommes*
+Est-ce qu'on peut commenter une régression dont l'intercept est non significatif ? En tout cas, les hommes bis, à âge, classe et diplome égal ont moins de chance d'être en couple que les hétéros. 
+*reg femmes* 
+Pour les femmes le modèle est au global significatif mais les femmes bies : p-valeur = 0,05. A voir comment on commente ça. 
+
+Les régressions semblent nous montrer une moindre probabilité des personnes bisexuelles à être en couple, même en neutralisant l'âge et la classe qui avaient été identifiés comme des déterminants de l'accès au couple. 
+
+## III. Le célibat des hommes bis
+
+Un résultat intéressant est la place du célibat chez les hommes bis. Dans un premier temps nous souhaitons creuser les caractéristiques des bis en couple / pas en couple. 
+
+```{r}
+#| label: tbl-célibat hommes bi  
+#| tbl-cap: "Les hommes bi célibataires. Virage PG (pondéré)."
+
+#Plan pondération 
+dwhbi = svydesign(id = ~1, weights = pgnhbi$poids_cal, data = pgnhbi)
+
+#Variables à inclure
+tab2_vars = c("age", "diplome", "csp", "revenu", "revenu_sub",  "taille_agglo", "enf_ego", "etatmat", "enf_ego")
+
+# Tableau PG pondéré -- Hommes bi 
+tab2_pg_hbi = dwhbi %>%
+  tbl_svysummary(
+    by = couple12mois,
+    include = all_of(tab2_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes bisexuels**")
+tab2_pg_hbi
+
 ```

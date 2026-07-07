@@ -19,7 +19,7 @@ path = "Data/"
 ## Nom des fichiers
 
 base = "viragelgbt_fpr.sas7bdat"
-formats = "formats.sas7bcat"
+formats = "formats_lgbt.sas7bcat"
 
 ## Import du fichier
 

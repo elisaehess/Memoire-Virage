@@ -15,7 +15,7 @@ editor:
     wrap: 72
 ---
 
-## Revue littérature 
+## Revue littérature
 
 -   conjugalité : de quoi on parle
 
