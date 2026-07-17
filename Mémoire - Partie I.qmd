@@ -426,9 +426,14 @@ Dans ce but qu'on fait un modèle mutlivarié comme une régression logistique :
 
 ### Régression logistique 
 
+On part du principe que tout fonctionne différement pour les hommes et pour les femmes : l'effet de l'âge sur la mise en couple n'est pas le même, l'impact de la classe sociale non plus et l'effet de l'orientation sexuelle est spécifique à chaque genre, on a commencé à le voir. 
+
+
 ```{r}
 #| label: tbl-régression accès conjugalité 
 #| tbl-cap: "Déterminants sociaux d'accès au couple. Virage PG (pondéré)."
+
+# Reg global 1
 
 pg_reg = pgn %>% 
   mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
@@ -448,6 +453,26 @@ reg = svyglm(
 ) %>% 
   tbl_regression(intercept = TRUE)
 print(reg)
+
+# Reg global 2
+
+pg_reg2 = pgn %>% 
+  mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
+         age = fct_relevel(age, "30-39"), 
+         csp = fct_relevel(csp, "Employé·e"), 
+         revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
+         enf_ego = fct_relevel(enf_ego, "Non")
+         )
+
+dw_reg2 = svydesign(id = ~1, weights = pg_reg2$poids_cal, data = pg_reg2)
+
+reg2 = svyglm(
+  couple12mois ~ genre_idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo   + enf_ego, 
+  family = binomial(), 
+  design = dw_reg2
+) %>% 
+  tbl_regression(intercept = TRUE)
+print(reg2)
 
 # Reg hommes 
 pgh_reg = pgnh %>% 
@@ -469,7 +494,7 @@ regh = svyglm(
   tbl_regression(intercept = TRUE)
 print(regh)
 
-# Reg hommes 
+# Reg femmes 
 pgf_reg = pgnf %>% 
   mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
          idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
@@ -516,12 +541,36 @@ Enfin, avoir des enfants est corrélé très positivement avec le fait d'être e
 --> trouver moyen de présenter joliment reg + commenter correctement (reprendre video larmarange + memoire ricardo p.47)
 
 On peut se demander ce qu'il se passe quand on est dans la population des hommes et dans la population des femmes. 
+
+*reg global 1 vs 2*
+Ce modèle présumé que l'effet d'être bisexuel sur la mise en couple est exactement le même que l'on soit un homme ou une femme. En regardant reg global 2 on voit que c'est faux : les hommes bis ont un coefficient de -1,8 (effet très négatif sur la probabilité d'être en couple), tandis que les femmes bies ont un coefficient de -0,50 (effet négatif beaucoup plus modéré, presque non significatif à la limite des 5%). Le modèle 1 lisse les réalités de genre très différentes derrière un "effet moyen de la bisexualité" artificiel. 
+Les hétéra ont une proba significativement plus faible d'être en couple que les hommes hétéosexuels (log(OR) = -0,19). Les hommes bisexuels ont la probabilité la plus faible de toutes les catégories d'être en couple par rapport aux hommes hétérosexuels (log(OR) = -1,8, très significatif). Les femmes bisexuelles ont aussi une proba plus faible que la référence (log(OR) = - 0,50), mais l'effet est nettement moins prononcé que pour les hommes bis. Les gays et lesbiennes ont des coefficients qui ne sont pas statistiquement différents de la référence (les intervalles de confiance contiennent 0 et les p-value sont élevées)
+
+l'effet de la bisexualité sur la conjugalité est genré
+
+Ici : modèle de **régression globale avec interaction**. On fait l'hypothèse que l'âge et la classe sociale ont le même effet chez les hommes et chez les femmes. Le référence de comparaison est unique, est la même pour tout le monde : comparé aux hommes hétéro. Meilleure puissance statistique : le modèle utilise la totalité des individus pour estimer les effets de contrôle (âge, classe). 
+
+Après : une **stratification**. On considère que l'âge et classe classe sociale peuvent avoir des effets totalement différents sur les hommes et les femmes. La référence de comparaison est double : les femmes bies sont comparées aux femmes hétéros et les hommes bis sont comparés aux hommes hétéros. Puissance statistique réduite : on réduit la taille des échantillons par deux, ce qui peut rendre les variables de contrôle moins significative. 
+
 *reg hommes*
 Est-ce qu'on peut commenter une régression dont l'intercept est non significatif ? En tout cas, les hommes bis, à âge, classe et diplome égal ont moins de chance d'être en couple que les hétéros. 
+
+En sciences sociales, on ne s'intéresse presque jamais à la significativité de l'intercept. Ce qui vous intéresse sociologiquement, ce sont les coefficients des variables explicatives (l'effet de l'âge, de la classe, de l'orientation) : c'est-à-dire l'écart par rapport à cette référence.
+
+Que votre point de départ (l'intercept) soit statistiquement différent de 50 % de chances d'être en couple ou non n'affecte en rien la validité, la précision ou la significativité des autres coefficients (par exemple, l'effet d'être un homme bi par rapport à un homme hétéro).
+
+Dans une régression logistique, l'intercept représente la valeur prédite (sous forme de log-odds, ou log de l'Odds Ratio) pour un individu qui se trouve dans la catégorie de référence de toutes vos variables explicatives.
+La p-valeur associée à l'intercept teste l'hypothèse nulle suivante : "Le log(OR) de l'intercept est égal à 0" (ce qui équivaut à un Odds Ratio de 1, soit une probabilité d'être en couple de pile 50 % ou 0,5).Avoir une p-valeur de 0,3 (supérieure au seuil classique de 0,05) signifie simplement que vous ne pouvez pas rejeter l'hypothèse selon laquelle cet homme de référence a exactement une chance sur deux (50 %) d'être en couple.
+
 *reg femmes* 
 Pour les femmes le modèle est au global significatif mais les femmes bies : p-valeur = 0,05. A voir comment on commente ça. 
 
 Les régressions semblent nous montrer une moindre probabilité des personnes bisexuelles à être en couple, même en neutralisant l'âge et la classe qui avaient été identifiés comme des déterminants de l'accès au couple. 
+
+*limites*
+Impossible de tester statistiquement si la différence entre un coefficient chez les hommes et chez les femmes est significatives, alors qu'un terme d'interaction dans un modèle global donne directement une p-value pour cette différence. 
+
+Approche additive : elle part du principe que l'effet de l'âge ne dépend pas de la classe, et inversement. Ce qui est sociologiquement très discutable : les dynamiques de mise en couple et de conjugalité varient fortement selon qu'on est jeune et précaire ou vieux et précaire. (trouver des refs sur les limites de la régression)
 
 ## III. Le célibat des hommes bis
 
@@ -554,3 +603,7 @@ tab2_pg_hbi = dwhbi %>%
 tab2_pg_hbi
 
 ```
+
+Les p-value ne sont pas souvent significatives : seulement pour la situation financière, le revenu et les enfants. Confirme l'effet de la classe sur la mise en couple. Pas spécifique aux hommes bis ? 
+
+Plutôt intéressant d'observer des trajectoires. 

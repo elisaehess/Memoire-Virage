@@ -94,6 +94,17 @@ pg_base = pg %>%
     ) |> 
       fct_relevel("Homo", "Bi", "Hétéro", "Présumé·e hétéro", "NSP/NVPD"),
     
+    # ↓ Nouvelle variable croisée genre et identification sexuelle 
+    genre_idsexu = case_when(
+      genre == "Un homme" & idsexu == "Hétéro" ~ "Hétéro", 
+      genre == "Un homme" & idsexu == "Bi" ~ "Bi", 
+      genre == "Un homme" & idsexu == "Homo" ~ "Gay",
+      genre == "Une femme" & idsexu == "Hétéro" ~ "Hétéra", 
+      genre == "Une femme" & idsexu == "Bi" ~ "Bie", 
+      genre == "Une femme" & idsexu == "Homo" ~ "Lesbienne"
+    ) %>% 
+      fct_relevel ("Hétéro", "Hétéra", "Bi", "Bie", "Gay", "Lesbienne"), 
+    
     # ↓ Attirance recodée
     attirance = fct_recode(
       as_factor(attirance_sexu),
