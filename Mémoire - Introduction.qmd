@@ -17,7 +17,9 @@ editor:
 
 ## Revue littérature
 
--   conjugalité : de quoi on parle
+-   conjugalité : de quoi on parle ? pourquoi on se concentre sur
+    conjugalité (echantillon ne permet pas de prendre en compte d'autres
+    formes relationnelles) ?
 
 -   bisexualité
 

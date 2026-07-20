@@ -79,6 +79,31 @@ suffisamment d'éléments pour dresser un instantané de la situation
 conjugale des personnes qui se disent bisexuelles au moment de l'enquête
 et dans les 12 derniers mois.
 
+Quelques hypothèses pour commencer
+
+\- Hypothèse 1 : l'âge est un déterminant d'accès à la conjugalité et de
+formes de conjugalité (Bozon, Bergström : voir si j'ai pas déjà cherché
+les refs qqpart ou dans doc revue litté)
+
+\- Hypothèse 2 : la classe est un déterminant d'accès à la conjugalité
+et des formes de conjugalité (idem)
+
+\- Hypothèse 3 : le fait d'être bi en couple de même sexe ou de sexe
+différent influence le type de conjugalité (ref sur conjugalité
+homosexuelle)
+
+\- Hypothèse 4 : les deux échantillons captent des bisexualités
+différentes, leur comportement vis-à-vis du couple ne sont toutefois pas
+réductible à leur structure hétérosexuelle ou homosexuelle de ceux-ci.
+Nous utiliserons la base en PG pour des observations générales puis
+creuserons certains aspects, lorsque nécessaire, grâce à la base LGBT.
+De plus les observations de couples bisexuels de même sexe se feront
+plutôt sur la base LGBT.
+
+\- Hypothèse 5 : les personnes bisexuelles en couple de sexe différent
+seront étudiés via PG / les personnes bisexuelles en couple de même sexe
+seront étudiés via LGBT.
+
 ## I. Des caractéristiques conjugales spécifiques ?
 
 ### A. Retour sur les analyses existantes
@@ -130,26 +155,27 @@ entre les années 1965 et 1985, connaît l'émergence de l'épidémie de
 VIH/Sida et la délimitation des populations dites à risque auxquelles
 sont intégrées les communautés homosexuelles[@girard2021]. Les hommes
 bisexuels sont accusés d'être un pont dans la transmission du virus à la
-population hétérosexuelle [@rust2002]. Ces éléments, ainsi que l'absence
-de communauté ou d'espaces bisexuels au moment de l'enquête en France
-nuancent l'idée qu'une identification bisexuelle est plus accessible à
-ces hommes que l'identification gay. On pourrait supposer que le
-stigmate du pédé et la pression conjugale hétérosexuelle jouent plus
-fort aux âges les plus jeunes, contraignant les hommes bisexuels à se
-ranger du côté de l'hétérosexualité. Avec l'avancée en âge et des
-événements biographiques comme des séparations, des divorces ou
-l'acquisition de l'indépendance financière l'expression de sa
-bisexualité devient plus accessible que lors de la jeunesse. Il serait
-intéressant d'observer la proportion d'hommes bisexuels âgés dans les
-enquêtes plus récentes comme Contexte des Sexualités en France (CSF2023,
-Inserm) pour prolonger cette analyse. On peut faire l’hypothèse que dans
-certaines générations masculines et dans certains milieux sociaux,
-l’identification bisexuelle pouvait être plus facile que
-l’identification homosexuelle. Les modes de vie gais qui se développent
-au cours des années soixante et soixante-dix en France \[9\] ne sont
-sans doute ni toujours accessibles, ni toujours désirés par l’ensemble
-des hommes qui ont des rapports sexuels avec des hommes.(Trachman 2018a
-les personnes qui se disent).
+population hétérosexuelle [@rust2002]
+<!--# pas le + pertinent ici (cf ce que dit trachman dans article "les personnes qui se disent bisexuelles". A peut être garder à un autre moment sur la difficulté d'accès à la conjugalité ? ou maintenir ici mais mieux l'amener, il tombe un peu comme un cheveu sur la soupe. -->.
+Ces éléments, ainsi que l'absence de communauté ou d'espaces bisexuels
+au moment de l'enquête en France nuancent l'idée qu'une identification
+bisexuelle est plus accessible à ces hommes que l'identification gay. On
+pourrait supposer que le stigmate du pédé et la pression conjugale
+hétérosexuelle jouent plus fort aux âges les plus jeunes, contraignant
+les hommes bisexuels à se ranger du côté de l'hétérosexualité. Avec
+l'avancée en âge et des événements biographiques comme des séparations,
+des divorces ou l'acquisition de l'indépendance financière l'expression
+de sa bisexualité devient plus accessible que lors de la jeunesse. Il
+serait intéressant d'observer la proportion d'hommes bisexuels âgés dans
+les enquêtes plus récentes comme Contexte des Sexualités en France
+(CSF2023, Inserm) pour prolonger cette analyse. On peut faire
+l’hypothèse que dans certaines générations masculines et dans certains
+milieux sociaux, l’identification bisexuelle pouvait être plus facile
+que l’identification homosexuelle. Les modes de vie gais qui se
+développent au cours des années soixante et soixante-dix en France \[9\]
+ne sont sans doute ni toujours accessibles, ni toujours désirés par
+l’ensemble des hommes qui ont des rapports sexuels avec des
+hommes.(Trachman 2018a les personnes qui se disent).
 
 Coté femmes, l’identification bisexuelle décroît avec l’âge, d'après
 Mathieu Trachman et Tania Lejbowicz c'est parce qu'elle est socialement
@@ -238,17 +264,24 @@ L'enquête Virage LGBT repose sur un échantillon de volontaires,
 sollicités en tant que LGBT, ce qui résulte en une frange plus mobilisée
 dans les espaces communautaires. De ce point de vue les répondant-es
 sont plus jeunes, plus diplômées, urbains et cadres et professions
-intellectuelles supérieures [@trachman2020b]. Concernant la conjugalité,
-les bisexuel·les de Virage LGBT sont plus souvent en couple avec une
-personne de même sexe. Cette proximité avec l'homosexualité se confirme
-aussi dans les parcours sexuels : plus nombreux·ses à avoir eu un
-premier partenaire de même sexe et les hommes des partenaires des deux
-sexes au cours de la vie. Mathieu Trachman et Tania Lejbowicz concluent
-ainsi à deux bisexualités différentes du point de vue des parcours
-conjugaux et sexuels : les bisexuel·les de Virage PG sont polarisé·es
-vers l'autre sexe tandis que ceux de Virage LGBT sont plus proches de
-l'homosexualité. Ainsi Virage LGBT accentue certains traits des
-populations homo-bisexuelles sans pour autant les distordre.
+intellectuelles supérieures [@trachman2020b]. En population générale ont
+voit une position sociale des hommes bisexuels relativement proche de
+celle des hétérosexuels. Comparativement à cette enquête en population
+générale, l'échantillon de convenance de Virage LGBT a tendance à gommer
+ces dispararités. Ce qui apparait spécifique aux homosexuels en
+population général (urbanité, position sociale supérieure, jeunesse) est
+accentué et caractérise aussi les bisexuels dans des proportions proches
+[@trawalé2026] . Concernant la conjugalité, les bisexuel·les de Virage
+LGBT sont plus souvent en couple avec une personne de même sexe. Cette
+proximité avec l'homosexualité se confirme aussi dans les parcours
+sexuels : plus nombreux·ses à avoir eu un premier partenaire de même
+sexe et les hommes des partenaires des deux sexes au cours de la vie.
+Mathieu Trachman et Tania Lejbowicz concluent ainsi à deux bisexualités
+différentes du point de vue des parcours conjugaux et sexuels : les
+bisexuel·les de Virage PG sont polarisé·es vers l'autre sexe tandis que
+ceux de Virage LGBT sont plus proches de l'homosexualité. Ainsi Virage
+LGBT accentue certains traits des populations homo-bisexuelles sans pour
+autant les distordre.
 
 Notre hypothèse : si l'échantillon en population générale capte une
 bisexualité tournée vers l'autre sexe, la conjugalité des bisexuel·les
@@ -359,18 +392,12 @@ tab1 %>%
   mise_en_forme_ft()
 ```
 
---\> vérifier mes intervalles de confiance. Comment les lire ? Quels
-groupes comparer ? Ils sont calculés sur les pourcentages en colonne,
-est-ce pertinent de comparer les groupes entre eux en ligne ? Regarder
-livre stat, demander à béné.
-
-Classe
+#### La position sociale des bisexuel·les : des femmes moins dotées économiquement et des hommes plus présents dans la ruralité ? 
 
 Les femmes bisexuelles déclarent plus souvent un revenu individuel
 inférieur à 1 000€ que les hétérosexuelles. Elles sont 48,4% dans cette
 situation contre 31%. L'intervalle de confiance ne permet pas une
-comparaison avec les lesbiennes même si l'écart est similaire à celui
-avec les hétérosexuelles. Cet écart s'observe également dans Virage LGBT
+comparaison avec les lesbiennes. Cet écart se retrouve dans Virage LGBT
 où près de la moitié des bisexuelles déclarent des revenus inférieurs à
 1 000€ contre un peu plus d'un quart des lesbiennes. La situation
 financière déclarée nous permet de ne pas interpréter trop hâtivement ce
@@ -385,15 +412,15 @@ ans, à la fois dans Virage PG et Virage LGBT et également plus souvent
 étudiantes.
 
 Le lien statistique entre identification sexuelle et revenu déclaré /
-situation financière est moins évident chez les hommes. Les p-value
+situation financière est moins évident chez les hommes. Les *p-value*
 invitent à la prudence. On observe également une plus forte présence des
 bisexuels dans les moins de 1 000€ par rapport aux hétéros : 29,6%
-contre 17,3% et par rapport aux gays dans Virage LGBT : 33,7% contre
-19,7%. Les gays déclarent plus souvent une aisance financière que les
-hétéros, un résultat cohérent avec la distribution observsée dans les
-csp. La situation des bisexuels peut ici encore être influencée par la
-structure d'âge, plus nombreux dans la catégorie la plus âgée et plus
-souvent retraités.
+contre 17,3% (p-valeur = 0,13) et par rapport aux gays dans Virage LGBT
+: 33,7% contre 19,7%. Les gays déclarent plus souvent une aisance
+financière que les hétéros (p-valeur = 0,4), un résultat cohérent avec
+la distribution observée dans les csp. La situation des bisexuels peut
+ici encore être influencée par la structure d'âge, plus nombreux dans la
+catégorie la plus âgée et plus souvent retraités.
 
 La taille d'agglomération vient compléter l'analyse du territoire
 d'habitation. 30,1% des bisexuelles vivent dans une agglomération de 200
@@ -413,127 +440,101 @@ urbains. L'opposition visibilité / invisibilité et urbain / rural
 masquant en fait des formes locales de "visibilité de fait"
 [@giraud2026]. L'ancrage territorial des bis est difficile à saisir :
 les femmes bies semblent proches des homosexuelles tandis que les hommes
-bis des hétérosexuels. (reprendre article Trawalé pour commenter +
-territoire)
+bis des hétérosexuels. Concernant les hommes, l'enquête ERAS (2023,
+Santé Publique France) montre une polarisation entre des ruraux peu
+diplômés, proches des répondants de l'enquête Virage PG et des Parisiens
+aux caractéristiques inverses, proches des bisexuels de Virage LGBT
+[@trawalé2026]. Plus globalement cette enquête montre des différences
+entre homo-bisexuels ruraux et résidents de Paris ou de grands centre
+urbains : moins diplômés, plus souvent bisexuels, moins nombreux à
+fréquenter les espaces communautaires, moins d'opportunités de
+rencontres sexuelles et entourage majoritairement hétérosexuel. Une part
+importante des bisexuels ruraux est en couple avec une femme,
+configuration bien moins fréquente dans les autres espaces considérés.
 
-Situation de couple : intéressons nous maintenant aux situations
-conjugales. Au moment de l'enquête les bisexuelles et lesbiennes sont
-moins souvent en couple que les hétérosexuelles. C'est également le cas
-des hommes, avec ici une spécificité des hommes bisexuels, seulement
-29,4% à être en couple au moment de l'enquête contre 54,4% des gays et
-73,7% des hérérosexuels. Dans Virage LGBT les femmes bisexuelles et
-lesbiennes sont plus souvent en couple : 61,2% et 69,9% contre 57,9% et
-55,3% dans Virage PG. Le résultat peut étonner quand on sait qu'elles
-sont également plus jeunes dans Virage LGBT que PG. Expliqué par
-l'appartenance de classe ? (Bozon ? Bergström ? ref qui lie classe et
-conjugalité). La photographie à un instant t de la conjugalité des
-enquêtés est insuffisante pour dresser un panorama des situations
-conjugales. La situation des hommes bisexuels se confirme lorsque l'on
-prend les personnes en couple de plus de 4 mois au cours des 12 derniers
-mois. Le célibat des hommes bisexuels est un célibat relativement long
-(plus d'un an) ou s'exprime dans des relations courtes (moins de 4
-mois). Les femmes sont un peu plus nombreuses à avoir connu un couple
-d'au moins 4 mois au cours des douzes derniers mois (p valeur = 0,032).
-Dans Virage LGBT elles sont encore plus nombreuses. L'expérience du
-couple est donc majoritaire chez les femmes, quelque soit
-l'identification et l'échantillon.
+#### Des hommes bis majoritairement célibataires et des femmes bies autant en couple que les lesbiennes et moins que les hétérosexuelles
 
-Enfants : les lesbiennes ont moins souvent des enfants que les
-bisexuelles qui ont elles-mêms moins souvent des enfants que les
-hétérosexuelles. Les écarts, significatifs, sont conséquents : 20,7% des
-lesbiennes, 45,9% des bisexuelles et 73,7% des hétérosexuelles.
+Intéressons nous maintenant aux situations conjugales. Au moment de
+l'enquête les bisexuelles et lesbiennes sont moins souvent en couple que
+les hétérosexuelles. C'est également le cas des hommes, avec ici une
+spécificité des hommes bisexuels, seulement 29,4% à être en couple au
+moment de l'enquête contre 54,4% des gays et 73,7% des hérérosexuels.
+Dans Virage LGBT les femmes bisexuelles et lesbiennes sont plus souvent
+en couple : 61,2% et 69,9% contre 57,9% et 55,3% dans Virage PG. Le
+résultat peut étonner quand on sait qu'elles sont également plus jeunes
+dans Virage LGBT que PG. Hors la période 20 - 29 ans correspond à la
+période dite de jeunesse sexuelle, où le célibat est une situation très
+fréquente, propices à diverses formes de relations amoureuses et
+sexuelles [@bouchet-valat2025]. De plus les jeunes vivant dans une
+grande ville (population surreprésentée dans l'échantillon Virage LGBT)
+sont moins souvent en couple que ceux vivant à proximité de petites
+villes [@bergström2025a]. La sociabilité communautaire plus forte dans
+l'échantillon Virage LGBT, facilitant les rencontres, peut expliquer en
+partie cette proportion plus forte à être en couple.
 
-Un premier indice du rapport spécifique de la bisexualité à la
-conjugalité : si elle est plus souvent tournée vers l'autre sexe dans la
-population générale, elle ne s'exprime toutefois pas de la même façon
-que la conjugalité hétérosexuelle. Les femmes bisexuelles sont aussi
-souvent célibataires que les lesbiennes et elles ont moins souvent des
-enfants que les hétérosexuelles. Dans l'échantillon LGBT, où la
-bisexualité se rapproche de l'homosexualité, les bisexuelles sont
-légérement plus souvent célibataires que les lesbiennes et elles ont
-moins souvent des enfants (p-valeur = 0,029). Le rapport à la
-conjugalité des hommes bisexuels s'illustre par le célibat
+La photographie à un instant t est insuffisante pour dresser un panorama
+des situations conjugales. Quand on s'intéresse aux 12 derniers mois, la
+situation des hommes bisexuels se confirme. Le célibat des hommes
+bisexuels est un célibat relativement long (plus d'un an) ou s'exprime
+dans des relations courtes (moins de 4 mois). Les femmes sont un peu
+plus nombreuses à avoir connu un couple d'au moins 4 mois au cours des
+douzes derniers mois (p valeur = 0,032) qu'au moment de l'enquête. Dans
+Virage LGBT elles sont encore plus nombreuses à avoir connu cette
+expérience dans l'année. L'expérience du couple est donc majoritaire
+chez les femmes, quelque soit l'identification et l'échantillon.
 
-Des bisexuelles en couple avec des hommes mais proche des lesbiennes
-dans le style d’union. Les lesbiennes et bisexuelles dans Virage PG sont
-moins souvent mariées, moins souvent en couple et plus souvent en union
-libre que les hétérosexuelles. L’écart de mariage des bisexuelles avec
-les hétérosexuelles subsiste même après contrôle de l’âge (travail sur
-les régressions en cours). L’écart entre lesbiennes et bisexuelles se
-creuse dans Virage LGBT, les bisexuelles sont moins souvent mariées et
-plus souvent célibataires. Cet écart doit encore être contrôlé par
-l’âge. Ces résultats sont intéressants quand on sait que 51,3 % de
-l’ensemble des femmes bisexuelles dans Virage PG sont en couple avec un
-homme (90 % de celles en couple). Une piste d’interprétation peut se
-trouver dans la déstabilisation du « principe hétérosexuel dyadique »
-(Klesse 2018) qu’implique la bisexualité et donc le potentiel
-éloignement vis-à-vis de l’institution du mariage. Aux États-Unis
-pourtant, les femmes bies sont les plus souvent en couple des LGB et
-elles invoquent les mêmes raisons de se marier que le reste de la
-population hétéro et LGBT (Gates 2015).
+Les lesbiennes ont moins souvent des enfants que les bisexuelles qui ont
+elles-mêmes moins souvent des enfants que les hétérosexuelles : 20,7%
+des lesbiennes, 45,9% des bisexuelles et 73,7% des hétérosexuelles. Idem
+chez les hommes : seulement 6,2% des gays ont des enfants, 41,8% des
+bisexuels et 66% des hétérosexuels. L'écart se réduit dans Virage LGBT
+entre bis et gays avec toutefois une différence de 18 points de
+pourcentage. Les bi·es sont surtout parents au sein d’unions de sexe
+différent (passées ou présentes) [@gates2015]. La population de Virage
+LGBT est majoritairement sans enfant.
 
-La spécificité des hommes bisexuels vis-à-vis du couple réside dans son
-absence. Les hommes bis sont plus souvent divorcés que les hétéros, deux
-fois moins souvent mariés et majoritairement célibataires (au moment de
-l’enquête comme dans les 12 derniers mois). Ce célibat est moins marqué
-dans Virage LGBT. On peut supposer qu’une partie des répondants
-bisexuels ont d’abord connu un mariage hétérosexuel avant de vivre leur
-bisexualité. Des recherches sur les mixed-orientation mariage dans les
-années 1980 se sont intéressées à ces gays, bi·es et lesbiennes en
-mariage hétéro (Rust 2002). Dans les « carrières bisexuelles », ce cas
-de figure correspond au moment biographique de la « quarantaine et + »,
-où la vie sociale est stabilisée, les normes pèsent moins fortement et
-où les hommes sont plus libres de vivre une sexualité bisexuelle
-(Dusseau 2017).
+Enfin, nous reprenons dans le tableau 1 la variable du type de couple.
+Les pourcentages y sont différents du tableau 2b de l'article de Mathieu
+Trachman et Tania Lejbowicz en raison de la variable prise en compte :
+nous prenons ici les personnes ayant été en couple de plus de 4 mois
+dans les 12 derniers mois, qui est la variable utilisée pour le reste du
+questionnaire tandis que l'article prend les personnes en couple au
+moment de l'enquête. Quelque soit la variable choisie, les couples de
+même sexe sont minoritaires chez les bisexuel·les de Virage PG :
+seulement 5,6% des femmes bisexuelles et 5,8% des hommes bisexuels (sur
+l'ensemble des personnes en couple et pas en couple).
 
-Des parents bisexuel·les à mi-chemin entre hétéros et homos. Les bi·es
-sont moins souvent sans enfant que les homos mais plus souvent que les
-hétéros. Cela s’éclaire par le fait que les bi·es sont surtout parents
-au sein d’unions de sexe différent (passées ou présentes) et que les
-enfants vivant avec un couple de même sexe sont le plus souvent nés
-d’une union de sexe différent antérieure (Gates 2015). La population de
-Virage LGBT est majoritairement sans enfant. Une asymétrie genrée de la
-bisexualité vis-à-vis du couple. Les femmes bisexuelles semblent
-canalisées vers des couples de sexe différent, non mariés tandis que les
-hommes sont surtout célibataires, parfois après un mariage.
+Ces premiers résultats sont un indice du rapport spécifique des
+bisexuel·les à la conjugalité : si elle est plus souvent tournée vers
+l'autre sexe dans la population générale, elle ne s'exprime toutefois
+pas de la même façon que la conjugalité hétérosexuelle. Les femmes
+bisexuelles sont aussi souvent célibataires que les lesbiennes et elles
+ont moins souvent des enfants que les hétérosexuelles. Dans
+l'échantillon LGBT, où la bisexualité se rapproche de l'homosexualité,
+les bisexuelles sont légérement plus souvent célibataires que les
+lesbiennes et elles ont moins souvent des enfants (p-valeur = 0,029). Le
+rapport des hommes bisexuels au couple réside dans son absence. Nous
+creuserons d'autres variables de caractérisation de la conjugalité dans
+la suite de cette partie pour développer notre réponse à cette
+hypothèse.
 
-type couple Raison différence de résultat // article MT et TL : ils ont
-pris en couple au moment de l'enquête. Je prends en couple dans les 12
-derniers mois \> 4 mois : qui est la variable utilisée pour le reste du
-questionnaire sur le couple. Nous permet de dire que les couples de même
-sexe sont minoritaires dans Virage PG.
-
-### Hypothèses
+## II. Accès à la conjugalité
 
 Pour vérifier ces rapports spécifiques des bisexuels au couple il est
 nécessaire de réfléchir aux autres variables qui ont des conséquences
-sur la conjugalité. - Hypothèse 1 : l'âge est un déterminant d'accès à
-la conjugalité et de formes de conjugalité (Bozon, Bergström : voir si
-j'ai pas déjà cherché les refs qqpart ou dans doc revue litté) -
-Hypothèse 2 : la classe est un déterminant d'accès à la conjugalité et
-des formes de conjugalité (idem) - Hypothèse 3 : le fait d'être bi en
-couple de même sexe ou de sexe différent influence le type de
-conjugalité (ref sur conjugalité homosexuelle) - Hypothèse 4 : les deux
-échantillons captent des bisexualités différentes, leur comportement
-vis-à-vis du couple ne sont toutefois pas réductible à leur structure
-hétérosexuelle ou homosexuelle de ceux-ci. Nous utiliserons la base en
-PG pour des observations générales puis creuserons certains aspects,
-lorsque nécessaire, grâce à la base LGBT. De plus les observations de
-couples bisexuels de même sexe se feront plutôt sur la base LGBT. -
-Hypothèse 5 : les personnes bisexuelles en couple de sexe différent
-seront étudiés via PG / les personnes bisexuelles en couple de même sexe
-seront étudiés via LGBT.
+sur la conjugalité. L'identification sexuelle, même quand son lien avec
+les variables conjugales est statistiquement significatif, n'est pas
+nécessairement un facteur causal. Puisque nous avons pour l'instant
+observé le fait d'être en couple, sans entrer dans le détail des formes
+de couple, nous allons contrôler le fait d'être en couple par l'âge et
+la classe. On a posé l'hypothèse que ces deux éléments ont une influence
+forte sur la conjugalité, de plus ce sont des variables que l'on peut
+observer dans nos échantillons contrairement à d'autres (race par
+exemple).
 
-Pour poursuivre il est intéressant de contrôler le fait d'être en couple
-par l'âge et la classe. On choisit la variable "en couple supérieur à 4
-mois dans les 12 derniers mois" car c'est celle qui est utilisée dans la
-suite du questionnaire pour les modules couples. Cela comporte
-évidemment des limites : à expliciter.
-
-On testera de la même façon la proba d'être marié, d'avoir des enfants,
-d'être en relation cohabitante en contrôlant par l'âge, la classe.
-
-## II. Accès à la conjugalité
+On choisit la variable "en couple supérieur à 4 mois dans les 12
+derniers mois" car c'est celle qui est utilisée dans la suite du
+questionnaire. Cela comporte évidemment des limites : à expliciter.
 
 On s'intéresse au fait d'être en couple, on veut voir comment les autres
 variables influencent le fait d'être en couple. On va commencer par
@@ -542,79 +543,76 @@ les variables. Comment le fait d'être en couple varie, selon nos
 différentes catégories.
 
 ```{r}
-#| label: tbl-couple
-#| tbl-cap: "Caractéristiques sociodémographiques selon le fait d'être en couple. Virage PG (pondéré)."
+#| fig-width: 20
+#| fig-height: 15
 
-# Liste commune des variables à inclure et leurs labels
-tab2_vars = c("genre", "idsexu", "age", "diplome", "csp", "statut_act2", "revenu", "revenu_sub", "taille_agglo", "enf_ego")
+# 1. Charger le package et créer fonction graph 
+library(patchwork)
+library(dplyr)
 
-# Tableau 
-tab2 = dw %>%
-  tbl_svysummary(
-    by = couple12mois,
-    include = all_of(tab2_vars),
-    percent = "row", 
-    statistic = all_categorical() ~ "{p} [{n_unweighted}]",
-    digits = all_categorical() ~ c(1,0), 
-    missing = "no"
-  ) %>% 
-  add_overall(last = TRUE) %>% 
-  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>% 
-  bold_labels() %>%
-  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})")
+graph = function(base_graph, titre_var) {
+  base_graph +
+    labs(title = titre_var, y = NULL, x = NULL, fill = "En couple au cours des 12 derniers mois (> 4 mois)") +
+    scale_fill_manual(values = c("Oui" = "darkseagreen1", "Non" = "darkseagreen4")) +
+    theme_minimal() + 
+    theme(panel.grid.major.x = element_blank(), 
+          plot.title = element_text(face = "italic", size = 14, color = "darkseagreen")) 
+}
+# ÉTAPE 2 : Créer les graphs individuellement 
 
-tab2 
+# Graphique 1 : Genre & idsexu 
+graph1 = ggsurvey(dw) + aes(x = genre_idsexu, fill = couple12mois) + geom_bar(position = "fill")
+graph1 = graph(graph1, "Genre & Identification sexuelle")
 
-# Graphiques 
-graph1 = ggsurvey(dw) +
-  aes(x = genre, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph1)
+# Graphique 2 : Groupe d'âge
+graph2 = ggsurvey(dw) + aes(x = age, fill = couple12mois) + geom_bar(position = "fill")
+graph2 = graph(graph2, "Groupe d'âge")
 
-graph2 = ggsurvey(dw) +
-  aes(x = idsexu, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph2)
+# Graphique 3 : Situation financière (Suppression NA / NVPD/NSP)
+dw_situ = dw %>% subset(!is.na(revenu_sub) & !revenu_sub %in% c("NVPD/NSP"))
+graph3 = ggsurvey(dw_situ) + aes(x = revenu_sub, fill = couple12mois) + geom_bar(position = "fill")
+graph3 = graph(graph3, "Situation financière")
 
-graph3 = ggsurvey(dw) +
-  aes(x = age, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph3)
+# Graphique 4 : Taille d'agglomération (Suppression NVPD/NSP)
+dw_taille = dw %>% subset(!taille_agglo %in% c("NVPD/NSP"))
+graph4 = ggsurvey(dw_taille) + aes(x = taille_agglo, fill = couple12mois) + geom_bar(position = "fill")
+graph4 = graph(graph4, "Taille d'agglomération")
 
-graph4 = ggsurvey(dw) +
-  aes(x = diplome, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph4)
+# Graphique 5 : A des enfants (Suppression NA)
+dw_enf = dw %>% subset(!is.na(enf_ego))
+graph5 = ggsurvey(dw_enf) + aes(x = enf_ego, fill = couple12mois) + geom_bar(position = "fill")
+graph5 = graph(graph5, "A des enfants")
 
-graph5 = ggsurvey(dw) +
-  aes(x = csp, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph5)
+# Graphique 6 : Diplôme (Suppression NVPD/NSP)
+dw_dipl = dw %>% subset(!diplome %in% c("NVPD/NSP"))
+graph6 = ggsurvey(dw_dipl) + aes(x = diplome, fill = couple12mois) + geom_bar(position = "fill")
+graph6 = graph(graph6, "Diplôme")
+# Comme les noms sont longs, on incline les étiquettes X pour ce graphique spécifique
+graph6 = graph6 + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-graph6 = ggsurvey(dw) +
-  aes(x = statut_act2, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph6)
+# Graphique 7 : Revenu (Suppression NVPD/NSP)
+dw_rev = dw %>% subset(!revenu %in% c("NVPD/NSP"))
+graph7 = ggsurvey(dw_rev) + aes(x = revenu, fill = couple12mois) + geom_bar(position = "fill") 
+graph7 = graph(graph7, "Revenu")
 
-graph7 = ggsurvey(dw) +
-  aes(x = revenu, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph7)
+# --- ÉTAPE 3 : Assemblage Final (patchwork) ---
+liste_g <- list(graph1, graph2, graph3, graph4, graph5, graph6, graph7)
 
-graph8 = ggsurvey(dw) +
-  aes(x = revenu_sub, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph8)
+graph_final <- wrap_plots(liste_g, ncol = 3) + 
+  plot_layout(guides = "collect") +
+  plot_annotation(
+    title = "Caractéristiques des répondant·es selon la situation de couple à 12 mois",
+    caption = "Source : Données Virage PG pondérées"
+  ) & 
+  theme(
+    legend.position = "bottom",
+    # Optionnel: On peut aussi épurer les titres principaux pour qu'ils soient moins gras
+    plot.title = element_text(face = "bold") 
+  ) &
+  expand_limits(x = 0, y = 0)
 
-graph9 = ggsurvey(dw) +
-  aes(x = taille_agglo, fill = couple12mois) +
-  geom_bar(position = "fill")
-print(graph9)
-
-graph10 = ggsurvey(dw) +
-  aes(fill = couple12mois, y = enf_ego) +
-  geom_bar(position = "fill")
-print(graph10)
+# Afficher le résultat
+print(graph_final)
 ```
 
 ### Analyse tableau / graphique
@@ -912,6 +910,23 @@ fortement selon qu'on est jeune et précaire ou vieux et précaire.
 ## III. Le célibat des hommes bis
 
 ### Qui sont les bis célibataires ?
+
+ancienne analyse : La spécificité des hommes bisexuels vis-à-vis du
+couple réside dans son absence. Les hommes bis sont plus souvent
+divorcés que les hétéros, deux fois moins souvent mariés et
+majoritairement célibataires (au moment de l’enquête comme dans les 12
+derniers mois). Ce célibat est moins marqué dans Virage LGBT. On peut
+supposer qu’une partie des répondants bisexuels ont d’abord connu un
+mariage hétérosexuel avant de vivre leur bisexualité. Des recherches sur
+les mixed-orientation mariage dans les années 1980 se sont intéressées à
+ces gays, bi·es et lesbiennes en mariage hétéro (Rust 2002). Dans les «
+carrières bisexuelles », ce cas de figure correspond au moment
+biographique de la « quarantaine et + », où la vie sociale est
+stabilisée, les normes pèsent moins fortement et où les hommes sont plus
+libres de vivre une sexualité bisexuelle (Dusseau 2017).
+
+Pour célibat et classe sociale : Bergström (célibat qui se poursuite
+avec âge : hommes populaires et moins diplômés)
 
 Un résultat intéressant est la place du célibat chez les hommes bis.
 Dans un premier temps nous souhaitons creuser les caractéristiques des
@@ -1274,6 +1289,24 @@ tab4 %>%
 
 ### Analyse tableau
 
+ancienne analyse : Des bisexuelles en couple avec des hommes mais proche
+des lesbiennes dans le style d’union. Les lesbiennes et bisexuelles dans
+Virage PG sont moins souvent mariées, moins souvent en couple et plus
+souvent en union libre que les hétérosexuelles. L’écart de mariage des
+bisexuelles avec les hétérosexuelles subsiste même après contrôle de
+l’âge (travail sur les régressions en cours). L’écart entre lesbiennes
+et bisexuelles se creuse dans Virage LGBT, les bisexuelles sont moins
+souvent mariées et plus souvent célibataires. Cet écart doit encore être
+contrôlé par l’âge. Ces résultats sont intéressants quand on sait que
+51,3 % de l’ensemble des femmes bisexuelles dans Virage PG sont en
+couple avec un homme (90 % de celles en couple). Une piste
+d’interprétation peut se trouver dans la déstabilisation du « principe
+hétérosexuel dyadique » (Klesse 2018) qu’implique la bisexualité et donc
+le potentiel éloignement vis-à-vis de l’institution du mariage. Aux
+États-Unis pourtant, les femmes bies sont les plus souvent en couple des
+LGB et elles invoquent les mêmes raisons de se marier que le reste de la
+population hétéro et LGBT (Gates 2015).
+
 \[à compléter une fois le tableau généré — pistes de lecture à garder en
 tête : 1) typecpl x csp_conjoint pour caractériser la position sociale
 des couples bi de sexe différent vs. de même sexe ; 2) lire
@@ -1386,8 +1419,6 @@ catégories FCPL = 03/04 (relations récemment terminées) est
 mécaniquement captée ici. Le revenu du ménage, enfin, ne se différencie
 pas significativement selon l'identification (p = 0,079) — à reconfirmer
 si les seuils de recodage, encore provisoires, sont resserrés.
-
---\> Regression mariage / cohabitation / durée relation
 
 ### Institutionnalisation couple - Regression
 
@@ -1594,6 +1625,25 @@ Jamais significatif pour les homo (pas grave, on utilise PG pour
 comparer les bies aux hétéras) Significatif chez les bies sur le mariage
 et la durée de relation : elles sont moins mariées et ont des relations
 moins longues, à âge égal, type de couple égal....
+
+# éléments d'analyse : 
+
+-   Rault, Lambert, 2019 : les représentations du couple et de la
+    sexualité des personnes ayant eu au moins une fois des pratiques
+    sexuelles avec une personne du même sexe sont différentes de celles
+    des personnes déclarant une hétérosexualité exclusive. Le groupe des
+    homo-bi se tient plus à distance du modèle associant sexualité,
+    sentiment amoureux et conjugalité, particulièrement chez les femmes.
+    L'écart dans le groupe des hommes est moins marqué, étant plus
+    incité à cette dissociation quelque soit l'orientation. Iels
+    déclarent plus souvent être d'accord avec le fait de pouvoir avoir
+    des relations sexuelles sans sentiment ; de pouvoir aimer quelqu'un
+    et avoir des aventures à côté ; de pouvoir être amoureux de
+    plusieurs personnes en même temps. Également plus de déclarations de
+    relations amoureuses moins importantes : existence d'autres types de
+    relations, entre relations de couple ou amoureuses et relations
+    sexuelles. Confirmé avec Envie et l'observation des sex-friends ou
+    des relations prolongées. 
 
 # Annexes
 
