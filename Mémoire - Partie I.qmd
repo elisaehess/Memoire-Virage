@@ -7,7 +7,7 @@ date-format: long
 lang: fr
 format: html
 execute:
-  echo: false               # le code n'apparaît pas dans le rendu, seuls les tableaux
+  echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
   warning: false
   message: false
 editor: 
@@ -36,8 +36,10 @@ theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 options(scipen = 999)
 
 # Import + préparation : on appelle les scripts existants -----------------
+source("01_PG_Import.R", encoding = "UTF-8")
 source("02_PG_Preparation.R", encoding = "UTF-8")
-#source("04_LGBT_Preparation.R", encoding = "UTF-8")
+source("03_LGBT_Import.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
 
 # Plans de pondération (PG uniquement) -----
 dw = svydesign(id = ~1, weights = pgn$poids_cal, data = pgn)
@@ -191,6 +193,24 @@ ans. Il semble globalement que les identifications minoritaires sont
 moins accessibles pour les femmes âgées que pour les hommes âgés et que
 les jeunes hommes affirment plus souvent des préférences exclusives :
 reflet de leur plus grande autonomie en matière de sexualité (Ibid) ?
+
+voir rault et lambert ci dessous
+
+Quand déclaration identification homo-bi
+
+bies et lesbiennes moins souvent un premier partenaire du même sexe que
+gays et bis (Trachman) ;
+
+hommes plus nombreux à se dire gays que les femmes à se dire lesbiennes
+;
+
+femmes plus nombreuses à se dire bie et à déclarer attirance pour même
+sexe ;
+
+Interprétation : plus facile de dire un désir ou des pratiques avec
+personnes des deux sexes pour les femmes (Trachman) ; modèles
+d’identifications disponibles : manque de référence et déni du
+lesbianisme (Chetcuti, Girard)
 
 Alors que la bisexualité masculine fait peser la menace du stigmate du
 pédé sur les jeunes hommes, déclarer une attirance ou des pratiques
@@ -392,7 +412,7 @@ tab1 %>%
   mise_en_forme_ft()
 ```
 
-#### La position sociale des bisexuel·les : des femmes moins dotées économiquement et des hommes plus présents dans la ruralité ? 
+#### La position sociale des bisexuel·les : des femmes moins dotées économiquement et des hommes plus présents dans la ruralité ?
 
 Les femmes bisexuelles déclarent plus souvent un revenu individuel
 inférieur à 1 000€ que les hétérosexuelles. Elles sont 48,4% dans cette
@@ -518,8 +538,6 @@ creuserons d'autres variables de caractérisation de la conjugalité dans
 la suite de cette partie pour développer notre réponse à cette
 hypothèse.
 
-## II. Accès à la conjugalité
-
 Pour vérifier ces rapports spécifiques des bisexuels au couple il est
 nécessaire de réfléchir aux autres variables qui ont des conséquences
 sur la conjugalité. L'identification sexuelle, même quand son lien avec
@@ -538,13 +556,12 @@ questionnaire. Cela comporte évidemment des limites : à expliciter.
 
 On s'intéresse au fait d'être en couple, on veut voir comment les autres
 variables influencent le fait d'être en couple. On va commencer par
-faire une série de tableaux croisés et regarder si il y a un lien entre
-les variables. Comment le fait d'être en couple varie, selon nos
-différentes catégories.
+faire une analyse bivariée sur plusieurs variables pour déterminer
+comment le fait d'être en couple varie, selon ces dernières.
 
 ```{r}
-#| fig-width: 20
-#| fig-height: 15
+#| fig-width: 17
+#| fig-height: 12
 
 # 1. Charger le package et créer fonction graph 
 library(patchwork)
@@ -596,7 +613,7 @@ graph7 = ggsurvey(dw_rev) + aes(x = revenu, fill = couple12mois) + geom_bar(posi
 graph7 = graph(graph7, "Revenu")
 
 # --- ÉTAPE 3 : Assemblage Final (patchwork) ---
-liste_g <- list(graph1, graph2, graph3, graph4, graph5, graph6, graph7)
+liste_g <- list(graph1, graph2, graph3, graph7, graph4, graph6, graph5)
 
 graph_final <- wrap_plots(liste_g, ncol = 3) + 
   plot_layout(guides = "collect") +
@@ -615,134 +632,91 @@ graph_final <- wrap_plots(liste_g, ncol = 3) +
 print(graph_final)
 ```
 
-### Analyse tableau / graphique
+Ces graphiques confirment certains éléments observés dans le tableau 1.
+Le test du Chi2 ajusté aux données pondérées a été effectué sur chaque
+variable catégorielle : toutes les variables présentées ici ont un effet
+significatif en analyse bivariée. On ne connaît toutefois pas la
+direction, ni l'intensité de l'effet. Tout d'abord les bisexuels sont
+majoritairement célibataires, à presque 75% loin devant les gays,
+bisexuelles et lesbiennes, environ 30%, eux-mêmes plus souvent
+célibataires que les hétérosexuel·les, seulement 25%. Concernant l'âge,
+dont nous faisons l'hypothèse qu'il influence l'accès à la conjugalité :
+on observe effectivement que les deux classes d'âge les moins souvent en
+couple sont celles aux extrêmités. Précisément celles où les bis sont
+surreprésentés. Les jeunes sont de loin la catégorie la moins en couple.
+Les plus âgés sont seulement quelques points de pourcentages derrière
+les 30-39 ans et les 40-49 ans. Ainsi l'âge ne suffit peut-être pas à
+expliquer le plus grand célibat des hommes bisexuels.
 
-Le tableau 2 confirme certains éléments observés dans le tableau 1. Tout
-d'abord les bi sont seulement une moitié à être en couple, contre 60%
-des homosexuels et 75% des hétérosexuels. On le sait il y a une forte
-disparité genrée, les hommes bisexuels étant majoritairement
-célibataire. Concernant l'âge, dont nous faisons l'hypothèse qu'il
-influence l'accès à la conjugalité : on observe effectivement que les
-deux classes d'âge les moins souvent en couple sont celles aux
-extrêmités. Précisément celles où les bis sont surreprésentés. Les
-jeunes sont de loin la catégorie la moins en couple. Les plus âgés sont
-seulement quelques points de pourcentages derrière les 30-39 ans et les
-40-49 ans. Ainsi l'âge ne suffit peut-être pas à expliquer le plus grand
-célibat des hommes bisexuels. Une autre variable a fort impact sur le
-fait d'être en couple : la csp. Si les ouvriers / employés sont 74% à
-être en couple, c'est le cas de 83% des cadres et 88% des agriculteurs.
-Le croisement de la csp et de l'identification sexuelle n'étant pas la
-plus probante, observons les autres variables de classe. Le fait d'être
-actif est correlé à une plus grande proba d'être en couple, de même pour
-le fait de déclarer 2 000€ et plus de revenu mensuel. On observe ici un
-écart de 20 points de pourcentage entre les personnes qui déclarent
-moins de 1 000€ et celles qui déclarent plus de 2 000€. Idem pour la
-situation financière déclarée, plus les personnes sont à l'aise, plus
-elles sont en couple. Enfin concernant la taille d'agglomération on
-observe un effet inversement proportionnel à la taille d'agglomération :
-plus les personnes vivent dans de grandes agglomérations, moins elles
-sont en couple. Sans surprise, le fait d'avoir des enfants est corrélé à
-une plus grande proba d'être en couple.
+les deux variables liées au revenu et à la situation financière sont
+probantes : le fait d'être en couple est corrélé positivement avec le
+revenu. On observe un écart de 20 points de pourcentage entre les
+personnes qui déclarent moins de 1 000€ et celles qui déclarent plus de
+2 000€ de revenu mensuel. Idem pour la situation financière déclarée,
+plus les personnes sont à l'aise, plus elles sont en couple. Enfin
+concernant la taille d'agglomération on observe un effet inversement
+proportionnel à la taille d'agglomération : plus les personnes vivent
+dans de grandes agglomérations, moins elles sont en couple. Sans
+surprise, le fait d'avoir des enfants est corrélé à une plus grande
+probabilité d'être en couple. Le diplôme est la variable la moins
+correlée, les personnes titulaires d'un dipôme supérieur à bac+3 ayant
+étant un tout petit plus souvent en couple.
 
 Cette analyse bivariée confirme une partie de nos hypothèses : l'âge et
 la classe sont corrélés au fait d'être en couple. De là à dire qu'ils
 sont des déterminants d'accès à la conjugalié il y a encore un pas. Ici
 l'analyse est faite à plat.
 
-La littérature nous aide ici : REF
-
-On voit (graphique) que les Bi sont les moins souvent en couple. On voit
-aussi que les catégories d'âge les moins souvent en couple sont les
-20-29 et les 50-69. La surreprésentation des bis dans ces catégories
-explique-t-elle le fait qu'iels sont moins couple ? Idem, la classe a un
-effet sur la mise en couple : tester l'effet de la classe.
-
---\> creuser comment faire de jolis graphiques en barre pour montrer
-cette anlayse bivariée dans un bo graphique
-
-suite analyse Tableau : on voit que l'identification sexuelle, l'âge et
-la classe ont des effets sur le fait d'être en couple. Les personnes les
-plus jeunes par exemple soint moins souvent en couple. Est-ce que ces
-effets sont significatifs ? Ici il s'agit de variables catégorielles :
-on effectue le test du Chi2, ajusté aux données pondérées. Quand on
-observe les p-valeurs on voit que toutes les variables ont un effet
-significatif en analyse bivariée.
+La surreprésentation des bisexuels dans la catégorie d'âge la plus âgée
+explique-t-elle le fait qu'ils sont moins couple ? Idem, la présence des
+bisexuelles parmi les personnes ayant un faible revenu joue-t-elle sur
+leur célibat ?
 
 Difficulté : des effets peuvent se mélanger. Par exemple si on croise
-diplome et age, les 50 et + ont plus de chance d'avoir un niveau d'étude
-inférieur au bac (démocratisation des études supérieures). Un effet
-marqué entre groupe d'âge et niveau d'étude. Hors on voit que le fait
-d'être en couple augmente avec l'âge (sauf chez les 50 et + ou ça
-rebaisse) et augmente avec le niveau d'étude. (pas meilleur exemple).
-Autre exemple : les bis sont plus souvent dans les 20 - 29 ans, hors les
-20 - 29 ans sont aussi la catégorie la moins souvent en couple. Est-ce
-que le fait que les bis sont moins en couple est lié est une causalité
-ou un effet de l'âge ? Un effet de l'âge ? Ou ce que voit dans l'âge
-c'est un effet de l'identification sexuelle ? Un effet de
-l'identification sexuelle? Ou ce qu'on voit dans l'identification
-sexuelle c'est un effet de l'âge ? Dans ce but qu'on fait un modèle
-mutlivarié comme une régression logistique : estimer un effet de l'âge,
-à identification sexuelle égale et un effet de l'identification sexuelle
-à âge égal.
+diplome et age, les 20 - 29 ans ont plus de chance d'avoir un niveau
+d'étude supérieur à Bac+3 avec la démocratisation des études
+supérieures. Hors on voit que le fait d'être en couple diminue chez les
+plus jeunes et augmente avec le niveau d'étude. Autre exemple : les
+bisexuelles sont plus présentes dans les 20 - 29 ans, hors les 20 - 29
+ans sont aussi la catégorie la moins souvent en couple. Est-ce que le
+fait que les bisexuelles sont moins en couple que les hétérosexuelles
+est lié à un effet de l'âge ? Un effet de l'identification sexuelle ?
+C'est dans ce but qu'on fait un modèle mutlivarié de régression
+logistique : estimer un effet de l'identification sexuelle sur le fait
+d'être en couple à âge égal.
 
-### Être en couple - Regression
+#### Les déterminants sociaux du fait d'être en couple
 
 On part du principe que tout fonctionne différement pour les hommes et
 pour les femmes : l'effet de l'âge sur la mise en couple n'est pas le
 même, l'impact de la classe sociale non plus et l'effet de l'orientation
-sexuelle est spécifique à chaque genre, on a commencé à le voir.
+sexuelle est spécifique à chaque genre, on a commencé à le voir. En
+conséquence on fait un modèle pour les hommes et un modèle pour les
+femmes. L'effet de la bisexualité sur la conjugalité est genré
+
+On considère que l'âge et classe classe sociale peuvent avoir des effets
+totalement différents sur les hommes et les femmes. La référence de
+comparaison est double : les femmes bies sont comparées aux femmes
+hétéros et les hommes bis sont comparés aux hommes hétéros. Puissance
+statistique réduite : on réduit la taille des échantillons par deux, ce
+qui peut rendre les variables de contrôle moins significative.
+
+Le tableau XXX nous montre les résultats des deux modèles concernant
+l'événement « avoir été en couple de plus de quatre mois dans l'année
+précédent l'enquête ». La modalité de référence est « ne pas être en
+couple », on teste donc la probabilité d'être en couple.
+
+On peut voir que les modèles sont globalement significatifs.
 
 ```{r}
 #| label: tbl-régression accès conjugalité 
 #| tbl-cap: "Déterminants sociaux d'accès au couple. Virage PG (pondéré)."
-
-# Reg global 1
-
-pg_reg = pgn %>% 
-  mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
-         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
-         age = fct_relevel(age, "30-39"), 
-         csp = fct_relevel(csp, "Employé·e"), 
-         revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
-         enf_ego = fct_relevel(enf_ego, "Non")
-         )
-
-dw_reg = svydesign(id = ~1, weights = pg_reg$poids_cal, data = pg_reg)
-
-reg = svyglm(
-  couple12mois ~ genre + idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo   + enf_ego, 
-  family = binomial(), 
-  design = dw_reg
-) %>% 
-  tbl_regression(intercept = TRUE)
-print(reg)
-
-# Reg global 2
-
-pg_reg2 = pgn %>% 
-  mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
-         age = fct_relevel(age, "30-39"), 
-         csp = fct_relevel(csp, "Employé·e"), 
-         revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
-         enf_ego = fct_relevel(enf_ego, "Non")
-         )
-
-dw_reg2 = svydesign(id = ~1, weights = pg_reg2$poids_cal, data = pg_reg2)
-
-reg2 = svyglm(
-  couple12mois ~ genre_idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo   + enf_ego, 
-  family = binomial(), 
-  design = dw_reg2
-) %>% 
-  tbl_regression(intercept = TRUE)
-print(reg2)
 
 # Reg hommes 
 pgh_reg = pgnh %>% 
   mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
          idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
          age = fct_relevel(age, "30-39"), 
-         csp = fct_relevel(csp, "Employé·e"), 
          revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
          enf_ego = fct_relevel(enf_ego, "Non")
          )
@@ -750,11 +724,12 @@ pgh_reg = pgnh %>%
 dwh_reg = svydesign(id = ~1, weights = pgh_reg$poids_cal, data = pgh_reg)
 
 regh = svyglm(
-  couple12mois ~ idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo + enf_ego, 
+  couple12mois ~ idsexu + age + diplome + revenu + revenu_sub + taille_agglo + enf_ego, 
   family = binomial(), 
   design = dwh_reg
-) %>% 
-  tbl_regression(intercept = TRUE)
+) 
+
+regh_tab = tbl_regression(regh, intercept = TRUE)
 print(regh)
 
 # Reg femmes 
@@ -762,7 +737,6 @@ pgf_reg = pgnf %>%
   mutate(couple12mois = fct_relevel(couple12mois, "Non"), 
          idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"), 
          age = fct_relevel(age, "30-39"), 
-         csp = fct_relevel(csp, "Employé·e"), 
          revenu = fct_relevel(revenu, "De 1 000 à moins de 2 000€"), 
          enf_ego = fct_relevel(enf_ego, "Non")
          )
@@ -770,241 +744,186 @@ pgf_reg = pgnf %>%
 dwf_reg = svydesign(id = ~1, weights = pgf_reg$poids_cal, data = pgf_reg)
 
 regf = svyglm(
-  couple12mois ~ idsexu + age + diplome + csp + statut_act2 + revenu + revenu_sub + taille_agglo + enf_ego, 
+  couple12mois ~ idsexu + age + diplome + revenu + revenu_sub + taille_agglo + enf_ego, 
   family = binomial(), 
   design = dwf_reg
-) %>% 
-  tbl_regression(intercept = TRUE)
+) 
+
+regh_tab = tbl_regression(regf, intercept = TRUE)
 print(regf)
+
+## tableau condensé 
+
+tbl_coupleh_condense = tbl_regression(
+  regh, 
+  include = c(idsexu, age, diplome, revenu, revenu_sub, taille_agglo, enf_ego),
+  intercept = TRUE
+) %>% 
+  modify_header(estimate ~ "**Être en couple**")
+
+tbl_couplef_condense = tbl_regression(
+  regf, 
+  include = c(idsexu, age, diplome, revenu, revenu_sub, taille_agglo, enf_ego),
+  intercept = TRUE
+) %>% 
+  modify_header(estimate ~ "**Être en couple**")
+
+tbl_couplehf_condense = tbl_merge(
+  tbls = list(tbl_coupleh_condense, tbl_couplef_condense),
+  tab_spanner = c("**Hommes**", "**Femmes**")
+) %>% 
+  modify_caption("Probabilité d'être en couple selon le genre (modèles contrôlés par l'identification sexuelle, l'âge, le diplôme, le revenu, le revenu subjectif, la taille d'agglomération d'habitation et le fait d'avoir des enfants)")
+print(tbl_couplehf_condense)
 ```
 
-### Analyse régression
+Concernant les hommes, on voit un lien existant avec l'identification
+bisexuelle. Le modèle nous confirme qu'à âge, diplôme, revenu,
+territoire et statut parental égal, les hommes bisexuels ont moins de
+chance d'être en couple que les hommes hétérosexuels. Ce résultat
+confirme un constat observé précédemment, il ne dit rien toutefois des
+raisons de ce célibat plus fréquent. Il peut exprimer une plus grande
+difficulté dans l'accès au couple comme une mise à distance du couple.
+En effet ce résultat peut rendre compte d'une vulnérabilité conjugale
+spécifique des hommes bisexuels comme d'un rapport à la conjugalité
+distancié, vu comme un obstacle à la réalisation des désirs
+[@trachman2018]. Nous creuserons la questions du célibat des hommes
+bisexuels dans la prochaines partie.
 
-Le modèle présente les déterminants de l'accès à la conjugalité. Ici la
-variable de conjugalité est celle correspondant à "a été en couple d'au
-moins 4 mois au cours de 12 derniers mois". La modalité de référence est
-"non". On teste donc la proba d'un oui, en fonction de différents
-déterminants sociaux.
+Chez les femmes le lien entre identification sexuelle et fait d'être en
+couple est moins significatif. Les caractéristiques déterminantes vont
+plutôt être l'âge : avoir plus de 50 ans est fortement correlé avec le
+fait de ne pas avoir été en couple l'année passé, contrôlé par les
+autres variables. C'est également le cas chez les hommes. C'est la
+modalité 30 - 39 ans qui a été choisie comme modalité de référence du
+fait de la présence de beaucoup d'étudiant·es dans la première catégorie
+ainsi que de son effectif moindre. Le fait d'être diplômée d'un niveau
+supérieur à bac+3 rend légèrement plus probable le fait d'être en couple
+: alors que pendant une bonne partie du XXe siècle les femmes diplômées
+du supérieur restaient souvent célibataires, l'allongement des études a
+généralisé l'expérience du célibat dans la vingtaine et le fait d'être
+très diplômée de pénalise plus les femmes en amour [@bouchet-valat2025].
+Avoir un revenu inférieur à 1 000€ augmente les chances d'être en couple
+pour les femmes alors que cela fait baisser la probabilité de cet
+événement pour les hommes. A l'inverse avoir un revenu \> 2 000€ est lié
+au fait d'être en couple chez les hommes. Cette différence illustre la
+persistance de rôles genrés avec une plus grande importance de
+l'autonomie financière comme préalable à l'engagement conjugal chez les
+hommes. Plus la taille d'agglomération de résidence est grande, plus les
+femmes sont célibataires dans l'année.
 
-On peut voir que le modèle est globalement significatif. Concernant le
-lien entre le fait d'être en couple et l'identification sexuelle, qui
-nous intéresse particulièrement, on voit un lien significatif pour les
-bi. Ceux-ci, à groupe d'âge, diplome, csp, statut d'activité, revenu,
-situation financière, t'aille d'agglo et enfants égal ont moins de
-probabilité d'être en couple.
+Enfin, avoir un/des enfant(s) est fortement correlé au fait d'être en
+couple, encore plus pour les hommes que pour les femmes.
 
-On observe bien un effet de l'âge : avoir plus de 40 ans est corrélé
-négativement avec le fait d'être en couple par rapport au fait d'avoir
-entre 30 et 39 ans. Qui a été choisi comme modalité de référence du fait
-de la présence de beaucoup d'étudiants dans la première catégorie ainsi
-que de son effectif moindre.
+Limite : il n'est pas possible avec ce modèle de tester statistiquement
+si la différence entre un coefficient chez les hommes et chez les femmes
+est significative. De plus, l'approche est ici additive, elle part du
+principe que l'effet de l'âge ne dépend pas de la classe, et
+inversement. Ce qui est sociologiquement très discutable : les
+dynamiques de mise en couple et de conjugalité varient fortement selon
+qu'on est jeune et précaire ou vieux et précaire.
 
-Avoir un niveau d'étude \> bac +3 est correlé positivement avec le fait
-d'être en couple.
+## II. Le célibat des hommes bis
 
-Aucun lien significatif pour la csp.
+#### L'identification bisexuelle comme « repoussoir » ou un célibat comme mise à distance choisie de la conjugalité ?
 
-statut act : pb à revoir.
+Le premier résultat central de ce travail est que la spécificité des
+hommes bisexuels vis-à-vis du couple réside dans son absence. Le célibat
+masculin bisexuel apparaît dans cette enquête à la fois plus massif et
+plus spécifiquement genré que son équivalent féminin. Ce point avait
+déjà été soulevé [@trachman2018] sans toutefois être contrôlé par
+d'autres variables telles que l'âge ou des déterminants de la classe.
+Deux lectures proposées sont proposées : d'une part une difficulté
+accrue à trouver un conjoint, liée à une « vulnérabilité conjugale
+spécifique des hommes bisexuels » : l'identification bisexuelle
+fonctionnerait comme un « repoussoir », ces hommes étant « socialement
+considérés comme des conjoints moins fiables par les femmes comme par
+les hommes ». D'autre part une mise à distance choisie de la
+conjugalité, perçue par une partie des hommes bisexuels comme un
+obstacle à la réalisation de leurs désirs.
 
-avoir un revenu \> 2000e par mois est correlé positivement avec le fait
-d'être en couple.
+La première hypothèse fait écho à l'idée selon laquelle les personnes
+bisexuelles seraient structurellement non-monogames, volages, incapables
+d'engagement de long terme parce qu'elles auraient simultanément besoin
+de partenaires des deux sexes — stéréotype que la recherche empirique
+contredit largement [@rust2002].
 
-Déclarer une situation financière difficile ou juste est corrélée
-négativement avec le fait d'être en couple.
+Une autre piste d'interprétation se trouve selon moi dans l'âge à part
+de la population bisexuelle masculine. Bien que l'on ait vu que la
+probabilité d'être en couple est plus faible pour tous les bis, quelque
+soit leur âge, cette sur-représentation nous donne une indication sur
+leurs potentiels parcours de vie. Si la trentaine est le moment où la
+pression conjugale est la plus forte [@bergström2019] il est tout à fait
+possible qu'elle entraîne une mise en couple avec une femme. Les
+pratiques bisexuelles lors de cette période ou ayant eu lieu plus jeunes
+peuvent être considérées comme de simples expériences, sans conséquence
+pour l'avenir. On peut supposer qu’une partie des répondants bisexuels
+ont d’abord connu un mariage hétérosexuel avant de vivre leur
+bisexualité. Des recherches sur les *mixed-orientation mariage* dans les
+années 1980 se sont intéressées à ces mariages impliquant une personne
+bisexuelle [@rust2002]. Passé un certain âge, et surtout un certain âge
+social lié au fait d'avoir été en couple, peut-être marié et avec des
+enfants, l'injonction de fonder une famille et de se mettre en ménage se
+relâche. Les séparations et divorces donnent plus de liberté pour se
+dire bisexuel après l'avoir occulté une partie de sa vie ou pour la
+première fois suite à un changement dans la façon d'envisager les
+relations sexuelles et amoureuses [@dusseau2017]. Les parcours d'hommes
+gays devenus bisexuels ne sont jamais évoqués dans la littérature. Ils
+existent pourtant et peuvent être liés à un élargissement des
+sociabilités après une jeunesse tournée vers les lieux communautaires
+gays, à la transition d'un partenaire ou encore à la volonté de faire
+concorder les pratiques au cours de la vie avec l'identification
+sexuelle [@rust2000].
+<!--# dernière phrase pas en lien avec célibat : voir si pertinent ailleurs -->
 
-Habiter dans une agglo de + 20 000 habitants est corrélée négativement
-avec le fait d'être en couple.
-
-Enfin, avoir des enfants est corrélé très positivement avec le fait
-d'être en couple.
-
---\> l'identification sexuelle, l'âge, la classe sont des déterminants
-de la conjugalité. cela fait écho aux résultats de travaux/
-
---\> trouver moyen de présenter joliment reg + commenter correctement
-(reprendre video larmarange + memoire ricardo p.47)
-
-On peut se demander ce qu'il se passe quand on est dans la population
-des hommes et dans la population des femmes.
-
-reg global 1 vs 2 Ce modèle présumé que l'effet d'être bisexuel sur la
-mise en couple est exactement le même que l'on soit un homme ou une
-femme. En regardant reg global 2 on voit que c'est faux : les hommes bis
-ont un coefficient de -1,8 (effet très négatif sur la probabilité d'être
-en couple), tandis que les femmes bies ont un coefficient de -0,50
-(effet négatif beaucoup plus modéré, presque non significatif à la
-limite des 5%). Le modèle 1 lisse les réalités de genre très différentes
-derrière un "effet moyen de la bisexualité" artificiel. Les hétéra ont
-une proba significativement plus faible d'être en couple que les hommes
-hétéosexuels (log(OR) = -0,19). Les hommes bisexuels ont la probabilité
-la plus faible de toutes les catégories d'être en couple par rapport aux
-hommes hétérosexuels (log(OR) = -1,8, très significatif). Les femmes
-bisexuelles ont aussi une proba plus faible que la référence (log(OR)
-= - 0,50), mais l'effet est nettement moins prononcé que pour les hommes
-bis. Les gays et lesbiennes ont des coefficients qui ne sont pas
-statistiquement différents de la référence (les intervalles de confiance
-contiennent 0 et les p-value sont élevées)
-
-l'effet de la bisexualité sur la conjugalité est genré
-
-Ici : modèle de régression globale avec interaction. On fait l'hypothèse
-que l'âge et la classe sociale ont le même effet chez les hommes et chez
-les femmes. Le référence de comparaison est unique, est la même pour
-tout le monde : comparé aux hommes hétéro. Meilleure puissance
-statistique : le modèle utilise la totalité des individus pour estimer
-les effets de contrôle (âge, classe).
-
-Après : une stratification. On considère que l'âge et classe classe
-sociale peuvent avoir des effets totalement différents sur les hommes et
-les femmes. La référence de comparaison est double : les femmes bies
-sont comparées aux femmes hétéros et les hommes bis sont comparés aux
-hommes hétéros. Puissance statistique réduite : on réduit la taille des
-échantillons par deux, ce qui peut rendre les variables de contrôle
-moins significative.
-
-reg hommes Est-ce qu'on peut commenter une régression dont l'intercept
-est non significatif ? En tout cas, les hommes bis, à âge, classe et
-diplome égal ont moins de chance d'être en couple que les hétéros.
-
-En sciences sociales, on ne s'intéresse presque jamais à la
-significativité de l'intercept. Ce qui vous intéresse sociologiquement,
-ce sont les coefficients des variables explicatives (l'effet de l'âge,
-de la classe, de l'orientation) : c'est-à-dire l'écart par rapport à
-cette référence.
-
-Que votre point de départ (l'intercept) soit statistiquement différent
-de 50 % de chances d'être en couple ou non n'affecte en rien la
-validité, la précision ou la significativité des autres coefficients
-(par exemple, l'effet d'être un homme bi par rapport à un homme hétéro).
-
-Dans une régression logistique, l'intercept représente la valeur prédite
-(sous forme de log-odds, ou log de l'Odds Ratio) pour un individu qui se
-trouve dans la catégorie de référence de toutes vos variables
-explicatives. La p-valeur associée à l'intercept teste l'hypothèse nulle
-suivante : "Le log(OR) de l'intercept est égal à 0" (ce qui équivaut à
-un Odds Ratio de 1, soit une probabilité d'être en couple de pile 50 %
-ou 0,5).Avoir une p-valeur de 0,3 (supérieure au seuil classique de
-0,05) signifie simplement que vous ne pouvez pas rejeter l'hypothèse
-selon laquelle cet homme de référence a exactement une chance sur deux
-(50 %) d'être en couple.
-
-reg femmes Pour les femmes le modèle est au global significatif mais les
-femmes bies : p-valeur = 0,05. A voir comment on commente ça.
-
-Les régressions semblent nous montrer une moindre probabilité des
-personnes bisexuelles à être en couple, même en neutralisant l'âge et la
-classe qui avaient été identifiés comme des déterminants de l'accès au
-couple.
-
-limites Impossible de tester statistiquement si la différence entre un
-coefficient chez les hommes et chez les femmes est significatives, alors
-qu'un terme d'interaction dans un modèle global donne directement une
-p-value pour cette différence.
-
-Approche additive : elle part du principe que l'effet de l'âge ne dépend
-pas de la classe, et inversement. Ce qui est sociologiquement très
-discutable : les dynamiques de mise en couple et de conjugalité varient
-fortement selon qu'on est jeune et précaire ou vieux et précaire.
-(trouver des refs sur les limites de la régression)
-
-## III. Le célibat des hommes bis
-
-### Qui sont les bis célibataires ?
-
-ancienne analyse : La spécificité des hommes bisexuels vis-à-vis du
-couple réside dans son absence. Les hommes bis sont plus souvent
-divorcés que les hétéros, deux fois moins souvent mariés et
-majoritairement célibataires (au moment de l’enquête comme dans les 12
-derniers mois). Ce célibat est moins marqué dans Virage LGBT. On peut
-supposer qu’une partie des répondants bisexuels ont d’abord connu un
-mariage hétérosexuel avant de vivre leur bisexualité. Des recherches sur
-les mixed-orientation mariage dans les années 1980 se sont intéressées à
-ces gays, bi·es et lesbiennes en mariage hétéro (Rust 2002). Dans les «
-carrières bisexuelles », ce cas de figure correspond au moment
-biographique de la « quarantaine et + », où la vie sociale est
-stabilisée, les normes pèsent moins fortement et où les hommes sont plus
-libres de vivre une sexualité bisexuelle (Dusseau 2017).
+Cet objet du célibat des hommes bisexuels est peu travaillé, la
+littérature française sur le célibat ne traite qu'exceptionnellement de
+son articulation avec l'orientation sexuelle, souvent faute d'effectifs
+suffisants dans les enquêtes [@bergström2019]. Le constat se poursuit
+dans Virage, dont les effectifs bisexuels, bien que restreints,
+permettent au moins une approche descriptive.
 
 Pour célibat et classe sociale : Bergström (célibat qui se poursuite
 avec âge : hommes populaires et moins diplômés)
+<!--# est-ce qu'on veut mettre ces premère hypothèses avant la régression : âge et classe des bis expliquent leur plus forte célibat. Puis après la régression creuser les hypothèses spécifiques à la bisexualité : stéréotype etc...  -->
 
-Un résultat intéressant est la place du célibat chez les hommes bis.
-Dans un premier temps nous souhaitons creuser les caractéristiques des
-bis en couple / pas en couple.
+#### Les trajectoires des hommes bisexuels dans Virage PG
 
-```{r}
-#| label: tbl-célibat hommes bi  
-#| tbl-cap: "Les hommes bi célibataires. Virage PG (pondéré)."
+Les petits effectifs nous empêchent d'entrer dans le détail statistique
+de qui sont les hommes bis célibataires. Il serait plus intéressant
+d'observer des trajectoires, de donner à voir les parcours biographiques
+: par exemple sont-ils célibataires suite à un divorce et une période
+longue de mariage avec enfants ? Ou alors sont-ils en célibat de longue
+durée, sans relation importante ? L'idée serait de faire des différences
+entre les hommes bisexuels célibataires. L'enquête Virage ne permet pas
+de faire une analyse de trajectoire au sens séquentiel. Elle ne comporte
+pas de calendriers des unions, contrairement à létude des relations
+familiales et intergénérationnelles ou GGS par exemple. Virage n'est pas
+une enquête biographique avec calendrier des unions, contrairement à
+Erfi par exemple. Le questionnaire ne demande pas non plus à quand
+remonte l'identification à la bisexualité. En revanche, le questionnaire
+documente en détail la relation actuelle et la dernière relation si la
+personne n'est plus en couple. On ne peut pas reconstruire une vraie
+séquence biographique mais on peut caractériser l'état de sortie de la
+dernière relation pour les personnes actuellement célibataires. On peut
+notamment creuser trois axes : le type de célibat (jamais en couple,
+célibataire après rupture) ; le statut de la dernière relation (marié,
+pacs, union libre) et le mode de sortie (séparation, veuvage) ;
+l'intensité de l'engagement dans le relation (cohabitation, durée,
+enfants).
 
-#Plan pondération 
-dwhbi = svydesign(id = ~1, weights = pgnhbi$poids_cal, data = pgnhbi)
+#### Les célibataires après rupture
 
-#Variables à inclure
-tab2_vars = c("age", "diplome", "csp", "revenu", "revenu_sub",  "taille_agglo", "enf_ego", "etatmat", "enf_ego")
+Pour commencer nous construisons un graphique-portrait (une ligne par
+répondant) des hommes bisexuels de Virage PG qui sont célibataires après
+rupture au moment de l'enquête. Les effectifs sont trop faibles pour un
+tableau croisé avec pourcentages : on privilégie donc une lecture
+individu par individu.
 
-# Tableau PG pondéré -- Hommes bi 
-tab2_pg_hbi = dwhbi %>%
-  tbl_svysummary(
-    by = couple12mois,
-    include = all_of(tab2_vars),
-    statistic = all_categorical() ~ "{p}",
-    digits = all_categorical() ~ 1,
-    missing = "no"
-  ) %>%
-  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
-  bold_labels() %>%
-  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
-  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes bisexuels**")
-tab2_pg_hbi
-```
-
-Les p-value ne sont pas souvent significatives : seulement pour la
-situation financière, le revenu et les enfants. Confirme l'effet de la
-classe sur la mise en couple. Pas spécifique aux hommes bis ?
-
-Plutôt intéressant d'observer des trajectoires. Donner à voir les
-parcours biographiques des hommes bisexuels : par exemple sont-ils
-célibataires suite à un divorce divorce et une période longue de mariage
-avec enfants ? Ou alors sont-ils en célibat de longue durée, sans
-relation importante ? L'idée serait de faire des différences entre les
-hommes bisexuels célibataires. Possible de faire une typologie du
-célibat mais pas une analyse de trajectoire au sens séquentiel /
-biographique. Virage n'est pas une enquête biographique avec calendrier
-des unions, contrairement à étude des relations familiales et
-intergénérationnelles ou GGS par exemple. Le questionnaire documente en
-détail : - La ou les relations actuelles - La dernière relation si la
-personne n'est plus en couple - Un simple compteur du nombre de mariages
-sur la vie entière Il n'existe pas de variable retraçant l'ensemble des
-unions successives, pas de 2e ou 3e relation détaillée, pas de
-calendrier. Donc on ne peut pas reconstruire une vraie séquence
-biographique complète. Mais on peut caractériser finement l'état de
-sortie de la dernière relation pour les personnes actuellement
-célibataires.
-
-Proposition : croiser trois axes - Jamais en couple VS célibataire après
-rupture - Type d'union atteint (jamais marié, marié une fois, marié
-plusieurs fois) x mode de sortie (séparation / veuvage) - intensité de
-l'engagement de la relation perdu : cohabitation x durée x enfants
-
-Ces résultats peuvent exprimer une plus grande difficulté à trouver un
-conjoint autant qu’une mise à distance du couple. Le célibat peut être
-choisi : la conjugalité serait alors perçue par une partie des hommes
-bisexuels comme un obstacle à la réalisation de leurs désirs. Ces
-résultats peuvent également rendre compte d’une vulnérabilité conjugale
-spécifique des hommes bisexuels, attestée par d’autres enquêtes \[10\] :
-l’identification bisexuelle apparaîtrait comme un repoussoir, ces hommes
-seraient socialement considérés comme des conjoints moins fiables par
-les femmes comme par les hommes.(Trachman, 2018a les personnes qui se
-disent bisexulles)
-
-### Portraits
-
-Construire un tableau-portrait (une ligne par répondant) des hommes
-bisexuels de Virage PG qui ne sont pas en couple au moment de l'enquête
-(Q6 = "03" célibataire après rupture, ou "04" jamais en couple).
-Effectifs trop faibles pour un tableau croisé avec pourcentages : on
-privilégie donc une lecture individu par individu.
+Le partage des célibataires jamais-en-couple / célibataires
+après-rupture est un résultat en lui-même. Un tiers des hommes bi
+célibataires (21/61) n'ont jamais eu de relation de couple au cours de
+leur vie. Cette catégorie se distingue de celle des célibataires
+"post-rupture" (40/61) que nous présentons ici.
 
 ```{r}
 #| label: tbl-portrait célibat hommes bi  
@@ -1063,54 +982,42 @@ ggplot(pgnhbi_celibat_graph) +
   )
 ```
 
-Le partage des célibataires jamais-en-couple / après-rupture est
-lui-même un résultat. Un tiers des hommes bi célibataires (21/61) n'ont
-jamais eu de relation de couple au cours de leur vie. Cette catégorie se
-distingue de celle des célibataires "post-rupture". (à commenter)
+Chez les 40 bisexuels qui ont connu au moins une relation et une
+rupture, le graphique fait apparaître deux populations : un noyau de
+relations longues (5 ans et plus) ; et une masse de relations plus
+courtes (moins de 3 ans). Dans les deux cas l'union libre est la forme
+la plus fréquente bien que le mariage soit plus présent dans les
+relations de 5 ans et plus. La plupart sont sans enfants. (à commenter :
+rapport au mariage Maillochon) Ce potentiel non-recours au mariage ne
+peut être présenté comme un résultat, on l'interrogera dans le cas des
+femmes bisexuelles, plus souvent en couple. L'observer simplement ici
+pose la question de ce que signifie le mariage pour les personnes
+bisexuelles. Majoritairement en couple hétéro dans Virage PG, on peut se
+demander si elles y ont autant recours que les hétéros. Le mariage à
+partir des années 1960 ne marque plus la naissance du couple mais sert
+de reconnaissance d'un couple préexistant. C'est une forme possible
+d'institutionnalisation, complété par le pacs qui est plus un mode
+alternatif d'officialisation qu'une étape vers le mariage. C'est bien
+plutôt la cohabitation qui institue le couple aujourd'hui
+[@maillochon2019]. Malheureusement les variables de cohabitation, durée
+de relation et sexe du dernier conjoint ne sont filtrées que pour les
+ruptures ayant eu lieu il y a moins de 8 mois. Ce choix de conception de
+l'enquête est logique : le module détaillé consacré aux relations ne
+s'applique qu'aux ruptures récentes survenues au cours de la période de
+référence de 12 mois utilisée par Virage tout au long de l'enquête.
+Questionner les individus sur des relations lointaines entraînerait des
+biais de mémoire. Ainsi les éléments sur la précédente relation ne nous
+donne que peu d'informations sur le véritable parcours conjugal. Et
+l'institutionnalisation d'un couple passé, via le pacs ou le mariage,
+nous dit peu de choses sans d'autres informations sur la relation.
 
-célibataires post rupture Chez les 40 qui ont connu au moins une
-relation et une rupture, le graphique fait apparaître deux populations :
-un noyau de relations longues (5 ans et plus) qui se termine soit en
-union libre non formalisée, soit en divorce/veuvage après mariage, avec
-enfants pour une partie d'entre eux (les cas à 32-38 ans de relation
-concentrent aussi les effectifs d'enfants les plus élevés — jusqu'à 6
-enfants) ; et une masse de relations plus courtes (moins de 3 ans),
-quasi systématiquement en union libre non mariée, sans enfant. (à
-commenter : rapport au mariage Maillochon)
-
-Nuance méthodologique Les éléments sur la précédente relation ne nous
-donne que peu d'informations sur le véritable parcours conjugal. En
-effet les variables de cohabitation, durée de relation et sexe du
-dernier conjoint ne sont filtrées que pour les ruptures ayant eu lieu il
-y a moins de 8 mois. Ce choix de conception de l'enquête est logique :
-le module détaillé consacré aux relations (cohabitation,
-caractéristiques démographiques du partenaire, questions sur la
-violence) ne s'applique qu'aux ruptures récentes survenues au cours de
-la période de référence de 12 mois utilisée par Virage tout au long de
-l'enquête, car les ruptures plus anciennes ne relèvent pas de cette
-période. Questionner les individus sur des relations lointaines entraîne
-des biais de mémoire.
+#### Les portraits d'hommes bisexuels célibataires dans l'enquête 
 
 Pour donner à voir les "parcours" je souhaite le compléter par quelques
 portraits rédigés descriptifs, choisis parmi les cas réels du tableau.
 Ils n'ont pas vocation à établir une typologie ou des cas-type mais
 plutôt d'illustrer concrètement ce que nous évoquons avec des tableaux
-et graphiques, sans sortir du registre descriptif et individuel. - un
-cas de célibat long après mariage avec enfants : Un homme de 60 ans,
-diplômé du secondaire : brevet des collèges / BEPC, en emploi,
-Professions intermédiaires administratives et commerciales des
-entreprises, rémunéré de 1600 à moins de 2000 euros, habitant Une
-agglomération de 100 000 à 200 000 habitants, 2 enfants, 2 enfants,
-divorcé depuis 24 ans, situation migratoire majoritaire, ayant eu des
-rapports sexuels avec une trentaine de personnes, des hommes et des
-femmes, a eu son premier rapport sexuel à 16 ans avec une femme, avec
-des attirances autant pour des hommes que pour des femmes,
-
-un cas de célibat long après union libre sans enfant,
-
-un cas de rupture très récente,
-
-un cas jamais-en-couple.
+et graphiques, sans sortir du registre descriptif et individuel.
 
 ```{r}
 portraits = pg %>%
@@ -1118,108 +1025,224 @@ portraits = pg %>%
 save(portraits, file = "Portraits.Rdata")
 ```
 
-Portraits — hommes bisexuels non repartenariés (Virage PG)
-
-Note méthodologique préalable : deux discordances internes aux données
-sont signalées ci-dessous (portraits 2 et 5) plutôt que résolues
-arbitrairement. Par ailleurs, le détail de la dernière relation (durée,
-cohabitation, sexe du ou de la partenaire) n'est disponible dans le
-questionnaire que lorsque la rupture date de moins de 8 mois — ce qui
-explique pourquoi ces informations manquent pour deux des cinq
-portraits.
-
 Portrait 1 (id …1429)
 
-Âgé de 26 ans, né en 1989, cet homme réside dans une agglomération
-moyenne du Grand Est (100 000 à 200 000 habitants). Diplômé du supérieur
-(bac+3 ou plus), il occupe une profession intermédiaire et perçoit un
-revenu individuel compris entre 1 300 et 1 600 euros nets par mois. Sans
-ascendance migratoire déclarée, il vit seul et n'a pas d'enfant. Il se
-déclare bisexuel, avec une attirance qu'il situe surtout vers le sexe
-opposé, mais aussi vers le même sexe.
+Arthur, âgé de 26 ans, né en 1989, réside dans une agglomération moyenne
+du Grand Est. Diplômé du supérieur (bac+3 ou plus), il occupe une
+profession intermédiaire, en emploi, pour un revenu individuel de 1 300
+à 1 600 euros mensuels. Il vit seul et sans enfant. Il situe son
+attirance, depuis l'âge de 17 ans, surtout vers le sexe opposé mais
+aussi vers le même sexe.
 
-Il a connu une relation de couple, en union libre, sans jamais se marier
-; cette relation s'est terminée par une séparation il y a environ trois
-ans, soit vers ses 23 ans. Sa durée, le fait qu'il ait ou non cohabité
-avec son ou sa partenaire, et le sexe de cette personne ne sont pas
-renseignés dans l'enquête : la rupture, trop ancienne, échappe au
-sous-module qui documente ces éléments. Il est aujourd'hui célibataire
-au sens légal, n'ayant jamais été marié.
+Il a grandi avec ses deux parents, sans séparation connue, aux côtés
+d'une sœur (pas de frère). Son père occupait une profession
+intermédiaire (technicien, agent de maîtrise), sa mère une profession
+d'employée. La religion avait « un peu » d'importance dans son éducation
+; lui-même se déclare aujourd'hui sans religion. Il a quitté le domicile
+parental à 19 ans et occupé son premier emploi de plus de quatre mois à
+21 ans.
+
+Son premier rapport sexuel a eu lieu à 17 ans, avec une femme qui allait
+devenir sa conjointe, un rapport qu'il souhaitait ; son premier rapport
+avec un homme est survenu la même année. Il compte une huitaine de
+partenaires sur l'ensemble de sa vie (quatre hommes, quatre femmes),
+mais aucun rapport sexuel au cours des douze derniers mois. Sa seule
+relation de couple connue, en union libre, jamais formalisée, s'est
+terminée par une séparation il y a environ trois ans (vers ses 23 ans).
+
+Son orientation n'est connue ni de son père, ni de sa mère, ni de sa
+sœur. Elle l'est en revanche de certains de ses amis hétérosexuels et de
+tous ses collègues proches, mais pas des autres collègues, de son
+supérieur ni de son médecin traitant. Il a déjà été confronté à une
+menace de dévoilement non consenti émanant de sa famille, et évite, dans
+certains lieux, les gestes affectueux en public par crainte. Il ne
+fréquente jamais de lieux gays ou lesbiens.
 
 Portrait 2 (id …3659)
 
 Âgé de 60 ans, né en 1955, cet homme vit dans une agglomération moyenne
 de Nouvelle-Aquitaine. Titulaire d'un CAP/BEP, il occupe une profession
-intermédiaire et reste en emploi à 60 ans, avec un revenu individuel de
-1 600 à 2 000 euros mensuels. Il vit seul, bien qu'il ait deux enfants —
-qui ne partagent donc pas son logement. Il décrit son attirance comme
-également répartie entre les deux sexes.
+intermédiaire et reste en emploi à 60 ans, pour un revenu individuel de
+1 600 à 2 000 euros. Il vit seul, bien qu'il ait deux enfants,
+aujourd'hui âgés de 30 et 27 ans, qui ne partagent pas son logement. Il
+situe son attirance, depuis ses 17 ans, également répartie entre les
+deux sexes.
 
-Sa dernière relation de couple était un mariage, qui s'est terminé par
-une séparation il y a vingt-quatre ans, soit vers ses 36 ans : selon
-l'enquête, il n'a connu aucune autre relation de couple depuis lors, ce
-qui dessine une trajectoire de long célibat après rupture conjugale. Il
-déclare un seul mariage au cours de sa vie, cohérent avec cet épisode.
+Il est issu d'une fratrie très nombreuse : quatre frères et sept sœurs,
+soit douze enfants au total. Ses parents vivaient ensemble lorsqu'il
+avait 14 ans. Son père occupait une profession intermédiaire
+administrative ou commerciale ; sa mère n'a pas d'activité
+professionnelle déclarée, ce qui, au regard de la taille de la fratrie,
+évoque une mère au foyer. La religion avait « assez » d'importance dans
+son éducation ; il se déclare aujourd'hui sans religion. Il a quitté le
+domicile parental à 24 ans.
 
-Point de vigilance : la variable construite "état matrimonial" (Etatmat)
-le classe comme "Marié.e" — un artefact de la règle de construction, qui
-priorise le statut légal de la dernière relation (mariage) sur la
-déclaration d'état civil actuel. Celle-ci (Q13a) indique explicitement
-"Divorcé.e", que je retiens ici comme l'information la plus directe.
+Son premier rapport sexuel, à 16 ans, était avec une femme dont il était
+amoureux (mais qui n'était pas encore sa conjointe), un rapport souhaité
+; son premier rapport avec un homme est survenu à 17 ans. Il déclare une
+trentaine de partenaires sur l'ensemble de sa vie (dix hommes, vingt
+femmes), et des rapports sexuels récents, avec plusieurs nouveaux
+partenaires au cours des douze derniers mois — une vie sexuelle active
+malgré l'absence de couple.
+
+Sa dernière relation de couple était un mariage, décidé par les deux
+conjoints d'un commun accord, à l'âge de 25 ans, un mariage réellement
+désiré et non précédé d'une naissance. Il s'est terminé par une
+séparation il y a vingt-quatre ans (vers ses 36 ans) ; aucune autre
+relation de couple n'est recensée depuis lors — une trajectoire de long
+célibat après rupture conjugale. (Rappel : la variable construite « état
+matrimonial » le classe par erreur de construction comme « marié »,
+alors que sa déclaration directe indique « divorcé », que je retiens
+ici.)
+
+Ni son père ni sa mère ne savent qu'il est bisexuel ; certains de ses
+frères et sœurs le savent, depuis qu'il avait 19 ans. Aucun de ses amis
+hétérosexuels ni de ses collègues proches n'est informé ; seul son
+médecin traitant l'est. Il n'a jamais été incité à cacher son
+orientation, jamais menacé d'un dévoilement non consenti, n'évite jamais
+de gestes affectueux en public et ne fréquente jamais de lieux gays ou
+lesbiens — un profil de dévoilement sélectif et stable.
 
 Portrait 3 (id …9144)
 
 Âgé de 28 ans, né en 1987, cet homme vit dans une agglomération petite à
-moyenne (20 000 à 100 000 habitants) des Pays de la Loire. Titulaire
-d'un baccalauréat (probablement technologique ou professionnel), il est
+moyenne des Pays de la Loire. Titulaire d'un baccalauréat, il est
 ouvrier et perçoit le revenu individuel le plus faible des cinq
-portraits (moins de 700 euros mensuels). Il vit en situation de famille
-monoparentale — vraisemblablement comme enfant d'un parent seul plutôt
-que comme parent lui-même, puisqu'il n'a pas d'enfant. Son attirance se
-porte surtout vers le même sexe, mais aussi vers le sexe opposé.
+portraits (moins de 700 euros). Il vit en situation de famille
+monoparentale, sans enfant lui-même. Son attirance se porte, depuis ses
+19 ans, surtout vers le même sexe, mais aussi vers le sexe opposé.
 
-C'est la rupture la plus récente des cinq portraits : une relation en
-union libre avec un homme de trois ans son aîné, sans cohabitation,
-d'une durée de deux ans, terminée par une séparation il y a trois mois —
-soit vers ses 25-27 ans. Il n'a jamais été marié et redevient, à l'issue
-de cette relation, célibataire au sens légal.
+Ses parents se sont séparés alors qu'il avait 14 ans ; il vivait alors
+avec sa mère seule — et n'a, selon l'enquête, jamais quitté le domicile
+parental : il réside donc probablement encore aujourd'hui, à 28 ans,
+dans le foyer de sa mère, ce qui éclaire directement sa situation de
+ménage actuelle. Il a un frère (pas de sœur). Son père était ouvrier, sa
+mère employée. Il a occupé son premier emploi de plus de quatre mois à
+22 ans. Catholique, il n'accorde aujourd'hui « pas du tout »
+d'importance à la religion, qui n'en avait qu'un peu dans son éducation.
+
+Son premier rapport sexuel, à 17 ans, était avec une femme tout juste
+rencontrée, un rapport souhaité ; son premier rapport avec un homme est
+survenu à 21 ans. Il compte une vingtaine de partenaires sur l'ensemble
+de sa vie (dix hommes, dix femmes), et a eu des rapports sexuels
+récents, avec un nouveau partenaire, au cours des douze derniers mois.
+Sa relation de couple la plus récente des cinq portraits — en union
+libre, avec un homme de trois ans son aîné, sans cohabitation, d'une
+durée de deux ans — s'est terminée par une séparation il y a trois mois.
+
+Sa mère et son frère savent qu'il est bisexuel, depuis qu'il avait 26
+ans — les deux l'ayant, semble-t-il, appris au même moment — et l'ont
+totalement accepté d'emblée, comme aujourd'hui encore. Tous ses amis
+hétérosexuels le savent également, ainsi que son médecin traitant ; en
+revanche, ni ses collègues ni son supérieur ne sont informés. Il n'a
+jamais été incité à cacher son orientation ni menacé d'un dévoilement
+non consenti. Il évite, dans certains lieux, les gestes affectueux en
+public, mais c'est le seul des cinq portraits à fréquenter,
+occasionnellement, des lieux gays et lesbiens.
 
 Portrait 4 (id …8986)
 
 Âgé de 56 ans, né en 1959, cet homme réside à Paris ou en petite
-couronne. Diplômé du supérieur à un niveau élevé (bac+5, probablement
-une formation d'ingénieur), cadre de profession, il est actuellement au
-chômage indemnisé, avec un revenu individuel de 700 à 1 000 euros
-mensuels — sensiblement inférieur à ce qu'on attendrait de sa position
-sociale, signe probable d'une perte d'emploi récente. Immigré, il vit
-seul et sans enfant. Il situe son attirance à égalité entre les deux
-sexes.
+couronne. Diplômé du supérieur à un niveau élevé (bac+5), cadre de
+profession, il est actuellement au chômage indemnisé, pour un revenu
+individuel de 700 à 1 000 euros — sensiblement inférieur à ce qu'on
+attendrait de sa position sociale, signe probable d'une perte d'emploi
+récente. Immigré, arrivé en France à 30 ans, il vit seul et sans enfant.
+Il situe son attirance également répartie entre les deux sexes.
 
-Il se distingue des quatre autres portraits en ce qu'il n'a, selon
-l'enquête, jamais eu de relation de couple : aucune information sur une
-éventuelle dernière relation n'est donc disponible, cette rubrique étant
-sans objet pour lui.
+Il a grandi avec ses deux parents, tous deux d'origine immigrée, aux
+côtés d'un frère et d'une sœur. Son père était employé, sa mère sans
+activité professionnelle déclarée. Il a quitté le domicile parental à 30
+ans — au moment même de son arrivée en France, ce qui suggère un départ
+lié à la migration plutôt qu'une décohabitation ordinaire. Il se
+rattache à une confession religieuse « autre » que les catégories
+usuelles, à laquelle il accorde aujourd'hui « un peu » d'importance ;
+elle en avait « assez » dans son éducation.
+
+Son premier rapport sexuel, tardif, à 27 ans, était avec une femme tout
+juste rencontrée — un rapport qu'il n'avait pas souhaité mais avait
+accepté. Son premier rapport avec un homme est survenu plus tard encore,
+à 31 ans. Le nombre de partenaires sur l'ensemble de sa vie n'est pas
+établi avec certitude (réponse « ne sait pas » à la question globale,
+alors que le détail déclaré suggère un chiffre très élevé — à traiter
+avec prudence). Il a eu des rapports sexuels récents, avec plusieurs
+nouveaux partenaires, au cours des douze derniers mois. Il est le seul
+des cinq portraits à n'avoir, selon l'enquête, jamais eu de relation de
+couple.
+
+Tous ses frères et sœurs savent qu'il est bisexuel, mais seulement
+depuis ses 38 ans — une reconnaissance tardive au regard de son âge
+actuel — et l'ont totalement acceptée, alors comme aujourd'hui. Tous ses
+amis hétérosexuels le savent également. Il a déjà été incité à cacher
+son orientation par des amis et des collègues, une situation qu'il juge
+susceptible de se reproduire, et a déjà subi des menaces de dévoilement
+non consenti dans au moins deux contextes distincts, dont le cadre
+professionnel — le profil le plus exposé des cinq portraits sur ce plan.
+Il déclare pourtant n'éviter jamais les gestes affectueux en public, et
+ne fréquente jamais de lieux gays ou lesbiens.
 
 Portrait 5 (id …7398)
 
 Âgé de 52 ans, né en 1963, cet homme vit dans un village de moins de 2
 000 habitants en Occitanie. Sans diplôme, retraité, il perçoit le revenu
-individuel le plus élevé des cinq portraits (plus de 3 000 euros
-mensuels), vraisemblablement une pension. Il vit seul et sans enfant. Il
-situe son attirance surtout vers le sexe opposé, mais aussi vers le même
-sexe.
+individuel le plus élevé des cinq portraits (plus de 3 000 euros,
+vraisemblablement une pension). Il vit seul et sans enfant. Il situe son
+attirance, depuis ses 20 ans, surtout vers le sexe opposé, mais aussi
+vers le même sexe.
 
-Il a vécu en couple pacsé avec une femme pendant trente-cinq ans, en
-cohabitation continue — une relation qui, si elle a commencé quand il
-avait autour de 17 ans, l'a accompagné jusqu'à la cinquantaine. Elle est
-décédée il y a sept mois, le laissant veuf.
+Ses parents vivaient ensemble lorsqu'il avait 14 ans. Il a une sœur (pas
+de frère). Son père était cadre administratif ou commercial (ingénieur
+possible), sa mère cadre de la fonction publique ou profession
+scientifique — une origine sociale nettement plus favorisée que sa
+situation actuelle sans diplôme, ce qui dessine une trajectoire
+descendante par rapport à ses parents. Catholique, il est le seul des
+cinq à accorder aujourd'hui « beaucoup » d'importance à la religion,
+comme elle en avait dans son éducation. Il a quitté le domicile parental
+à 18 ans et n'a subi, dit-il, aucune pression familiale au mariage.
 
-Point de vigilance : il déclare par ailleurs avoir été marié une fois au
-cours de sa vie (Q13a1), alors que cette dernière union est enregistrée
-comme un Pacs (Q13). Les deux informations ne semblent pas se rapporter
-au même épisode ; faute de pouvoir les articuler avec certitude, je ne
-tranche pas entre un mariage antérieur non documenté et une possible
-incohérence de saisie.
+Son premier rapport sexuel, précoce, à 14 ans, était avec une femme tout
+juste rencontrée, un rapport souhaité ; son premier rapport avec un
+homme est survenu à 20 ans. Il compte une dizaine de partenaires sur
+l'ensemble de sa vie (trois hommes, sept femmes), mais aucun rapport
+sexuel au cours des douze derniers mois — cohérent avec un veuvage
+récent.
+
+Il a vécu trente-cinq ans avec une femme, en pacs, en cohabitation
+continue, une relation commencée vers ses 17 ans et achevée par le décès
+de sa partenaire il y a sept mois. Il déclare par ailleurs un mariage au
+cours de sa vie, célébré à ses 25 ans, décidé par les deux conjoints,
+réellement désiré et non précédé d'une naissance — sans qu'on puisse
+établir avec certitude s'il s'agit du même épisode que l'union pacsée
+qui vient de s'achever, ou d'un épisode antérieur distinct.
+
+Son père, sa mère et sa sœur savent tous qu'il est bisexuel, depuis ses
+21 ans — une divulgation apparemment simultanée à l'ensemble du cercle
+familial proche — et l'ont totalement acceptée, alors comme aujourd'hui.
+Certains de ses amis hétérosexuels le savent également, ainsi que son
+médecin traitant. Il n'a jamais été incité à cacher son orientation ni
+menacé d'un dévoilement non consenti, et déclare n'éviter jamais les
+gestes affectueux en public — à nuancer toutefois, la question portant
+sur un partenaire de même sexe, alors que sa dernière relation, vécue
+trente-cinq ans durant, était avec une femme. Il ne fréquente jamais de
+lieux gays ou lesbiens.
+
+Quelques lignes de force qui ressortent une fois les portraits mis côte
+à côte, si tu veux les reprendre en synthèse :
+
+Le dévoilement familial et le "jamais en couple" ne se recoupent pas
+simplement. Le portrait 4 (jamais en couple) a un dévoilement familial
+tardif (38 ans) mais large (toute la fratrie, tous les amis) ; le
+portrait 2 (24 ans de célibat après rupture) a un dévoilement quasi
+inexistant en famille mais stable et non conflictuel. Le célibat
+conjugal ne prédit donc pas le rapport à l'entourage. Le rapport à la
+sexualité pendant le célibat est hétérogène : deux portraits (1 et 5)
+n'ont eu aucun rapport sexuel dans l'année, deux autres (2 et 4) restent
+sexuellement actifs avec de nouveaux partenaires malgré l'absence de
+couple — utile si tu veux nuancer l'équation "célibataire = désengagé
+sexuellement". Le portrait 3 est le seul où l'origine sociale, la
+trajectoire résidentielle (jamais quitté le foyer maternel) et le
+célibat s'articulent de façon lisible — les quatre autres montrent des
+chemins plus disparates.
 
 ## IV. Les situations conjugales des femmes bisexuelles
 
@@ -1457,7 +1480,7 @@ reg_mariage_svy = svyglm(
 )  
 
 reg_mariage_tab = tbl_regression(reg_mariage_svy, intercept = TRUE)
-print(reg_mariage)
+print(reg_mariage_svy)
 
 # Reg cohabitation
 
@@ -1477,7 +1500,7 @@ reg_cohabitation_svy = svyglm(
 ) 
 
 reg_cohabitation_tab = tbl_regression(reg_cohabitation_svy, intercept = TRUE)
-print(reg_cohabitation)
+print(reg_cohabitation_svy)
 
 # Reg duree relation
 
@@ -1505,7 +1528,7 @@ reg_duree_svy = svyglm(
 ) 
 
 reg_duree_tab = tbl_regression(reg_duree_svy, intercept = TRUE)
-print(reg_duree)
+print(reg_duree_svy)
 
 ## tableau condensé 
 
@@ -1626,7 +1649,7 @@ comparer les bies aux hétéras) Significatif chez les bies sur le mariage
 et la durée de relation : elles sont moins mariées et ont des relations
 moins longues, à âge égal, type de couple égal....
 
-# éléments d'analyse : 
+# éléments d'analyse :
 
 -   Rault, Lambert, 2019 : les représentations du couple et de la
     sexualité des personnes ayant eu au moins une fois des pratiques
@@ -1645,104 +1668,215 @@ moins longues, à âge égal, type de couple égal....
     sexuelles. Confirmé avec Envie et l'observation des sex-friends ou
     des relations prolongées. 
 
+1.  Le mariage comme institution recomposée plutôt que disparue
+    Maillochon (2019) établit que le mariage n'a pas disparu mais changé
+    de fonction dans le parcours conjugal. Jusque dans les années 1960,
+    il conditionnait l'entrée en conjugalité ; désormais, « c'est
+    désormais la cohabitation qui permet d'instituer le couple, qu'il se
+    maintienne en union libre ou soit officialisé » (Maillochon,
+    2019, p. 43). Le mariage n'est plus une condition d'accès au couple
+    mais « une de ses institutionnalisations possibles », concurrencée
+    par le pacs depuis 1999 (p. 43). Cette bascule se lit dans les
+    chiffres qu'elle mobilise sur Épic : 15 % des personnes mariées dans
+    les années 1964-1973 avaient cohabité avant le mariage, contre 84 %
+    dans les années 1994-2013 (p. 43, tableau 1). Point directement
+    mobilisable pour votre sous-partie : le mariage, quand il survient,
+    ne marque plus la naissance du couple mais sert de mode de «
+    valorisation » ou de « représentation » d'un couple déjà installé
+    (p. 42, citant Maillochon 2016). Cette bascule sémantique — du
+    mariage comme seuil d'entrée au mariage comme acte de reconnaissance
+    d'un couple préexistant — est utile si vous cherchez à interroger ce
+    que peut signifier, pour un couple bisexuel préexistant, le recours
+    (ou le non-recours) au mariage.
+2.  Le mariage comme opérateur de reproduction sociale : la lecture de
+    Bozon Vos notes sur Bozon (1991) portent sur l'homogamie sociale et
+    n'abordent pas l'orientation sexuelle : elles documentent le mariage
+    comme « moment de reproduction de la société », les mécanismes
+    d'homogamie variables selon les groupes sociaux, et la thèse
+    conclusive selon laquelle l'homogamie est « un résultat d'ensemble
+    \[…\] qui correspond à des situations, des trajectoires, des
+    processus très divers, variables d'un milieu social à l'autre »,
+    plutôt qu'une « recherche systématique et mécanique du semblable ».
+    Cette réserve méthodologique de Bozon — ne pas réifier l'homogamie
+    comme préférence individuelle mais la traiter comme effet de
+    structure — peut être transposée par analogie à votre objet : si
+    vous observez, dans Virage, des régularités dans les profils
+    conjugaux des bisexuel·les (par exemple la prédominance de
+    partenaires de sexe différent chez les hommes bi signalée par
+    Trachman & Lejbowicz), la prudence de Bozon invite à ne pas la lire
+    comme une préférence affichée mais à l'articuler aux structures
+    d'opportunité (accessibilité des partenaires, contraintes de
+    rencontre). Je souligne que ce rapprochement est une extrapolation
+    de ma part : Bozon ne traite pas des minorités sexuelles.
+3.  Le mariage de même sexe : un accès différencié selon le genre
+    (Meslay) Meslay (2019) documente, à partir de l'état civil
+    2013-2017, des écarts genrés nets dans le recours au mariage chez
+    les couples homosexuels — un matériau adjacent à la bisexualité,
+    puisqu'il porte sur la conjugalité de même sexe en général, mais qui
+    ne traite pas spécifiquement des personnes bisexuelles. Elle montre
+    que les couples d'hommes mariés sont nettement plus âgés que les
+    couples de femmes mariées (45,9 ans contre 40,7 ans en moyenne, p.
+    503), et avance que, pour les hommes, « c'est surtout l'avancée en
+    âge qui importe », le mariage étant associé à une recherche de
+    protection juridique (pension de réversion, héritage), tandis que
+    pour les femmes, la surreprésentation de la tranche 25-34 ans «
+    reflète en partie \[…\] un usage du mariage lié à des enjeux
+    parentaux, via l'adoption » (p. 504). Elle relève aussi un écart
+    d'âge entre époux plus important chez les couples gays (7,4 ans en
+    moyenne) que chez les couples lesbiens (5,1 ans) ou hétérosexuels
+    (4,3 ans), qu'elle relie à un marché de rencontre plus restreint et
+    à des lieux de rencontre différents (p. 505). Elle propose enfin
+    l'hypothèse, à titre d'explication possible et non de résultat
+    démontré par ses données, que « les enjeux de protection juridique
+    du/de la conjoint·e \[…\] soient plus déterminants pour les couples
+    d'hommes que pour les couples de femmes dans le choix du type
+    d'union » (p. 504). Ce matériau peut vous servir de point de
+    comparaison structurel : les logiques d'accès au mariage identifiées
+    par Meslay (protection juridique tardive côté hommes, filiation côté
+    femmes) sont pensées pour des couples homosexuels stables, et la
+    question de savoir si elles s'appliquent, se déplacent ou sont sans
+    objet pour des couples où l'un des partenaires est bisexuel reste,
+    dans ce corpus, non traitée — c'est un angle mort que votre travail
+    sur Virage peut contribuer à éclairer plutôt qu'un résultat que vous
+    pourriez citer comme acquis.
+4.  Ce que Virage établit spécifiquement sur bisexualité et couple C'est
+    Trachman & Lejbowicz (2018) qui fournissent le seul matériau du
+    corpus traitant directement de la conjugalité et du mariage chez les
+    personnes bisexuelles. Ils notent que « la conjugalité des personnes
+    bisexuelles est, comme leur sexualité, plutôt tournée vers l'autre
+    sexe » et que, lorsqu'ils sont en couple, « les bisexuels le sont le
+    plus souvent avec une personne de sexe différent, en particulier les
+    femmes : la moitié d'entre elles sont en couple avec un homme » (p.
+    4). Le texte ne détaille pas spécifiquement le statut marié/non
+    marié de ces couples — il documente le fait d'être en couple ou hors
+    couple, non le recours au mariage — ce qui laisse un espace pour
+    votre propre exploitation de Virage PG sur ce point précis.
+5.  L'idéal relationnel bi et la question de la monogamie conjugale
+    (Rust) Vos notes sur Rust (2002) apportent un éclairage sur la
+    manière dont la littérature anglophone articule bisexualité et
+    normes conjugales, sans traiter du mariage français comme
+    institution. Rust y relaie l'idée, attribuée à Blumstein et Schwartz
+    ainsi qu'à Weinberg, que « l'approbation sociale et la
+    reconnaissance légale \[ont\] plus à voir avec la longévité de la
+    relation que l'orientation sexuelle » — c'est-à-dire que « la
+    sanction du mariage explique la longévité des relations entre
+    personnes de sexe différent plutôt que l'orientation hétéro ». Ce
+    point est directement transposable à votre objet : il suggère que,
+    si les relations bisexuelles avec un partenaire de sexe différent
+    apparaissent statistiquement plus stables ou plus longues,
+    l'explication proposée dans cette littérature n'est pas une affinité
+    plus grande pour l'hétéroconjugalité, mais l'effet propre de
+    l'institution matrimoniale elle-même, accessible plus anciennement
+    et plus aisément à ce type de couple. Sur la question, adjacente, de
+    la monogamie : Rust rapporte que les taux de monogamie plus faibles
+    chez les personnes bisexuelles ne relèveraient pas, selon Engel et
+    Saracino ainsi que Weinberg, d'une incapacité à s'engager, mais d'un
+    « rejet culturel de la monogamie sexuelle en faveur d'autres types
+    idéaux de relations » (dual primary relationships, polyfidélité,
+    monogamie sérielle). Ce point ne concerne pas le mariage comme
+    institution légale mais l'idéal relationnel bisexuel en général ; il
+    peut être mobilisé comme hypothèse concurrente à celle,
+    institutionnelle, de Blumstein/Schwartz, plutôt que comme donnée
+    s'appliquant au contexte français ou à l'enquête Virage.
+
 # Annexes
 
-```{r}
-#| label: tbl-trachman-lejbowicz-2018
-#| tbl-cap: "Caractéristiques sociodémographiques des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)."
-
-# Liste commune des variables à inclure et leurs labels
-tab1_annexe_vars = c("age", "diplome", "statut_act", "csp", "territoire", "mig")
-labs = list(
-  age        ~ "Groupe d'âges",
-  diplome    ~ "Diplôme le plus élevé obtenu",
-  statut_act ~ "Statut d'activité",
-  csp        ~ "Catégorie socioprofessionnelle",
-  territoire ~ "Territoire d'habitation", 
-  mig ~ "Statut migratoire"
-)
-
-# Tableau PG pondéré -- Femmes
-tab1_annexe_pg_f = dwf %>%
-  tbl_svysummary(
-    by = idsexu,
-    include = all_of(vars_inc),
-    statistic = all_categorical() ~ "{p}",
-    digits = all_categorical() ~ 1,
-    label = labs,
-    missing = "no"
-  ) %>%
-  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
-  bold_labels() %>%
-  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
-  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
-
-# Tableau PG pondéré -- Hommes
-tab1_annexe_pg_h = dwh %>%
-  tbl_svysummary(
-    by = idsexu,
-    include = all_of(vars_inc),
-    statistic = all_categorical() ~ "{p}",
-    digits = all_categorical() ~ 1,
-    label = labs,
-    missing = "no"
-  ) %>%
-  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
-  bold_labels() %>%
-  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
-  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
-
-# Tableau LGBT non pondéré -- Femmes
-tab1_annexe_lgbt_f = lgbtnf %>%
-  tbl_summary(
-    by = idsexu,
-    include = all_of(vars_inc),
-    statistic = all_categorical() ~ "{p}",
-    digits = all_categorical() ~ 1,
-    label = labs,
-    missing = "no"
-  ) %>%
-  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-  add_p(
-  test = all_categorical() ~ "fisher.test",
-  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
-) %>%
-  bold_labels() %>%
-  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
-  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
-
-# Tableau LGBT non pondéré -- Hommes
-tab1_annexe_lgbt_h = lgbtnh %>%
-  tbl_summary(
-    by = idsexu,
-    include = all_of(vars_inc),
-    statistic = all_categorical() ~ "{p}",
-    digits = all_categorical() ~ 1,
-    label = labs,
-    missing = "no"
-  ) %>%
-  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-  add_p(
-  test = all_categorical() ~ "fisher.test",
-  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
-) %>%
-  bold_labels() %>%
-  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
-  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
-
-# Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz
-tab1_annexe = tbl_merge(
-  tbls = list(tab1_annexe_pg_f, tab1_annexe_pg_h, tab1_annexe_lgbt_f, tab1_annexe_lgbt_h),
-  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
-) %>%
-  modify_caption(
-    "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés."
-  )
-
-# Version FINALE
-tab1_annexe %>%
-  as_flex_table() %>%
-  mise_en_forme_ft()
+```{# {r}
+# #| label: tbl-trachman-lejbowicz-2018
+# #| tbl-cap: "Caractéristiques sociodémographiques des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)."
+# 
+# # Liste commune des variables à inclure et leurs labels
+# tab1_annexe_vars = c("age", "diplome", "statut_act", "csp", "territoire", "mig")
+# labs = list(
+#   age        ~ "Groupe d'âges",
+#   diplome    ~ "Diplôme le plus élevé obtenu",
+#   statut_act ~ "Statut d'activité",
+#   csp        ~ "Catégorie socioprofessionnelle",
+#   territoire ~ "Territoire d'habitation", 
+#   mig ~ "Statut migratoire"
+# )
+# 
+# # Tableau PG pondéré -- Femmes
+# tab1_annexe_pg_f = dwf %>%
+#   tbl_svysummary(
+#     by = idsexu,
+#     include = all_of(tab1_annexe_vars),
+#     statistic = all_categorical() ~ "{p}",
+#     digits = all_categorical() ~ 1,
+#     label = labs,
+#     missing = "no"
+#   ) %>%
+#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+#   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+#   bold_labels() %>%
+#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+#   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+# 
+# # Tableau PG pondéré -- Hommes
+# tab1_annexe_pg_h = dwh %>%
+#   tbl_svysummary(
+#     by = idsexu,
+#     include = all_of(vars_inc),
+#     statistic = all_categorical() ~ "{p}",
+#     digits = all_categorical() ~ 1,
+#     label = labs,
+#     missing = "no"
+#   ) %>%
+#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+#   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+#   bold_labels() %>%
+#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+#   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+# 
+# # Tableau LGBT non pondéré -- Femmes
+# tab1_annexe_lgbt_f = lgbtnf %>%
+#   tbl_summary(
+#     by = idsexu,
+#     include = all_of(vars_inc),
+#     statistic = all_categorical() ~ "{p}",
+#     digits = all_categorical() ~ 1,
+#     label = labs,
+#     missing = "no"
+#   ) %>%
+#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+#   add_p(
+#   test = all_categorical() ~ "fisher.test",
+#   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+# ) %>%
+#   bold_labels() %>%
+#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+#   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+# 
+# # Tableau LGBT non pondéré -- Hommes
+# tab1_annexe_lgbt_h = lgbtnh %>%
+#   tbl_summary(
+#     by = idsexu,
+#     include = all_of(vars_inc),
+#     statistic = all_categorical() ~ "{p}",
+#     digits = all_categorical() ~ 1,
+#     label = labs,
+#     missing = "no"
+#   ) %>%
+#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
+#   add_p(
+#   test = all_categorical() ~ "fisher.test",
+#   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+# ) %>%
+#   bold_labels() %>%
+#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+#   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+# 
+# # Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz
+# tab1_annexe = tbl_merge(
+#   tbls = list(tab1_annexe_pg_f, tab1_annexe_pg_h, tab1_annexe_lgbt_f, tab1_annexe_lgbt_h),
+#   tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+# ) %>%
+#   modify_caption(
+#     "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés."
+#   )
+# 
+# # Version FINALE
+# tab1_annexe %>%
+#   as_flex_table() %>%
+#   mise_en_forme_ft()
 ```
