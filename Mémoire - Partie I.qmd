@@ -824,7 +824,270 @@ qu'on est jeune et précaire ou vieux et précaire.
 
 ## II. Le célibat des hommes bis
 
-#### L'identification bisexuelle comme « repoussoir » ou un célibat comme mise à distance choisie de la conjugalité ?
+### A. Les trajectoires des hommes bisexuels dans Virage PG
+
+Les petits effectifs nous empêchent d'entrer dans le détail statistique
+de qui sont les hommes bis célibataires. Il serait plus intéressant
+d'observer des trajectoires, de donner à voir les parcours biographiques
+: par exemple sont-ils célibataires suite à un divorce et une période
+longue de mariage avec enfants ? Ou alors sont-ils en célibat de longue
+durée, sans relation importante ? L'idée serait de faire des différences
+entre les hommes bisexuels célibataires. L'enquête Virage ne permet pas
+de faire une analyse de trajectoire au sens séquentiel. Elle ne comporte
+pas de calendriers des unions, contrairement à létude des relations
+familiales et intergénérationnelles ou GGS par exemple. Virage n'est pas
+une enquête biographique avec calendrier des unions, contrairement à
+Erfi par exemple. Le questionnaire ne demande pas non plus à quand
+remonte l'identification à la bisexualité. En revanche, le questionnaire
+documente en détail la relation actuelle et la dernière relation si la
+personne n'est plus en couple. On ne peut pas reconstruire une vraie
+séquence biographique mais on peut caractériser l'état de sortie de la
+dernière relation pour les personnes actuellement célibataires. On peut
+notamment creuser trois axes : le type de célibat (jamais en couple,
+célibataire après rupture) ; le statut de la dernière relation (marié,
+pacs, union libre) et le mode de sortie (séparation, veuvage) ;
+l'intensité de l'engagement dans le relation (cohabitation, durée,
+enfants).
+
+#### Les célibataires après rupture
+
+Pour commencer nous construisons un graphique-portrait (une ligne par
+répondant) des hommes bisexuels de Virage PG qui sont célibataires après
+rupture au moment de l'enquête. Les effectifs sont trop faibles pour un
+tableau croisé avec pourcentages : on privilégie donc une lecture
+individu par individu.
+
+Le partage des célibataires jamais-en-couple / célibataires
+après-rupture est un résultat en lui-même. Un tiers des hommes bi
+célibataires (21/61) n'ont jamais eu de relation de couple au cours de
+leur vie. Cette catégorie se distingue de celle des célibataires
+"post-rupture" (40/61) que nous présentons ici.
+
+```{r} #| label: tbl-portrait célibat hommes bi   #| tbl-cap: "Le tableau portrait des hommes bi célibataires. Virage PG (pondéré)."  pgnhbi_celibat = pgnhbi_celibat %>%    select(     ID, couple_celib, statut_derniere_relation, etat_matrimonial_atteint, motif_fin_relation, nb_mariages_vie, cohabitation_derniere_relation, duree_cohabitation_mois, duree_derniere_relation, duree_depuis_rupture, sexe_dernier_conjoint, nb_enfants_ego)   view(pgnhbi_celibat)  ## Préparation des données pour le graphique  pgnhbi_celibat_graph = pgnhbi_celibat %>%   filter(couple_celib == "Célibataire après rupture") %>% #on garde que les hommes célib après rupture   mutate(ID = fct_reorder(as.character(ID), duree_depuis_rupture))  ## Graphique  ggplot(pgnhbi_celibat_graph) +   aes(     x = duree_depuis_rupture,     y = ID,     fill = statut_derniere_relation,      alpha = nb_enfants_ego > 0    ) +   geom_bar(stat = "summary", fun = "sum", width = 0.7) +   scale_alpha_manual(     values = c("FALSE" = 0.6, "TRUE" = 1),      labels = c("Sans enfant", "Avec enfant(s)"),      name = " "   ) +   scale_fill_manual(     values = c("Union libre" = "#A5D1C2",     "Pacs" = "#E0A989",     "Mariage" = "#D39191"),      name = "Statut dernière relation"   ) +   scale_x_continuous(     breaks = seq(0, 480, by = 60),       # Un repère tous les 60 mois (5 ans)     labels = function(x) paste0(x / 12, " ans") # Divise par 12 pour l'affichage   ) +   labs(     x = "Durée depuis la rupture (années)",     y = "Chaque ligne = Un parcours individuel",     title = "Trajectoire des hommes bisexuels célibataires après rupture (Virage PG)",     caption = "Lecture : 40 hommes ayant eu une relation par le passé. 21 hommes supplémentaires n'ont jamais eu de relation de couple au cours de la vie (non représentés ici). "   ) +   theme_minimal() +   theme(     legend.position = "bottom",     plot.title = element_text(face = "bold"),     plot.caption = element_text(face = "italic",     hjust = 0),     axis.text.y = element_blank(),      panel.grid.major.y = element_blank()   )}
+```
+
+Chez les 40 bisexuels qui ont connu au moins une relation et une
+rupture, le graphique fait apparaître deux populations : un noyau de
+relations longues (5 ans et plus) ; et une masse de relations plus
+courtes (moins de 3 ans). Dans les deux cas l'union libre est la forme
+la plus fréquente bien que le mariage soit plus présent dans les
+relations de 5 ans et plus. La plupart sont sans enfants. (à commenter :
+rapport au mariage Maillochon) Ce potentiel non-recours au mariage ne
+peut être présenté comme un résultat, on l'interrogera dans le cas des
+femmes bisexuelles, plus souvent en couple. L'observer simplement ici
+pose la question de ce que signifie le mariage pour les personnes
+bisexuelles. Majoritairement en couple hétéro dans Virage PG, on peut se
+demander si elles y ont autant recours que les hétéros. Le mariage à
+partir des années 1960 ne marque plus la naissance du couple mais sert
+de reconnaissance d'un couple préexistant. C'est une forme possible
+d'institutionnalisation, complété par le pacs qui est plus un mode
+alternatif d'officialisation qu'une étape vers le mariage. C'est bien
+plutôt la cohabitation qui institue le couple aujourd'hui
+[@maillochon2019]. Malheureusement les variables de cohabitation, durée
+de relation et sexe du dernier conjoint ne sont filtrées que pour les
+ruptures ayant eu lieu il y a moins de 8 mois. Ce choix de conception de
+l'enquête est logique : le module détaillé consacré aux relations ne
+s'applique qu'aux ruptures récentes survenues au cours de la période de
+référence de 12 mois utilisée par Virage tout au long de l'enquête.
+Questionner les individus sur des relations lointaines entraînerait des
+biais de mémoire. Ainsi les éléments sur la précédente relation ne nous
+donne que peu d'informations sur le véritable parcours conjugal. Et
+l'institutionnalisation d'un couple passé, via le pacs ou le mariage,
+nous dit peu de choses sans d'autres informations sur la relation.
+
+### B. Un célibat subi lié à une identification bisexuelle « repoussoir » ou un célibat comme mise à distance choisie de la conjugalité ?
+
+#### Quelques portraits d'hommes bisexuels célibataires dans l'enquête
+
+Pour donner à voir les "parcours" je souhaite le compléter par quelques
+portraits rédigés descriptifs, choisis parmi les cas réels du tableau.
+Ils n'ont pas vocation à établir une typologie ou des cas-type mais
+plutôt d'illustrer concrètement ce que nous évoquons avec des tableaux
+et graphiques, sans sortir du registre descriptif et individuel.
+
+```{r}
+portraits = pg %>%   filter(ID %in% c(1000883659, 1000741429, 1001539144, 1004057398, 1002858986)) 
+save(portraits, file = "Portraits.Rdata")
+```
+
+##### Arthur (id …1429)
+
+Arthur, âgé de 26 ans, né en 1989, réside à Reims. Il a grandi avec ses
+deux parents et sa soeur. Son père était agent de maîtrise et sa mère
+employée. La religion avait « un peu » d'importance dans son éducation ;
+lui-même se déclare aujourd'hui sans religion. Il a quitté le domicile
+parental à 19 ans et occupé son premier emploi de plus de quatre mois à
+21 ans. Diplômé du supérieur (bac+3 ou plus), il est technicien pour un
+revenu individuel de 1 300 à 1 600 euros mensuels. Il vit seul et sans
+enfant.
+
+*Une bisexualité plutôt tournée vers l'autre sexe.* Il est attiré
+surtout par les femmes mais aussi par les hommes, depuis l'âge de 17
+ans. Son premier rapport sexuel a eu lieu à 17 ans, avec une femme avec
+qui il a été en couple, son premier rapport avec un homme est survenu la
+même année. Il compte huit partenaires sur l'ensemble de sa vie (quatre
+hommes, quatre femmes), mais aucun rapport sexuel au cours des douze
+derniers mois. Sa deuxième et dernière relation de couple connue était
+avec une femme, en union libre, s'est terminée par une séparation il y a
+environ trois ans (vers ses 23 ans).
+
+*Un dévoilement réduit de sa bisexualité*. Son orientation n'est connue
+ni de son père, ni de sa mère, ni de sa sœur. Elle l'est en revanche de
+certains de ses amis hétérosexuels et de tous ses collègues proches,
+mais pas des autres collègues, de son supérieur ni de son médecin
+traitant. Il a déjà été confronté à une menace de dévoilement non
+consenti émanant de sa famille, et évite, dans certains lieux, les
+gestes affectueux en public avec un partenaire, par crainte. Il ne
+fréquente jamais de lieux gays ou lesbiens.
+
+##### Patrick (id …3659)
+
+Âgé de 60 ans, né en 1955, Patrick vit à Niort. Il est issu d'une
+famille très nombreuse : quatre frères et sept sœurs, soit douze enfants
+au total. Ses parents vivaient ensemble lorsqu'il avait 14 ans. Son père
+occupait une profession intermédiaire administrative ou commerciale ; sa
+mère était mère au foyer. La religion avait « assez » d'importance dans
+son éducation ; il se déclare aujourd'hui sans religion. Il a quitté le
+domicile parental à 24 ans.Titulaire d'un CAP/BEP, il est
+technico-commercial dans la vente et reste en emploi à 60 ans, pour un
+revenu mensuel de 1 600 à 2 000 euros. Il vit seul, bien qu'il ait deux
+enfants, âgés de 30 et 27 ans, qui ne partagent pas son logement. Il est
+attiré également par les hommes et les femmes, depuis ses 17 ans.
+
+*Un célibat long avec vie relationnelle et sexuelle active après un
+divorce.* Son premier rapport sexuel, à 16 ans, était avec une femme
+dont il était amoureux avec qui il n'était pas en couple ; son premier
+rapport avec un homme est survenu à 17 ans. Sa dernière relation de
+couple était un mariage à l'âge de 25 ans. Il s'est terminé par une
+séparation il y a vingt-quatre ans (vers ses 36 ans). Il déclare une
+trentaine de partenaires sur l'ensemble de sa vie (dix hommes, vingt
+femmes), dont une vingtaine de relations de plus de quatre mois, et des
+rapports sexuels récents, avec plusieurs nouveaux partenaires au cours
+des douze derniers mois. Aucune autre relation de couple n'est recensée
+depuis le divorce
+
+*Un dévoilement sélectif de la bisexualité.* Ni son père ni sa mère ne
+savent qu'il est bisexuel ; certains de ses frères et sœurs le savent,
+depuis qu'il a 19 ans. Aucun de ses amis hétérosexuels ni de ses
+collègues proches n'est informé ; seul son médecin traitant l'est. Il
+n'a jamais été incité à cacher son orientation, jamais menacé d'un
+dévoilement non consenti, n'évite jamais de gestes affectueux en public
+et ne fréquente jamais de lieux gays ou lesbiens.
+
+##### Maxime (id …9144)
+
+Maxime est né en 1987, âgé de 28 ans au moment de l'enquête, il vit chez
+sa mère à Orvault dans les Pays de la Loire. Ses parents sont séparés,
+il a un frère et n'a jamais quitté le domicile maternel. Son père était
+ouvrier et sa mère employée. La religion était un peu présente dans son
+éducation, il n' y accorde aujourd'hui pas du tout d'importance mais se
+dit catholique. Il est titulaire d'un baccalauréat, il a occupé son
+premier emploi de plus de quatre mois à 22 ans et est aujourd'hui
+chauffeur pour moins de 700 euros de revenu mensuel. Son attirance se
+porte, depuis ses 19 ans, surtout vers le même sexe, mais aussi vers le
+sexe opposé.
+
+*Des pratiques réparties entre les deux sexes et une relation de couple
+avec un homme, récemment terminée.* Son premier rapport sexuel, à 17
+ans, était avec une femme tout juste rencontrée ; son premier rapport
+avec un homme est survenu à 21 ans. Il compte une vingtaine de
+partenaires sur l'ensemble de sa vie (dix hommes, dix femmes). Sa
+dernière et seule relation de couple qui a duré deux ans, avec un homme
+de trois ans son aîné, s'est terminée par une séparation il y a trois
+mois. Il a eu des rapports sexuels avec un nouveau partenaire au cours
+des douze derniers mois.
+
+*Une bisexualité connue*. Sa mère et son frère savent qu'il est
+bisexuel, depuis qu'il avait 26 ans, on peut supposer au moment de la
+mise en couple avec son ancien partenaire, le couple rendant plus
+complexe la dissimulation de l'identification sexuelle. Ils l'ont
+totalement accepté dès le départ. Tous ses amis hétérosexuels le savent
+également, ainsi que son médecin traitant ; en revanche, ni ses
+collègues ni son supérieur ne sont informés. Il n'a jamais été incité à
+cacher son orientation ni menacé d'un dévoilement non consenti. Il
+évite, dans certains lieux, les gestes affectueux en public. Il
+fréquente occasionnellement, des lieux gays et lesbiens.
+
+Portrait 4 (id …8986)
+
+Âgé de 56 ans, né en 1959, Abdel réside en petite couronne de Paris.
+Diplômé du supérieur (bac+5), ingénieur de profession, il est au chômage
+depuis 4 ans, indemnisé entre 700 et 1 000 euros. Immigré, arrivé en
+France à 30 ans, il est devenu français à 35 ans. Il vit seul et sans
+enfant. Il a grandi avec ses deux parents, tous deux de nationalité
+étrangère, aux côtés d'un frère et d'une sœur. Son père était employé,
+sa mère sans activité professionnelle déclarée. Il a quitté le domicile
+parental à 30 ans, au moment de son arrivée en France. Il accorde
+aujourd'hui « un peu » d'importance à la religion qui en avait « assez »
+dans son éducation.
+
+*Une vie sexuelle à l'écart du couple.* Il est attiré également par les
+hommes et les femmes. Son premier rapport sexuel a eu lieu à 27 ans,
+avec une femme tout juste rencontrée, un rapport qu'il n'avait pas
+souhaité mais avait accepté. Son premier rapport avec un homme est
+survenu plus tard, à 31 ans. Il a eu des rapports sexuels récents, avec
+plusieurs nouveaux partenaires, au cours des douze derniers mois. Il n'a
+jamais eu de relation de couple.
+
+*Une bisexualité exposée qui dérange.* Son frère et sa soeur savent
+qu'il est bisexuel, seulement depuis ses 38 ans, ils l'ont totalement
+accepté. Tous ses amis hétérosexuels le savent également. Il a déjà été
+incité à cacher son orientation par des amis et des collègues, une
+situation qu'il juge susceptible de se reproduire, et a déjà subi des
+menaces de dévoilement non consenti dans au moins deux contextes
+distincts, dont le cadre professionnel. Il déclare n'éviter jamais les
+gestes affectueux en public, et ne fréquente jamais de lieux gays ou
+lesbiens.
+
+Portrait 5 (id …7398)
+
+Âgé de 52 ans, né en 1963, Sylvain vit dans un village en Occitanie. Il
+a une soeur, son père était ingénieur et sa mère cadre de la fonction
+publique. Catholique, il accorde beaucoup d'importance à la religion,
+une importance qu'il a reçu dans son éducation. Il a quitté le domicile
+parental à 18 ans. Sans diplôme, aujourd'hui retraité, avec une pension
+de 3 000 euros, il vit seul et sans enfant.
+
+Son premier rapport sexuel, précoce, à 14 ans, était avec une femme tout
+juste rencontrée ; son premier rapport avec un homme est survenu à 20
+ans. Depuis cette période il dit être attiré surtout par les femmes mais
+aussi par les hommes. Il compte une dizaine de partenaires sur
+l'ensemble de sa vie (trois hommes, sept femmes), mais aucun rapport
+sexuel au cours des douze derniers mois. Il a vécu trente-cinq ans avec
+une femme, une relation commencée vers ses 17 ans, suivie d'un mariage à
+25 ans et achevée par le décès de sa partenaire il y a sept mois. La
+durée de sa relation et la date de son premier rapport avec un homme
+suggère qu'au moins certaines relations sexuelles ont eu lieu pendant sa
+relation de couple unique.
+
+Son père, sa mère et sa sœur savent tous qu'il est bisexuel, depuis ses
+21 ans, sans que cela pose problème. Certains de ses amis hétérosexuels
+le savent également, ainsi que son médecin traitant. Il n'a jamais été
+incité à cacher son orientation ni menacé d'un dévoilement non consenti,
+et déclare n'éviter jamais les gestes affectueux en public — à nuancer
+toutefois, la question portant sur un partenaire de même sexe, alors que
+sa dernière relation, vécue trente-cinq ans durant, était avec une
+femme. Il ne fréquente jamais de lieux gays ou lesbiens.
+
+Quelques lignes de force qui ressortent une fois les portraits mis côte
+à côte, si tu veux les reprendre en synthèse :
+
+Le dévoilement familial et le "jamais en couple" ne se recoupent pas
+simplement. Le portrait 4 (jamais en couple) a un dévoilement familial
+tardif (38 ans) mais large (toute la fratrie, tous les amis) ; le
+portrait 2 (24 ans de célibat après rupture) a un dévoilement quasi
+inexistant en famille mais stable et non conflictuel. Le célibat
+conjugal ne prédit donc pas le rapport à l'entourage. Le rapport à la
+sexualité pendant le célibat est hétérogène : deux portraits (1 et 5)
+n'ont eu aucun rapport sexuel dans l'année, deux autres (2 et 4) restent
+sexuellement actifs avec de nouveaux partenaires malgré l'absence de
+couple — utile si tu veux nuancer l'équation "célibataire = désengagé
+sexuellement". Le portrait 3 est le seul où l'origine sociale, la
+trajectoire résidentielle (jamais quitté le foyer maternel) et le
+célibat s'articulent de façon lisible — les quatre autres montrent des
+chemins plus disparates.
+
+#### Des parcours conjugaux moins linéaires et un célibat qui revêt des formes diverses
 
 Le premier résultat central de ce travail est que la spécificité des
 hommes bisexuels vis-à-vis du couple réside dans son absence. Le célibat
@@ -885,364 +1148,6 @@ permettent au moins une approche descriptive.
 Pour célibat et classe sociale : Bergström (célibat qui se poursuite
 avec âge : hommes populaires et moins diplômés)
 <!--# est-ce qu'on veut mettre ces premère hypothèses avant la régression : âge et classe des bis expliquent leur plus forte célibat. Puis après la régression creuser les hypothèses spécifiques à la bisexualité : stéréotype etc...  -->
-
-#### Les trajectoires des hommes bisexuels dans Virage PG
-
-Les petits effectifs nous empêchent d'entrer dans le détail statistique
-de qui sont les hommes bis célibataires. Il serait plus intéressant
-d'observer des trajectoires, de donner à voir les parcours biographiques
-: par exemple sont-ils célibataires suite à un divorce et une période
-longue de mariage avec enfants ? Ou alors sont-ils en célibat de longue
-durée, sans relation importante ? L'idée serait de faire des différences
-entre les hommes bisexuels célibataires. L'enquête Virage ne permet pas
-de faire une analyse de trajectoire au sens séquentiel. Elle ne comporte
-pas de calendriers des unions, contrairement à létude des relations
-familiales et intergénérationnelles ou GGS par exemple. Virage n'est pas
-une enquête biographique avec calendrier des unions, contrairement à
-Erfi par exemple. Le questionnaire ne demande pas non plus à quand
-remonte l'identification à la bisexualité. En revanche, le questionnaire
-documente en détail la relation actuelle et la dernière relation si la
-personne n'est plus en couple. On ne peut pas reconstruire une vraie
-séquence biographique mais on peut caractériser l'état de sortie de la
-dernière relation pour les personnes actuellement célibataires. On peut
-notamment creuser trois axes : le type de célibat (jamais en couple,
-célibataire après rupture) ; le statut de la dernière relation (marié,
-pacs, union libre) et le mode de sortie (séparation, veuvage) ;
-l'intensité de l'engagement dans le relation (cohabitation, durée,
-enfants).
-
-#### Les célibataires après rupture
-
-Pour commencer nous construisons un graphique-portrait (une ligne par
-répondant) des hommes bisexuels de Virage PG qui sont célibataires après
-rupture au moment de l'enquête. Les effectifs sont trop faibles pour un
-tableau croisé avec pourcentages : on privilégie donc une lecture
-individu par individu.
-
-Le partage des célibataires jamais-en-couple / célibataires
-après-rupture est un résultat en lui-même. Un tiers des hommes bi
-célibataires (21/61) n'ont jamais eu de relation de couple au cours de
-leur vie. Cette catégorie se distingue de celle des célibataires
-"post-rupture" (40/61) que nous présentons ici.
-
-```{r}
-#| label: tbl-portrait célibat hommes bi  
-#| tbl-cap: "Le tableau portrait des hommes bi célibataires. Virage PG (pondéré)."
-
-pgnhbi_celibat = pgnhbi_celibat %>% 
-  select(
-    ID, couple_celib, statut_derniere_relation, etat_matrimonial_atteint, motif_fin_relation, nb_mariages_vie, cohabitation_derniere_relation, duree_cohabitation_mois, duree_derniere_relation, duree_depuis_rupture, sexe_dernier_conjoint, nb_enfants_ego) 
-
-view(pgnhbi_celibat)
-
-## Préparation des données pour le graphique
-
-pgnhbi_celibat_graph = pgnhbi_celibat %>%
-  filter(couple_celib == "Célibataire après rupture") %>% #on garde que les hommes célib après rupture
-  mutate(ID = fct_reorder(as.character(ID), duree_depuis_rupture))
-
-## Graphique 
-ggplot(pgnhbi_celibat_graph) +
-  aes(
-    x = duree_depuis_rupture,
-    y = ID,
-    fill = statut_derniere_relation, 
-    alpha = nb_enfants_ego > 0 
-  ) +
-  geom_bar(stat = "summary", fun = "sum", width = 0.7) +
-  scale_alpha_manual(
-    values = c("FALSE" = 0.6, "TRUE" = 1), 
-    labels = c("Sans enfant", "Avec enfant(s)"), 
-    name = " "
-  ) +
-  scale_fill_manual(
-    values = c("Union libre" = "#A5D1C2",
-    "Pacs" = "#E0A989",
-    "Mariage" = "#D39191"), 
-    name = "Statut dernière relation"
-  ) +
-  scale_x_continuous(
-    breaks = seq(0, 480, by = 60),       # Un repère tous les 60 mois (5 ans)
-    labels = function(x) paste0(x / 12, " ans") # Divise par 12 pour l'affichage
-  ) +
-  labs(
-    x = "Durée depuis la rupture (années)",
-    y = "Chaque ligne = Un parcours individuel",
-    title = "Trajectoire des hommes bisexuels célibataires après rupture (Virage PG)",
-    caption = "Lecture : 40 hommes ayant eu une relation par le passé. 21 hommes supplémentaires n'ont jamais eu de relation de couple au cours de la vie (non représentés ici). "
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    plot.title = element_text(face = "bold"),
-    plot.caption = element_text(face = "italic",
-    hjust = 0),
-    axis.text.y = element_blank(), 
-    panel.grid.major.y = element_blank()
-  )
-```
-
-Chez les 40 bisexuels qui ont connu au moins une relation et une
-rupture, le graphique fait apparaître deux populations : un noyau de
-relations longues (5 ans et plus) ; et une masse de relations plus
-courtes (moins de 3 ans). Dans les deux cas l'union libre est la forme
-la plus fréquente bien que le mariage soit plus présent dans les
-relations de 5 ans et plus. La plupart sont sans enfants. (à commenter :
-rapport au mariage Maillochon) Ce potentiel non-recours au mariage ne
-peut être présenté comme un résultat, on l'interrogera dans le cas des
-femmes bisexuelles, plus souvent en couple. L'observer simplement ici
-pose la question de ce que signifie le mariage pour les personnes
-bisexuelles. Majoritairement en couple hétéro dans Virage PG, on peut se
-demander si elles y ont autant recours que les hétéros. Le mariage à
-partir des années 1960 ne marque plus la naissance du couple mais sert
-de reconnaissance d'un couple préexistant. C'est une forme possible
-d'institutionnalisation, complété par le pacs qui est plus un mode
-alternatif d'officialisation qu'une étape vers le mariage. C'est bien
-plutôt la cohabitation qui institue le couple aujourd'hui
-[@maillochon2019]. Malheureusement les variables de cohabitation, durée
-de relation et sexe du dernier conjoint ne sont filtrées que pour les
-ruptures ayant eu lieu il y a moins de 8 mois. Ce choix de conception de
-l'enquête est logique : le module détaillé consacré aux relations ne
-s'applique qu'aux ruptures récentes survenues au cours de la période de
-référence de 12 mois utilisée par Virage tout au long de l'enquête.
-Questionner les individus sur des relations lointaines entraînerait des
-biais de mémoire. Ainsi les éléments sur la précédente relation ne nous
-donne que peu d'informations sur le véritable parcours conjugal. Et
-l'institutionnalisation d'un couple passé, via le pacs ou le mariage,
-nous dit peu de choses sans d'autres informations sur la relation.
-
-#### Les portraits d'hommes bisexuels célibataires dans l'enquête 
-
-Pour donner à voir les "parcours" je souhaite le compléter par quelques
-portraits rédigés descriptifs, choisis parmi les cas réels du tableau.
-Ils n'ont pas vocation à établir une typologie ou des cas-type mais
-plutôt d'illustrer concrètement ce que nous évoquons avec des tableaux
-et graphiques, sans sortir du registre descriptif et individuel.
-
-```{r}
-portraits = pg %>%
-  filter(ID %in% c(1000883659, 1000741429, 1001539144, 1004057398, 1002858986))
-save(portraits, file = "Portraits.Rdata")
-```
-
-Portrait 1 (id …1429)
-
-Arthur, âgé de 26 ans, né en 1989, réside dans une agglomération moyenne
-du Grand Est. Diplômé du supérieur (bac+3 ou plus), il occupe une
-profession intermédiaire, en emploi, pour un revenu individuel de 1 300
-à 1 600 euros mensuels. Il vit seul et sans enfant. Il situe son
-attirance, depuis l'âge de 17 ans, surtout vers le sexe opposé mais
-aussi vers le même sexe.
-
-Il a grandi avec ses deux parents, sans séparation connue, aux côtés
-d'une sœur (pas de frère). Son père occupait une profession
-intermédiaire (technicien, agent de maîtrise), sa mère une profession
-d'employée. La religion avait « un peu » d'importance dans son éducation
-; lui-même se déclare aujourd'hui sans religion. Il a quitté le domicile
-parental à 19 ans et occupé son premier emploi de plus de quatre mois à
-21 ans.
-
-Son premier rapport sexuel a eu lieu à 17 ans, avec une femme qui allait
-devenir sa conjointe, un rapport qu'il souhaitait ; son premier rapport
-avec un homme est survenu la même année. Il compte une huitaine de
-partenaires sur l'ensemble de sa vie (quatre hommes, quatre femmes),
-mais aucun rapport sexuel au cours des douze derniers mois. Sa seule
-relation de couple connue, en union libre, jamais formalisée, s'est
-terminée par une séparation il y a environ trois ans (vers ses 23 ans).
-
-Son orientation n'est connue ni de son père, ni de sa mère, ni de sa
-sœur. Elle l'est en revanche de certains de ses amis hétérosexuels et de
-tous ses collègues proches, mais pas des autres collègues, de son
-supérieur ni de son médecin traitant. Il a déjà été confronté à une
-menace de dévoilement non consenti émanant de sa famille, et évite, dans
-certains lieux, les gestes affectueux en public par crainte. Il ne
-fréquente jamais de lieux gays ou lesbiens.
-
-Portrait 2 (id …3659)
-
-Âgé de 60 ans, né en 1955, cet homme vit dans une agglomération moyenne
-de Nouvelle-Aquitaine. Titulaire d'un CAP/BEP, il occupe une profession
-intermédiaire et reste en emploi à 60 ans, pour un revenu individuel de
-1 600 à 2 000 euros. Il vit seul, bien qu'il ait deux enfants,
-aujourd'hui âgés de 30 et 27 ans, qui ne partagent pas son logement. Il
-situe son attirance, depuis ses 17 ans, également répartie entre les
-deux sexes.
-
-Il est issu d'une fratrie très nombreuse : quatre frères et sept sœurs,
-soit douze enfants au total. Ses parents vivaient ensemble lorsqu'il
-avait 14 ans. Son père occupait une profession intermédiaire
-administrative ou commerciale ; sa mère n'a pas d'activité
-professionnelle déclarée, ce qui, au regard de la taille de la fratrie,
-évoque une mère au foyer. La religion avait « assez » d'importance dans
-son éducation ; il se déclare aujourd'hui sans religion. Il a quitté le
-domicile parental à 24 ans.
-
-Son premier rapport sexuel, à 16 ans, était avec une femme dont il était
-amoureux (mais qui n'était pas encore sa conjointe), un rapport souhaité
-; son premier rapport avec un homme est survenu à 17 ans. Il déclare une
-trentaine de partenaires sur l'ensemble de sa vie (dix hommes, vingt
-femmes), et des rapports sexuels récents, avec plusieurs nouveaux
-partenaires au cours des douze derniers mois — une vie sexuelle active
-malgré l'absence de couple.
-
-Sa dernière relation de couple était un mariage, décidé par les deux
-conjoints d'un commun accord, à l'âge de 25 ans, un mariage réellement
-désiré et non précédé d'une naissance. Il s'est terminé par une
-séparation il y a vingt-quatre ans (vers ses 36 ans) ; aucune autre
-relation de couple n'est recensée depuis lors — une trajectoire de long
-célibat après rupture conjugale. (Rappel : la variable construite « état
-matrimonial » le classe par erreur de construction comme « marié »,
-alors que sa déclaration directe indique « divorcé », que je retiens
-ici.)
-
-Ni son père ni sa mère ne savent qu'il est bisexuel ; certains de ses
-frères et sœurs le savent, depuis qu'il avait 19 ans. Aucun de ses amis
-hétérosexuels ni de ses collègues proches n'est informé ; seul son
-médecin traitant l'est. Il n'a jamais été incité à cacher son
-orientation, jamais menacé d'un dévoilement non consenti, n'évite jamais
-de gestes affectueux en public et ne fréquente jamais de lieux gays ou
-lesbiens — un profil de dévoilement sélectif et stable.
-
-Portrait 3 (id …9144)
-
-Âgé de 28 ans, né en 1987, cet homme vit dans une agglomération petite à
-moyenne des Pays de la Loire. Titulaire d'un baccalauréat, il est
-ouvrier et perçoit le revenu individuel le plus faible des cinq
-portraits (moins de 700 euros). Il vit en situation de famille
-monoparentale, sans enfant lui-même. Son attirance se porte, depuis ses
-19 ans, surtout vers le même sexe, mais aussi vers le sexe opposé.
-
-Ses parents se sont séparés alors qu'il avait 14 ans ; il vivait alors
-avec sa mère seule — et n'a, selon l'enquête, jamais quitté le domicile
-parental : il réside donc probablement encore aujourd'hui, à 28 ans,
-dans le foyer de sa mère, ce qui éclaire directement sa situation de
-ménage actuelle. Il a un frère (pas de sœur). Son père était ouvrier, sa
-mère employée. Il a occupé son premier emploi de plus de quatre mois à
-22 ans. Catholique, il n'accorde aujourd'hui « pas du tout »
-d'importance à la religion, qui n'en avait qu'un peu dans son éducation.
-
-Son premier rapport sexuel, à 17 ans, était avec une femme tout juste
-rencontrée, un rapport souhaité ; son premier rapport avec un homme est
-survenu à 21 ans. Il compte une vingtaine de partenaires sur l'ensemble
-de sa vie (dix hommes, dix femmes), et a eu des rapports sexuels
-récents, avec un nouveau partenaire, au cours des douze derniers mois.
-Sa relation de couple la plus récente des cinq portraits — en union
-libre, avec un homme de trois ans son aîné, sans cohabitation, d'une
-durée de deux ans — s'est terminée par une séparation il y a trois mois.
-
-Sa mère et son frère savent qu'il est bisexuel, depuis qu'il avait 26
-ans — les deux l'ayant, semble-t-il, appris au même moment — et l'ont
-totalement accepté d'emblée, comme aujourd'hui encore. Tous ses amis
-hétérosexuels le savent également, ainsi que son médecin traitant ; en
-revanche, ni ses collègues ni son supérieur ne sont informés. Il n'a
-jamais été incité à cacher son orientation ni menacé d'un dévoilement
-non consenti. Il évite, dans certains lieux, les gestes affectueux en
-public, mais c'est le seul des cinq portraits à fréquenter,
-occasionnellement, des lieux gays et lesbiens.
-
-Portrait 4 (id …8986)
-
-Âgé de 56 ans, né en 1959, cet homme réside à Paris ou en petite
-couronne. Diplômé du supérieur à un niveau élevé (bac+5), cadre de
-profession, il est actuellement au chômage indemnisé, pour un revenu
-individuel de 700 à 1 000 euros — sensiblement inférieur à ce qu'on
-attendrait de sa position sociale, signe probable d'une perte d'emploi
-récente. Immigré, arrivé en France à 30 ans, il vit seul et sans enfant.
-Il situe son attirance également répartie entre les deux sexes.
-
-Il a grandi avec ses deux parents, tous deux d'origine immigrée, aux
-côtés d'un frère et d'une sœur. Son père était employé, sa mère sans
-activité professionnelle déclarée. Il a quitté le domicile parental à 30
-ans — au moment même de son arrivée en France, ce qui suggère un départ
-lié à la migration plutôt qu'une décohabitation ordinaire. Il se
-rattache à une confession religieuse « autre » que les catégories
-usuelles, à laquelle il accorde aujourd'hui « un peu » d'importance ;
-elle en avait « assez » dans son éducation.
-
-Son premier rapport sexuel, tardif, à 27 ans, était avec une femme tout
-juste rencontrée — un rapport qu'il n'avait pas souhaité mais avait
-accepté. Son premier rapport avec un homme est survenu plus tard encore,
-à 31 ans. Le nombre de partenaires sur l'ensemble de sa vie n'est pas
-établi avec certitude (réponse « ne sait pas » à la question globale,
-alors que le détail déclaré suggère un chiffre très élevé — à traiter
-avec prudence). Il a eu des rapports sexuels récents, avec plusieurs
-nouveaux partenaires, au cours des douze derniers mois. Il est le seul
-des cinq portraits à n'avoir, selon l'enquête, jamais eu de relation de
-couple.
-
-Tous ses frères et sœurs savent qu'il est bisexuel, mais seulement
-depuis ses 38 ans — une reconnaissance tardive au regard de son âge
-actuel — et l'ont totalement acceptée, alors comme aujourd'hui. Tous ses
-amis hétérosexuels le savent également. Il a déjà été incité à cacher
-son orientation par des amis et des collègues, une situation qu'il juge
-susceptible de se reproduire, et a déjà subi des menaces de dévoilement
-non consenti dans au moins deux contextes distincts, dont le cadre
-professionnel — le profil le plus exposé des cinq portraits sur ce plan.
-Il déclare pourtant n'éviter jamais les gestes affectueux en public, et
-ne fréquente jamais de lieux gays ou lesbiens.
-
-Portrait 5 (id …7398)
-
-Âgé de 52 ans, né en 1963, cet homme vit dans un village de moins de 2
-000 habitants en Occitanie. Sans diplôme, retraité, il perçoit le revenu
-individuel le plus élevé des cinq portraits (plus de 3 000 euros,
-vraisemblablement une pension). Il vit seul et sans enfant. Il situe son
-attirance, depuis ses 20 ans, surtout vers le sexe opposé, mais aussi
-vers le même sexe.
-
-Ses parents vivaient ensemble lorsqu'il avait 14 ans. Il a une sœur (pas
-de frère). Son père était cadre administratif ou commercial (ingénieur
-possible), sa mère cadre de la fonction publique ou profession
-scientifique — une origine sociale nettement plus favorisée que sa
-situation actuelle sans diplôme, ce qui dessine une trajectoire
-descendante par rapport à ses parents. Catholique, il est le seul des
-cinq à accorder aujourd'hui « beaucoup » d'importance à la religion,
-comme elle en avait dans son éducation. Il a quitté le domicile parental
-à 18 ans et n'a subi, dit-il, aucune pression familiale au mariage.
-
-Son premier rapport sexuel, précoce, à 14 ans, était avec une femme tout
-juste rencontrée, un rapport souhaité ; son premier rapport avec un
-homme est survenu à 20 ans. Il compte une dizaine de partenaires sur
-l'ensemble de sa vie (trois hommes, sept femmes), mais aucun rapport
-sexuel au cours des douze derniers mois — cohérent avec un veuvage
-récent.
-
-Il a vécu trente-cinq ans avec une femme, en pacs, en cohabitation
-continue, une relation commencée vers ses 17 ans et achevée par le décès
-de sa partenaire il y a sept mois. Il déclare par ailleurs un mariage au
-cours de sa vie, célébré à ses 25 ans, décidé par les deux conjoints,
-réellement désiré et non précédé d'une naissance — sans qu'on puisse
-établir avec certitude s'il s'agit du même épisode que l'union pacsée
-qui vient de s'achever, ou d'un épisode antérieur distinct.
-
-Son père, sa mère et sa sœur savent tous qu'il est bisexuel, depuis ses
-21 ans — une divulgation apparemment simultanée à l'ensemble du cercle
-familial proche — et l'ont totalement acceptée, alors comme aujourd'hui.
-Certains de ses amis hétérosexuels le savent également, ainsi que son
-médecin traitant. Il n'a jamais été incité à cacher son orientation ni
-menacé d'un dévoilement non consenti, et déclare n'éviter jamais les
-gestes affectueux en public — à nuancer toutefois, la question portant
-sur un partenaire de même sexe, alors que sa dernière relation, vécue
-trente-cinq ans durant, était avec une femme. Il ne fréquente jamais de
-lieux gays ou lesbiens.
-
-Quelques lignes de force qui ressortent une fois les portraits mis côte
-à côte, si tu veux les reprendre en synthèse :
-
-Le dévoilement familial et le "jamais en couple" ne se recoupent pas
-simplement. Le portrait 4 (jamais en couple) a un dévoilement familial
-tardif (38 ans) mais large (toute la fratrie, tous les amis) ; le
-portrait 2 (24 ans de célibat après rupture) a un dévoilement quasi
-inexistant en famille mais stable et non conflictuel. Le célibat
-conjugal ne prédit donc pas le rapport à l'entourage. Le rapport à la
-sexualité pendant le célibat est hétérogène : deux portraits (1 et 5)
-n'ont eu aucun rapport sexuel dans l'année, deux autres (2 et 4) restent
-sexuellement actifs avec de nouveaux partenaires malgré l'absence de
-couple — utile si tu veux nuancer l'équation "célibataire = désengagé
-sexuellement". Le portrait 3 est le seul où l'origine sociale, la
-trajectoire résidentielle (jamais quitté le foyer maternel) et le
-célibat s'articulent de façon lisible — les quatre autres montrent des
-chemins plus disparates.
 
 ## IV. Les situations conjugales des femmes bisexuelles
 
@@ -1781,102 +1686,4 @@ moins longues, à âge égal, type de couple égal....
 
 # Annexes
 
-```{# {r}
-# #| label: tbl-trachman-lejbowicz-2018
-# #| tbl-cap: "Caractéristiques sociodémographiques des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)."
-# 
-# # Liste commune des variables à inclure et leurs labels
-# tab1_annexe_vars = c("age", "diplome", "statut_act", "csp", "territoire", "mig")
-# labs = list(
-#   age        ~ "Groupe d'âges",
-#   diplome    ~ "Diplôme le plus élevé obtenu",
-#   statut_act ~ "Statut d'activité",
-#   csp        ~ "Catégorie socioprofessionnelle",
-#   territoire ~ "Territoire d'habitation", 
-#   mig ~ "Statut migratoire"
-# )
-# 
-# # Tableau PG pondéré -- Femmes
-# tab1_annexe_pg_f = dwf %>%
-#   tbl_svysummary(
-#     by = idsexu,
-#     include = all_of(tab1_annexe_vars),
-#     statistic = all_categorical() ~ "{p}",
-#     digits = all_categorical() ~ 1,
-#     label = labs,
-#     missing = "no"
-#   ) %>%
-#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-#   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
-#   bold_labels() %>%
-#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
-#   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
-# 
-# # Tableau PG pondéré -- Hommes
-# tab1_annexe_pg_h = dwh %>%
-#   tbl_svysummary(
-#     by = idsexu,
-#     include = all_of(vars_inc),
-#     statistic = all_categorical() ~ "{p}",
-#     digits = all_categorical() ~ 1,
-#     label = labs,
-#     missing = "no"
-#   ) %>%
-#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-#   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
-#   bold_labels() %>%
-#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
-#   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
-# 
-# # Tableau LGBT non pondéré -- Femmes
-# tab1_annexe_lgbt_f = lgbtnf %>%
-#   tbl_summary(
-#     by = idsexu,
-#     include = all_of(vars_inc),
-#     statistic = all_categorical() ~ "{p}",
-#     digits = all_categorical() ~ 1,
-#     label = labs,
-#     missing = "no"
-#   ) %>%
-#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-#   add_p(
-#   test = all_categorical() ~ "fisher.test",
-#   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
-# ) %>%
-#   bold_labels() %>%
-#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
-#   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
-# 
-# # Tableau LGBT non pondéré -- Hommes
-# tab1_annexe_lgbt_h = lgbtnh %>%
-#   tbl_summary(
-#     by = idsexu,
-#     include = all_of(vars_inc),
-#     statistic = all_categorical() ~ "{p}",
-#     digits = all_categorical() ~ 1,
-#     label = labs,
-#     missing = "no"
-#   ) %>%
-#   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%  
-#   add_p(
-#   test = all_categorical() ~ "fisher.test",
-#   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
-# ) %>%
-#   bold_labels() %>%
-#   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
-#   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
-# 
-# # Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz
-# tab1_annexe = tbl_merge(
-#   tbls = list(tab1_annexe_pg_f, tab1_annexe_pg_h, tab1_annexe_lgbt_f, tab1_annexe_lgbt_h),
-#   tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
-# ) %>%
-#   modify_caption(
-#     "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés."
-#   )
-# 
-# # Version FINALE
-# tab1_annexe %>%
-#   as_flex_table() %>%
-#   mise_en_forme_ft()
-```
+`{# {r} # #| label: tbl-trachman-lejbowicz-2018 # #| tbl-cap: "Caractéristiques sociodémographiques des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)." #  # # Liste commune des variables à inclure et leurs labels # tab1_annexe_vars = c("age", "diplome", "statut_act", "csp", "territoire", "mig") # labs = list( #   age        ~ "Groupe d'âges", #   diplome    ~ "Diplôme le plus élevé obtenu", #   statut_act ~ "Statut d'activité", #   csp        ~ "Catégorie socioprofessionnelle", #   territoire ~ "Territoire d'habitation",  #   mig ~ "Statut migratoire" # ) #  # # Tableau PG pondéré -- Femmes # tab1_annexe_pg_f = dwf %>% #   tbl_svysummary( #     by = idsexu, #     include = all_of(tab1_annexe_vars), #     statistic = all_categorical() ~ "{p}", #     digits = all_categorical() ~ 1, #     label = labs, #     missing = "no" #   ) %>% #   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%   #   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>% #   bold_labels() %>% #   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>% #   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**") #  # # Tableau PG pondéré -- Hommes # tab1_annexe_pg_h = dwh %>% #   tbl_svysummary( #     by = idsexu, #     include = all_of(vars_inc), #     statistic = all_categorical() ~ "{p}", #     digits = all_categorical() ~ 1, #     label = labs, #     missing = "no" #   ) %>% #   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%   #   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>% #   bold_labels() %>% #   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>% #   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**") #  # # Tableau LGBT non pondéré -- Femmes # tab1_annexe_lgbt_f = lgbtnf %>% #   tbl_summary( #     by = idsexu, #     include = all_of(vars_inc), #     statistic = all_categorical() ~ "{p}", #     digits = all_categorical() ~ 1, #     label = labs, #     missing = "no" #   ) %>% #   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%   #   add_p( #   test = all_categorical() ~ "fisher.test", #   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000) # ) %>% #   bold_labels() %>% #   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>% #   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**") #  # # Tableau LGBT non pondéré -- Hommes # tab1_annexe_lgbt_h = lgbtnh %>% #   tbl_summary( #     by = idsexu, #     include = all_of(vars_inc), #     statistic = all_categorical() ~ "{p}", #     digits = all_categorical() ~ 1, #     label = labs, #     missing = "no" #   ) %>% #   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%   #   add_p( #   test = all_categorical() ~ "fisher.test", #   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000) # ) %>% #   bold_labels() %>% #   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>% #   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**") #  # # Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz # tab1_annexe = tbl_merge( #   tbls = list(tab1_annexe_pg_f, tab1_annexe_pg_h, tab1_annexe_lgbt_f, tab1_annexe_lgbt_h), #   tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux # ) %>% #   modify_caption( #     "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés." #   ) #  # # Version FINALE # tab1_annexe %>% #   as_flex_table() %>% #   mise_en_forme_ft()`
