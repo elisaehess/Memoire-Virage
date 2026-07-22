@@ -332,7 +332,8 @@ pg_base = pg %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("En couple au cours des 12 derniers mois (> 4 mois)"), 
     
-    # ↓ Statut du couple au moment de l'enquête (sur l'ensemble)
+    # ↓ Statut du couple au moment de l'enquête (sur l'ensemble). Pas construit à partir de FCPL, 
+    # mais de Q6, Q7, Q9, Q13 
     statutcouple = fct_recode(
       as_factor(Situmat),
       "NVPD/NSP" = "NVPD",
@@ -463,7 +464,8 @@ pg_base = pg %>%
     ) %>%
       fct_relevel("En couple cohabitant", "En couple non cohabitant", "Pas en couple") %>% 
       set_variable_labels("Cohabitation"),
-    # ↓ Nombre d'enfants du couple (filtré sur pers. en couple à l'enquête)
+    # ↓ Nombre d'enfants du couple parmi vos enfants 
+    # (filtré sur pers. en couple à l'enquête et avec au moins 1 enfant)
     enf_couple = fct_recode(
       as_factor(ENF2),
       NULL = "",
@@ -669,7 +671,10 @@ pgn_conjugal = pgn %>%
   )
 
 pgnf_conjugal = pgn_conjugal %>% # sous-pop femmes en couple > 4 mois
-  filter(genre == "Une femme")
+  filter(genre == "Une femme") %>% 
+  mutate(
+    typecpl = fct_drop(typecpl) # supprime "NSP/NVPD" (vide ici)
+  )
 
 pgnh_conjugal = pgn_conjugal %>% # sous-pop hommes en couple > 4 mois
   filter(genre == "Un homme")

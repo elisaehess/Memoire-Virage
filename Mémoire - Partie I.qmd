@@ -863,8 +863,7 @@ célibataires (21/61) n'ont jamais eu de relation de couple au cours de
 leur vie. Cette catégorie se distingue de celle des célibataires
 "post-rupture" (40/61) que nous présentons ici.
 
-```{r} #| label: tbl-portrait célibat hommes bi   #| tbl-cap: "Le tableau portrait des hommes bi célibataires. Virage PG (pondéré)."  pgnhbi_celibat = pgnhbi_celibat %>%    select(     ID, couple_celib, statut_derniere_relation, etat_matrimonial_atteint, motif_fin_relation, nb_mariages_vie, cohabitation_derniere_relation, duree_cohabitation_mois, duree_derniere_relation, duree_depuis_rupture, sexe_dernier_conjoint, nb_enfants_ego)   view(pgnhbi_celibat)  ## Préparation des données pour le graphique  pgnhbi_celibat_graph = pgnhbi_celibat %>%   filter(couple_celib == "Célibataire après rupture") %>% #on garde que les hommes célib après rupture   mutate(ID = fct_reorder(as.character(ID), duree_depuis_rupture))  ## Graphique  ggplot(pgnhbi_celibat_graph) +   aes(     x = duree_depuis_rupture,     y = ID,     fill = statut_derniere_relation,      alpha = nb_enfants_ego > 0    ) +   geom_bar(stat = "summary", fun = "sum", width = 0.7) +   scale_alpha_manual(     values = c("FALSE" = 0.6, "TRUE" = 1),      labels = c("Sans enfant", "Avec enfant(s)"),      name = " "   ) +   scale_fill_manual(     values = c("Union libre" = "#A5D1C2",     "Pacs" = "#E0A989",     "Mariage" = "#D39191"),      name = "Statut dernière relation"   ) +   scale_x_continuous(     breaks = seq(0, 480, by = 60),       # Un repère tous les 60 mois (5 ans)     labels = function(x) paste0(x / 12, " ans") # Divise par 12 pour l'affichage   ) +   labs(     x = "Durée depuis la rupture (années)",     y = "Chaque ligne = Un parcours individuel",     title = "Trajectoire des hommes bisexuels célibataires après rupture (Virage PG)",     caption = "Lecture : 40 hommes ayant eu une relation par le passé. 21 hommes supplémentaires n'ont jamais eu de relation de couple au cours de la vie (non représentés ici). "   ) +   theme_minimal() +   theme(     legend.position = "bottom",     plot.title = element_text(face = "bold"),     plot.caption = element_text(face = "italic",     hjust = 0),     axis.text.y = element_blank(),      panel.grid.major.y = element_blank()   )}
-```
+`{r} #| label: tbl-portrait célibat hommes bi   #| tbl-cap: "Le tableau portrait des hommes bi célibataires. Virage PG (pondéré)."  pgnhbi_celibat = pgnhbi_celibat %>%    select(     ID, couple_celib, statut_derniere_relation, etat_matrimonial_atteint, motif_fin_relation, nb_mariages_vie, cohabitation_derniere_relation, duree_cohabitation_mois, duree_derniere_relation, duree_depuis_rupture, sexe_dernier_conjoint, nb_enfants_ego)   view(pgnhbi_celibat)  ## Préparation des données pour le graphique  pgnhbi_celibat_graph = pgnhbi_celibat %>%   filter(couple_celib == "Célibataire après rupture") %>% #on garde que les hommes célib après rupture   mutate(ID = fct_reorder(as.character(ID), duree_depuis_rupture))  ## Graphique  ggplot(pgnhbi_celibat_graph) +   aes(     x = duree_depuis_rupture,     y = ID,     fill = statut_derniere_relation,      alpha = nb_enfants_ego > 0    ) +   geom_bar(stat = "summary", fun = "sum", width = 0.7) +   scale_alpha_manual(     values = c("FALSE" = 0.6, "TRUE" = 1),      labels = c("Sans enfant", "Avec enfant(s)"),      name = " "   ) +   scale_fill_manual(     values = c("Union libre" = "#A5D1C2",     "Pacs" = "#E0A989",     "Mariage" = "#D39191"),      name = "Statut dernière relation"   ) +   scale_x_continuous(     breaks = seq(0, 480, by = 60),       # Un repère tous les 60 mois (5 ans)     labels = function(x) paste0(x / 12, " ans") # Divise par 12 pour l'affichage   ) +   labs(     x = "Durée depuis la rupture (années)",     y = "Chaque ligne = Un parcours individuel",     title = "Trajectoire des hommes bisexuels célibataires après rupture (Virage PG)",     caption = "Lecture : 40 hommes ayant eu une relation par le passé. 21 hommes supplémentaires n'ont jamais eu de relation de couple au cours de la vie (non représentés ici). "   ) +   theme_minimal() +   theme(     legend.position = "bottom",     plot.title = element_text(face = "bold"),     plot.caption = element_text(face = "italic",     hjust = 0),     axis.text.y = element_blank(),      panel.grid.major.y = element_blank()   )}`
 
 Chez les 40 bisexuels qui ont connu au moins une relation et une
 rupture, le graphique fait apparaître deux populations : un noyau de
@@ -981,21 +980,21 @@ sa mère à Orvault dans les Pays de la Loire. Ses parents sont séparés,
 il a un frère et n'a jamais quitté le domicile maternel. Son père était
 ouvrier et sa mère employée. La religion était un peu présente dans son
 éducation, il n' y accorde aujourd'hui pas du tout d'importance mais se
-dit catholique. Il est titulaire d'un baccalauréat, il a occupé son
-premier emploi de plus de quatre mois à 22 ans et est aujourd'hui
-chauffeur pour moins de 700 euros de revenu mensuel. Son attirance se
-porte, depuis ses 19 ans, surtout vers le même sexe, mais aussi vers le
-sexe opposé.
+dit catholique. Il déclare des faits répétés de violence physique Il est
+titulaire d'un baccalauréat, il a occupé son premier emploi de plus de
+quatre mois à 22 ans et est aujourd'hui chauffeur pour moins de 700
+euros de revenu mensuel.
 
 *Des pratiques réparties entre les deux sexes et une relation de couple
-avec un homme, récemment terminée.* Son premier rapport sexuel, à 17
-ans, était avec une femme tout juste rencontrée ; son premier rapport
-avec un homme est survenu à 21 ans. Il compte une vingtaine de
-partenaires sur l'ensemble de sa vie (dix hommes, dix femmes). Sa
-dernière et seule relation de couple qui a duré deux ans, avec un homme
-de trois ans son aîné, s'est terminée par une séparation il y a trois
-mois. Il a eu des rapports sexuels avec un nouveau partenaire au cours
-des douze derniers mois.
+avec un homme, récemment terminée.* Son attirance se porte, depuis ses
+19 ans, surtout vers le même sexe, mais aussi vers le sexe opposé. Son
+premier rapport sexuel, à 17 ans, était avec une femme tout juste
+rencontrée ; son premier rapport avec un homme est survenu à 21 ans. Il
+compte une vingtaine de partenaires sur l'ensemble de sa vie (dix
+hommes, dix femmes). Sa dernière et seule relation de couple qui a duré
+deux ans, avec un homme de trois ans son aîné, s'est terminée par une
+séparation il y a trois mois. Il a eu des rapports sexuels avec un
+nouveau partenaire au cours des douze derniers mois.
 
 *Une bisexualité connue*. Sa mère et son frère savent qu'il est
 bisexuel, depuis qu'il avait 26 ans, on peut supposer au moment de la
@@ -1008,7 +1007,7 @@ cacher son orientation ni menacé d'un dévoilement non consenti. Il
 évite, dans certains lieux, les gestes affectueux en public. Il
 fréquente occasionnellement, des lieux gays et lesbiens.
 
-Portrait 4 (id …8986)
+##### Portrait 4 (id …8986)
 
 Âgé de 56 ans, né en 1959, Abdel réside en petite couronne de Paris.
 Diplômé du supérieur (bac+5), ingénieur de profession, il est au chômage
@@ -1039,7 +1038,7 @@ distincts, dont le cadre professionnel. Il déclare n'éviter jamais les
 gestes affectueux en public, et ne fréquente jamais de lieux gays ou
 lesbiens.
 
-Portrait 5 (id …7398)
+##### Portrait 5 (id …7398)
 
 Âgé de 52 ans, né en 1963, Sylvain vit dans un village en Occitanie. Il
 a une soeur, son père était ingénieur et sa mère cadre de la fonction
@@ -1153,17 +1152,16 @@ avec âge : hommes populaires et moins diplômés)
 
 ### Cadrage
 
-On a vu dans la partie I que les femmes bisexuelles sont aussi souvent
+On a vu dans la partie A. que les femmes bisexuelles sont aussi souvent
 célibataires que les lesbiennes, mais que lorsqu'elles sont en couple
 elles le sont très majoritairement avec un homme (51,3 % de l'ensemble
 des femmes bisexuelles de Virage PG sont en couple avec un homme, soit
 90 % de celles qui sont en couple). On se demande ici ce que recouvre
 concrètement cette conjugalité : avec qui les femmes bisexuelles
-forment-elles couple (sexe et position sociale du/de la conjoint·e),
-quelle est la position relative d'Ego dans ce couple (revenu et
-patrimoine comparés, revenu du ménage) et dans quelle mesure ce couple
-est institutionnalisé (mariage/Pacs, cohabitation, durée de la relation,
-enfants du couple).
+font-elles couple (position sociale du/de la conjoint·e), quelle est
+leur position relative dans ce couple (revenu et patrimoine comparés,
+revenu du ménage) et dans quelle mesure ce couple est institutionnalisé
+(mariage/Pacs, cohabitation, durée de la relation, enfants du couple).
 
 On se limite pour l'instant à Virage PG, où la comparaison Hétéro / Bi /
 Homo reste possible avec pondération et intervalles de confiance. La
@@ -1171,12 +1169,12 @@ comparaison spécifique des couples bi de sexe différent (PG) et bi de
 même sexe (LGBT) est renvoyée à un second temps (hypothèse 5, partie I).
 
 Champ des tableaux qui suivent : femmes de 20-69 ans ayant eu une
-relation de couple de 4 mois ou plus au cours des 12 derniers mois (FCPL
-= 01 à 04, base pgnf_conjugal). C'est un champ plus large que celui des
-seules personnes en couple au moment de l'enquête : il inclut aussi les
-personnes dont la relation qualifiante s'est terminée récemment, ce qui
-peut faire apparaître quelques cas "Pas en couple" dans la variable de
-statut conjugal au moment de l'enquête (statutcouple).
+relation de couple de 4 mois ou plus au cours des 12 derniers mois.
+C'est un champ plus large que celui des seules personnes en couple au
+moment de l'enquête : il inclut aussi les personnes dont la relation
+qualifiante s'est terminée récemment, ce qui peut faire apparaître
+quelques cas "Pas en couple" dans la variable de statut conjugal au
+moment de l'enquête.
 
 ```{r}
 #| include: false
@@ -1191,6 +1189,14 @@ dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf
 
 # Variables à inclure
 tab4_vars = c("typecpl", "revenu_compare", "patrimoine_compare", "revenu_menage", "ecart_age", "statutcouple", "cohabitation", "duree_rel", "enf_couple")
+## champ des variables 
+# revenu et patrimoine comparé ; ecart age : FCPL = 01...04
+# revenu menage : FCOHAB = 01...04 
+# statut couple : à partir de Q6, Q7, Q9, Q13
+# cohabitation : à partir de FCOHAB 
+# duree_rel : Q6, Q11_duree, Q15
+# Enf_couple : FCPL 01...04 ET au moins 1 enfant déclaré 
+
 
 # Tableau PG pondéré -- Femmes en couple
 tab4 = dwf_conjugal %>%
