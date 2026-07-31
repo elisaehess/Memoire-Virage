@@ -1,0 +1,16 @@
+/* Style général du texte académique */
+
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 12pt;       /* Taille de police 12 */
+  line-height: 1.5;      /* Interligne 1.5 */
+  text-align: justify;   /* Texte justifié */
+  color: #000000;        /* Noir pur pour une rigidité académique */
+}
+
+/* Ajustement des titres */
+
+h1, h2, h3, h4 {
+  font-family: "Times New Roman", Times, serif;
+  color: #111111;
+}

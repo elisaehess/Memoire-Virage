@@ -81,7 +81,7 @@ pg_base = pg %>%
     REV3, # ressources mensuelles nettes du (précédent) ménage
     REV4bis, # Revenu // (ex)partenaire
     REV5, # patrimoine ménage
-    ENF3a, # enfants (ex)partenaire avec autre personne
+    Enf3, # enfants (ex)partenaire avec autre personne
     ENF4_01, # sexe premier enfant ego
     ENF4_02, # sexe deuxième enfant ego 
     ENF5_01, # âge premier enfant 
@@ -407,26 +407,6 @@ pg_base = pg %>%
                         "NSP/NVPD")) %>%
       set_variable_labels("Type de couple"),
     
-    # ↓ Nombre d'enfants d'ego (sur l'ensemble)
-    enf_ego = fct_recode(
-      as_factor(Enf1), 
-      "Non" = "0", 
-      "Oui" = "1", 
-      "Oui" = "2",
-      "Oui" = "3",
-      "Oui" = "4",
-      "Oui" = "5",
-      "Oui" = "6",
-      "Oui" = "7",
-      "Oui" = "8",
-      "Oui" = "9",
-      "Oui" = "10",
-      "Oui" = "11",
-      "Oui" = "12"
-    ) |> 
-      fct_relevel("Oui", "Non") %>% 
-      set_variable_labels("A des enfants"), 
-    
     # ↓ Célibat et dernière relation 
     couple_celib = fct_recode(
       as_factor(Q6), 
@@ -464,9 +444,31 @@ pg_base = pg %>%
     ) %>%
       fct_relevel("En couple cohabitant", "En couple non cohabitant", "Pas en couple") %>% 
       set_variable_labels("Cohabitation"),
+    
+    # ↓ Nombre d'enfants d'ego (sur l'ensemble)
+    enf_ego = fct_recode(
+      as_factor(Enf1), 
+      NULL = "", 
+      "Non" = "0", 
+      "Oui" = "1", 
+      "Oui" = "2",
+      "Oui" = "3",
+      "Oui" = "4",
+      "Oui" = "5",
+      "Oui" = "6",
+      "Oui" = "7",
+      "Oui" = "8",
+      "Oui" = "9",
+      "Oui" = "10",
+      "Oui" = "11",
+      "Oui" = "12"
+    ) |> 
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("A des enfants"), 
+    
     # ↓ Nombre d'enfants du couple parmi vos enfants 
     # (filtré sur pers. en couple à l'enquête et avec au moins 1 enfant)
-    enf_couple = fct_recode(
+    enf_avc_cjt = fct_recode(
       as_factor(ENF2),
       NULL = "",
       "Non" = "00",
@@ -486,6 +488,45 @@ pg_base = pg %>%
     ) %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("A un/des enfant(s) avec (ex) conjoint·e"),
+    
+    # ↓ Enfant conjoint avec une autre personne
+    enf_cjt_autre = fct_recode(
+      as_factor(Enf3), 
+      "Non" = "0", 
+      "Oui" = "1", 
+      "Oui" = "2", 
+      "Oui" = "3", 
+      "Oui" = "4", 
+      "Oui" = "5", 
+      "Oui" = "6", 
+      "Oui" = "7", 
+      "Oui" = "11"
+    ) %>%
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("Enfant partenaire avec autre personne"),
+    
+    # (filtré sur pers. en couple à l'enquête et avec au moins 1 enfant)
+    enf_couple = fct_recode(
+      as_factor(ENF2),
+      "Sans enfant" = "",
+      "Enfant(s) d'une précédente union" = "00",
+      "Enfant(s) dans le couple" = "01",
+      "Enfant(s) dans le couple" = "02",
+      "Enfant(s) dans le couple" = "03",
+      "Enfant(s) dans le couple" = "04",
+      "Enfant(s) dans le couple" = "05",
+      "Enfant(s) dans le couple" = "06",
+      "Enfant(s) dans le couple" = "07",
+      "Enfant(s) dans le couple" = "08",
+      "Enfant(s) dans le couple" = "09",
+      "Enfant(s) dans le couple" = "10",
+      "Enfant(s) dans le couple" = "11",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>%
+      fct_relevel("Sans enfant", "Enfant(s) dans le couple", "Enfant(s) d'une précédente union") %>% 
+      set_variable_labels("Situation parentale"),
+    
     # ↓ Durée de la relation actuelle (en années, catégorisée)
     # DUR_RELCONJ en mois ; 888=NVPD, 999=NSP → NA
     dur_rel_mois = if_else(
@@ -562,15 +603,15 @@ pg_base = pg %>%
     # ↓ Revenu du ménage (REV3), en tranches. Champ : ménage cohabitant
     #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre du ménage).
     revenu_menage = case_when(
-      REV3 %in% c("00", "01", "02") ~ "Moins de 1 200€",
-      REV3 %in% c("03", "04")       ~ "De 1 200 à moins de 2 400€",
-      REV3 %in% c("05", "06")       ~ "De 2 400 à moins de 4 000€",
+      REV3 %in% c("00", "01", "02", "03") ~ "Moins de 1 800€",
+      REV3 %in% c("04", "05")       ~ "De 1 800 à moins de 3 000€",
+      REV3 %in% c("06")             ~ "De 3 000 à moins de 4 000€", 
       REV3 %in% c("07", "08")       ~ "4 000€ et plus",
       REV3 %in% c("10", "88", "99") ~ "Pas de budget commun/NVPD/NSP",
       TRUE                          ~ NA_character_
     ) %>%
-      factor(levels = c("Moins de 1 200€", "De 1 200 à moins de 2 400€",
-                        "De 2 400 à moins de 4 000€", "4 000€ et plus",
+      factor(levels = c("Moins de 1 800€", "De 1 800 à moins de 3 000€",
+                        "De 3 000 à moins de 4 000€", "4 000€ et plus",
                         "Pas de budget commun/NVPD/NSP")) %>%
       set_variable_labels("Revenu du ménage"),
     
@@ -748,7 +789,7 @@ pgnh_conjugal = pgn_conjugal %>% # sous-pop hommes en couple > 4 mois
 # 
 # save(pgn_conjugal, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgn_conjugal.Rdata")
 # 
-# save(pgnf_conjugal, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnf_conjugal.Rdata")
+save(pgnf_conjugal, file = "NOUVELLES BASES/pgnf_conjugal.Rdata")
 # 
 # save(pgnh_conjugal, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnh_conjugal.Rdata")
 # 
