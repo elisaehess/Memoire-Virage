@@ -304,6 +304,11 @@ pg_base = pg %>%
       fct_relevel("Moins de 20 000", "De 20 000 à 200 000", "200 000 et plus", "NVPD/NSP") %>% 
       set_variable_labels("Taille d'agglomération"), 
     
+    territoire = fct_recode(
+      as_factor(TERRITOIRE_3MOD),
+      "NVPD/NSP" = "NVPD",
+      "NVPD/NSP" = "NSP"), 
+    
     # ↓ statut migratoire 
     mig = fct_recode(
       as_factor(Mig_e),

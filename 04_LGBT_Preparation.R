@@ -79,6 +79,8 @@ lgbtn = lgbt %>%
     EA2, 
     REV2, # Revenu individuel
     REV4, # Revenu subjectif
+    Q2_rec, # Reconstruire territoire
+    Q3_rec,  # Reconstruire territoire
     # ↓ Variables brutes pour reconstruire ETATMAT et SITUMAT
     Q6, Q6a,
     Q7, Q7a,

@@ -8,6 +8,8 @@ lang: fr
 format:
   docx:
     toc: true
+    toc_depth: 5
+    fig-cap-location: "top"
 execute:
   echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
   warning: false
@@ -52,20 +54,6 @@ dw = svydesign(id = ~1, weights = pgn$poids_cal, data = pgn)
 dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
 dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
 
-# Fonction de mise en forme ----
-mise_en_forme_ft <- function(ft) {
-ft %>%
-    fontsize(size = 7, part = "all") %>%
-    # padding gauche/droite à 0.5 pour gagner de la place :
-    padding(padding.top = 1, 
-            padding.bottom = 1, 
-            padding.left = 0.5, 
-            padding.right = 0.5, 
-            part = "all") %>%
-    line_spacing(space = 1, part = "all") %>% 
-    merge_h(i = 1, part = "header") %>% 
-    autofit()
-}
 ```
 
 # Partie I : les situations conjugales bisexuelles
@@ -353,7 +341,7 @@ tab1_pg_f = dwf %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
-  add_ci(pattern = "{stat} ({ci})") %>%  
+  add_ci(pattern = "{stat}\n({ci})") %>%  
   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
   bold_labels() %>%
   modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
@@ -368,7 +356,7 @@ tab1_pg_h = dwh %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
-  add_ci(pattern = "{stat} ({ci})") %>% 
+  add_ci(pattern = "{stat}\n({ci})") %>% 
   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
   bold_labels() %>%
   modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
@@ -432,8 +420,9 @@ tab1 %>%
     ref_symbols = "4", 
     part = "body"
   ) %>% 
-  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.") %>%
-  mise_en_forme_ft()
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
 ```
 
 #### La position sociale des bisexuel·les : des femmes moins dotées économiquement et des hommes plus présents dans la ruralité ?
@@ -584,10 +573,10 @@ faire une analyse bivariée sur plusieurs variables pour déterminer
 comment le fait d'être en couple varie, selon ces dernières.
 
 ```{r}
-#| label: graph-sociodemo-couple
-#| fig-cap: "En couple au cours des 12 derniers mois. Virage PG (pondéré)."
-#| fig-width: 8
-#| fig-height: 9
+#| label: fig-en-couple
+#| fig-cap: "En couple, au moins 4 mois, au cours des 12 derniers mois. Virage PG (pondéré)."
+#| fig-width: 10
+#| fig-height: 10
 
 # Créer fonction graph 
 
@@ -633,9 +622,9 @@ graphique1 = ggplot(base_graph1, aes(x = modalite, y= pct)) +
   scale_y_continuous(limits = c(0, 100)) + 
   theme_minimal() + 
   theme(panel.grid.major.x = element_blank(), # supprime lignes verticales de la grille
-        axis.text = element_text(family = "serif", size = 10, color = "black"),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
         axis.title = element_blank(),
-        strip.text = element_text(face = "italic",family = "serif", size = 10, color = "darkseagreen")
+        strip.text = element_text(face = "italic",family = "serif", size = 12, color = "darkseagreen")
         )
 graphique1
 ```
@@ -717,10 +706,10 @@ couple », on teste donc la probabilité d'être en couple.
 On peut voir que les modèles sont globalement significatifs.
 
 ```{r}
-#| label: tbl-regression-acces-conjugalite
-#| fig-cap: "Probabilité d'être en couple selon le genre toutes autres variables égales par ailleurs. Virage PG (pondéré)."
-#| fig-width: 8
-#| fig-height: 9
+#| label: fig-regression-en-couple
+#| fig-cap: "Probabilité d'être en couple plutôt que célibataire (régression logistique). Virage PG (données pondérées)."
+#| fig-width: 6.3
+#| fig-height: 7.5
 
 # Reg hommes 
 pgh_reg = pgnh %>%
@@ -768,8 +757,8 @@ ggcoef_compare(list("Homme" = regh, "Femme" = regf), exponentiate = T, type = "f
   theme(panel.grid.major.x = element_blank(), # supprime lignes verticales de la grille
         axis.text = element_text(family = "serif", color = "black"),
         axis.title = element_blank(),
-        strip.text.x = element_text(face = "italic",family = "serif", size = 10, color = "darkseagreen"),
-        strip.text.y = element_text(face = "italic",family = "serif", size = 10, color = "darkgrey")
+        strip.text.x = element_text(face = "italic",family = "serif", size = 12, color = "darkseagreen"),
+        strip.text.y = element_text(face = "italic",family = "serif", size = 12, color = "darkgrey")
   )
 ```
 
@@ -863,8 +852,8 @@ leur vie. Cette catégorie se distingue de celle des célibataires
 ```{r}
 #| label: fig-celibat-hommes-bi
 #| fig-cap: "Trajectoire des hommes bisexuels célibataires après rupture. Virage PG (pondéré)."
-#| fig-width: 8
-#| fig-height: 9
+#| fig-width: 6.3
+#| fig-height: 7.5
 
 # Sélectionner les variables
 
@@ -905,16 +894,16 @@ ggplot(pgnhbi_celibat_graph) +
   labs(
     x = "Durée depuis la rupture (années)",
     y = "Chaque ligne = Un parcours individuel",
-    title = "Trajectoire des hommes bisexuels célibataires après rupture (Virage PG)",
     caption = "Lecture : 40 hommes ayant eu une relation par le passé. 21 hommes supplémentaires n'ont jamais eu de relation de couple au cours de la vie (non représentés ici). "
   ) +
   theme_minimal() +
   theme(
     legend.position = "bottom",
-    plot.title = element_text(face = "bold"),
-    plot.caption = element_text(face = "italic",
-    hjust = 0),
+    plot.caption = element_text(family = "serif", face = "italic", size = 12, hjust = 0),
     axis.text.y = element_blank(), # masque numéros ID 
+    axis.text = element_text(family = "serif", size = 12), 
+    strip.text.x = element_text(family = "serif", size = 12),
+    strip.text.y = element_text(family = "serif", size = 12),
     panel.grid.major.y = element_blank() # masque lignes grille horizontales
   )
 ```
@@ -1230,7 +1219,7 @@ moment de l'enquête.
 
 ```{r}
 #| label: tbl-conjugalite-femmes-bi
-#| tbl-cap: "Les couples des femmes ayant été en couple (> 4 mois, 12 derniers mois), selon l'identification sexuelle. Virage PG (pondéré)."
+#| tbl-cap: "Les couples des femmes selon l'identification sexuelle, parmi les celles en couple dans l'année. Virage PG (pondéré)."
 
 # Plan de pondération -- femmes en couple > 4 mois (12 derniers mois)
 dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf_conjugal)
@@ -1250,18 +1239,28 @@ tab4 = dwf_conjugal %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
-  add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>%
+  add_ci(pattern = "{stat}\n({ci})") %>%
   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
   bold_labels() %>%
   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes en couple**") %>%
-  modify_caption(
-    "Champ : femmes de 20-69 ans en couple > 4 mois au cours des 12 derniers mois. Pourcentages pondérés."
-  )
+  modify_footnote( # notes bas de tableau 
+      p.value ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
 
 tab4 %>%
   as_flex_table() %>% 
-  mise_en_forme_ft()
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : femmes de 20-69 ans en couple, au moins 4 mois, au cours des 12 derniers mois.\nLecture : Parmi les femmes bisexuelles en couple dans l'enquête Virage en population générale, 8,9% sont en couple de même sexe, avec un intervalle de confiance à 95% de [4,6% - 17%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
 ```
 
 ancienne analyse : Des bisexuelles en couple avec des hommes mais proche
@@ -1398,9 +1397,9 @@ de la cohab, de la durée des relations
 
 ```{r}
 #| label: fig-institutionnalisation-couple-femmes-bi
-#| fig-cap: "Institutionnalisation du couple chez les femmes bisexuelles. Virage PG (pondéré)."
-#| fig-width: 8
-#| fig-height: 9
+#| fig-cap: "Institutionnalisation du couple chez les femmes bisexuelles en couple dans l'année (régression logistique). Virage PG (pondéré)."
+#| fig-width: 6.3
+#| fig-height: 7.5
 
 # Reg mariage
 
@@ -1505,14 +1504,14 @@ ggplot(forest_data, aes(x = estimate, y = modele, color = modalite)) +
     x = "log(OR) (réf. Hétéro)",
     y = NULL,
     color = "Identification\nsexuelle", 
-    title = "Institutionnalisation du couple chez les femmes bisexuelles",
-    subtitle = "Coefficients ajustés (âge, type de couple, revenu, enfants). Virage PG pondéré."
+    caption = "Coefficients ajustés (âge, type de couple, revenu, enfants). Virage PG pondéré."
   ) +
   theme_minimal(base_size = 12) +
   theme(panel.grid.minor = element_blank(), 
+        plot.caption = element_text(family = "serif", size = 12, hjust = 0),
         axis.text.y = element_text(family = "serif", face = "bold", color = "darkseagreen"),
-        title = element_text(family = "serif"),
-        subtitle = element_text(family = "serif", size = 10)
+        axis.text.x = element_text(family = "serif", size = 12), 
+        strip.text.x = element_text(family = "serif", size = 12)
         ) 
 
 ```
@@ -1860,152 +1859,54 @@ investie au quotidien.
 <!-- attirances : deschamps (2002) -->
 
 
-<!-- # Annexes -->
+# Annexes
 
-<!-- ## Annexe 1 : tableau socio-démo (Trachman, Lejbowicz, 2018) -->
+## Annexe 1 : tableau socio-démo (Trachman, Lejbowicz, 2018)
 
-<!-- ```{r} -->
-<!-- #| label: tbl-trachman-lejbowicz-2018 -->
-<!-- #| tbl-cap: "Caractéristiques sociodémographiques des répondant·es selon le sexe et l'identification sexuelle. Virage PG (pondéré) et Virage LGBT (non pondéré)." -->
 
-<!-- # Liste commune des variables à inclure et leurs labels -->
-<!-- tab1_annexe_vars = c("age", "diplome", "statut_act", "csp", "territoire", "mig") -->
-<!-- labs = list( -->
-<!--   age        ~ "Groupe d'âges", -->
-<!--   diplome    ~ "Diplôme le plus élevé obtenu", -->
-<!--   statut_act ~ "Statut d'activité", -->
-<!--   csp        ~ "Catégorie socioprofessionnelle", -->
-<!--   territoire ~ "Territoire d'habitation", -->
-<!--   mig ~ "Statut migratoire" -->
-<!-- ) -->
+## Annexe 2 : tableau régression situations conjugales des femmes bisexuelles
 
-<!-- # Tableau PG pondéré -- Femmes -->
-<!-- tab1_annexe_pg_f = dwf %>% -->
-<!--   tbl_svysummary( -->
-<!--     by = idsexu, -->
-<!--     include = all_of(tab1_annexe_vars), -->
-<!--     statistic = all_categorical() ~ "{p}", -->
-<!--     digits = all_categorical() ~ 1, -->
-<!--     label = labs, -->
-<!--     missing = "no" -->
-<!--   ) %>% -->
-<!--   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>% -->
-<!--   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>% -->
-<!--   bold_labels() %>% -->
-<!--   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>% -->
-<!--   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**") -->
+```{r}
+#| label: tbl-institutionnalisation-couple-femmes-bi
+#| tbl-cap: "Institutionnalisation du couple chez les femmes bisexuelles en couple dans l'année (régression logistique). Virage PG (pondéré)."
 
-<!-- # Tableau PG pondéré -- Hommes -->
-<!-- tab1_annexe_pg_h = dwh %>% -->
-<!--   tbl_svysummary( -->
-<!--     by = idsexu, -->
-<!--     include = all_of(vars_inc), -->
-<!--     statistic = all_categorical() ~ "{p}", -->
-<!--     digits = all_categorical() ~ 1, -->
-<!--     label = labs, -->
-<!--     missing = "no" -->
-<!--   ) %>% -->
-<!--   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>% -->
-<!--   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>% -->
-<!--   bold_labels() %>% -->
-<!--   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>% -->
-<!--   modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**") -->
+# Tableaux reg mariage, cohabitation, durée relation
 
-<!-- # Tableau LGBT non pondéré -- Femmes -->
-<!-- tab1_annexe_lgbt_f = lgbtnf %>% -->
-<!--   tbl_summary( -->
-<!--     by = idsexu, -->
-<!--     include = all_of(vars_inc), -->
-<!--     statistic = all_categorical() ~ "{p}", -->
-<!--     digits = all_categorical() ~ 1, -->
-<!--     label = labs, -->
-<!--     missing = "no" -->
-<!--   ) %>% -->
-<!--   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>% -->
-<!--   add_p( -->
-<!--   test = all_categorical() ~ "fisher.test", -->
-<!--   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000) -->
-<!-- ) %>% -->
-<!--   bold_labels() %>% -->
-<!--   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>% -->
-<!--   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**") -->
+reg_mariage_tab = tbl_regression(reg_mariage_svy, intercept = TRUE)
 
-<!-- # Tableau LGBT non pondéré -- Hommes -->
-<!-- tab1_annexe_lgbt_h = lgbtnh %>% -->
-<!--   tbl_summary( -->
-<!--     by = idsexu, -->
-<!--     include = all_of(vars_inc), -->
-<!--     statistic = all_categorical() ~ "{p}", -->
-<!--     digits = all_categorical() ~ 1, -->
-<!--     label = labs, -->
-<!--     missing = "no" -->
-<!--   ) %>% -->
-<!--   add_ci(statistic = ~ "[{conf.low}% - {conf.high}%]") %>% -->
-<!--   add_p( -->
-<!--   test = all_categorical() ~ "fisher.test", -->
-<!--   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000) -->
-<!-- ) %>% -->
-<!--   bold_labels() %>% -->
-<!--   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>% -->
-<!--   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**") -->
+reg_cohabitation_tab = tbl_regression(reg_cohabitation_svy, intercept = TRUE)
 
-<!-- # Fusion des 4 sous-tableaux en un seul, comme Trachman & Lejbowicz -->
-<!-- tab1_annexe = tbl_merge( -->
-<!--   tbls = list(tab1_annexe_pg_f, tab1_annexe_pg_h, tab1_annexe_lgbt_f, tab1_annexe_lgbt_h), -->
-<!--   tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux -->
-<!-- ) %>% -->
-<!--   modify_caption( -->
-<!--     "Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés." -->
-<!--   ) -->
+reg_duree_tab = tbl_regression(reg_duree_svy, intercept = TRUE)
 
-<!-- # Version FINALE -->
-<!-- tab1_annexe %>% -->
-<!--   as_flex_table() %>% -->
-<!--   mise_en_forme_ft() -->
-<!-- ``` -->
+# tableau condensé
 
-<!-- ## Annexe 2 : tableau régression situations conjugales des femmes bisexuelles -->
+tbl_mariage_condense = tbl_regression(
+  reg_mariage_svy,
+  include = c(idsexu, age, typecpl, revenu_sub, enf_ego),
+  label = idsexu ~ "Identification sexuelle"
+) %>%
+  modify_header(estimate ~ "**Mariage**")
 
-<!-- ```{r} -->
-<!-- #| label: tbl-régression institutionnalisation couple   -->
-<!-- #| tbl-cap: "Insitutionnalisation du couple. Virage PG (pondéré)." -->
+tbl_cohabitation_condense = tbl_regression(
+  reg_cohabitation_svy,
+  include = c(idsexu, age, typecpl, statutcouple, revenu_sub, enf_ego)
+) %>%
+  modify_header(estimate ~ "**Cohabitation**")
 
-<!-- # Tableaux reg mariage, cohabitation, durée relation  -->
+tbl_duree_condense = tbl_regression(
+  reg_duree_svy,
+  include = c(idsexu, age, typecpl, statutcouple, revenu_sub, enf_ego)
+) %>%
+  modify_header(estimate ~ "**Durée relation (>5 ans)**")
 
-<!-- reg_mariage_tab = tbl_regression(reg_mariage_svy, intercept = TRUE) -->
+tbl_reg_institutionnalisation = tbl_merge(
+  tbls = list(tbl_mariage_condense, tbl_cohabitation_condense, tbl_duree_condense),
+  tab_spanner = c("**Mariage**", "**Cohabitation**", "**Durée >5 ans**")
+) 
 
-<!-- reg_cohabitation_tab = tbl_regression(reg_cohabitation_svy, intercept = TRUE) -->
-
-<!-- reg_duree_tab = tbl_regression(reg_duree_svy, intercept = TRUE) -->
-
-<!-- # tableau condensé  -->
-
-<!-- tbl_mariage_condense = tbl_regression( -->
-<!--   reg_mariage_svy,  -->
-<!--   include = c(idsexu, age, typecpl, revenu_sub, enf_ego),    -->
-<!--   label = idsexu ~ "Identification sexuelle" -->
-<!-- ) %>%  -->
-<!--   modify_header(estimate ~ "**Mariage**") -->
-
-<!-- tbl_cohabitation_condense = tbl_regression( -->
-<!--   reg_cohabitation_svy,  -->
-<!--   include = c(idsexu, age, typecpl, statutcouple, revenu_sub, enf_ego) -->
-<!-- ) %>%  -->
-<!--   modify_header(estimate ~ "**Cohabitation**") -->
-
-<!-- tbl_duree_condense = tbl_regression( -->
-<!--   reg_duree_svy,  -->
-<!--   include = c(idsexu, age, typecpl, statutcouple, revenu_sub, enf_ego) -->
-<!-- ) %>%  -->
-<!--   modify_header(estimate ~ "**Durée relation (>5 ans)**") -->
-
-<!-- tbl_reg_institutionnalisation = tbl_merge( -->
-<!--   tbls = list(tbl_mariage_condense, tbl_cohabitation_condense, tbl_duree_condense), -->
-<!--   tab_spanner = c("**Mariage**", "**Cohabitation**", "**Durée >5 ans**") -->
-<!-- ) %>%  -->
-<!--   modify_caption("Effet de l'identification sexuelle sur l'institutionnalisation du couple (modèles contrôlés par âge, type de couple, revenu subjectif, enfants — tableaux complets en annexe)") %>%  -->
-<!--   as_flex_table() %>%  -->
-<!--   mise_en_forme_ft() -->
-
-<!-- print(tbl_reg_institutionnalisation) -->
-<!-- ``` -->
+tbl_reg_institutionnalisation %>%
+  as_flex_table() %>%
+  add_footer_lines("Champ : femmes de 20-69 ans s'étant déclarées en couple, au moins 4 mois, au cours des 12 derniers mois.\nLecture : Le fait de se déclarer bisexuelle diminue la probabilité d'être mariée par rapport aux hétérosexuelles.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+```
