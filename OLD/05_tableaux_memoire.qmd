@@ -49,6 +49,15 @@ dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal,
                           data = pgnf_conjugal)
 dwh_conjugal = svydesign(id = ~1, weights = pgnh_conjugal$poids_cal,
                           data = pgnh_conjugal)
+
+# Fonction de mise en forme ----
+mise_en_forme_ft <- function(ft) {
+  ft %>%
+    fontsize(size = 7, part = "all") %>%       # 7-8 pt pour les tableaux larges
+    padding(padding = 1, part = "all") %>%      # marges internes réduites
+    line_spacing(space = 1, part = "all") %>%
+    set_table_properties(layout = "autofit", width = 1)  # occupe 100% de la largeur dispo
+}
 ```
 
 # Tableaux principaux
@@ -123,80 +132,96 @@ tab_id_lgbt_h = lgbt_aip_h %>%
   modify_header(stat_0 = "**Hommes**\n(n = {N})") %>%
   modify_spanning_header(stat_0 = "**Virage LGBT**")
 
-# Fusion des 4 sous-tableaux
+# Fusion des 4 sous-tableaux  
 tab1 = tbl_merge(
   list(tab_id_pg_f, tab_id_pg_h, tab_id_lgbt_f, tab_id_lgbt_h),
   tab_spanner = FALSE
-) %>%
-  modify_column_hide(columns = starts_with("ci_")) %>% #décommenter pour masquer IC
-  as_flex_table()
+)
+
+# Version FINALE (IC masqués) 
+tab1 %>%
+  modify_column_hide(columns = starts_with("ci_")) %>%
+  as_flex_table() %>%
+  mise_en_forme_ft()
 ```
 
-**Comparaison des bisexualités selon le critère retenu**
+**Lecture du tableau**
 
--   Les attirances bisexuelles sont supérieures aux pratiques
-    bisexuelles, elles-mêmes supérieures aux identifications bisexuelles
-    chez les femmes et les hommes.
+*Un gradient interne à la bisexualité.* Pour les deux sexes, les
+attirances bisexuelles l'emportent sur les pratiques bisexuelles,
+elles-mêmes plus fréquentes que les identifications bisexuelles : se
+dire bisexuel·le est plus rare que d'en avoir les attirances ou les
+pratiques.
 
-    -   *Chevauchement IC entre pratiques et attirances bisexuelles chez
-        les hommes dans PG*
+-   *Réserve : les IC des pratiques et des attirances bisexuelles se
+    chevauchent chez les hommes dans PG — gradient à ne pas affirmer
+    pour eux.*
 
-**Comparaison bisexualité / homosexualité selon critère retenu**
+*Bisexualité vs homosexualité — Virage PG.* Les attirances et pratiques
+bisexuelles sont plus fréquentes que les attirances et pratiques
+strictement homosexuelles ; mais les hommes se disent plus souvent
+homosexuels que bisexuels.
 
-[Virage PG]{.underline}
+-   *Réserve : IC qui se chevauchent entre identification homosexuelle
+    et bisexuelle chez les femmes.*
 
--   Les attirances et pratiques bisexuelles sont plus fréquentes que les
-    attirances et pratiques strictement homosexuelles.
+*Bisexualité vs homosexualité — Virage LGBT.* L'identification
+homosexuelle est majoritaire. Chez les hommes, pratiques et attirances
+homosexuelles dépassent les bisexuelles ; chez les femmes, c'est
+l'inverse (pratiques et attirances bisexuelles plus fréquentes).
 
--   Les hommes se disent plus souvent homosexuels que bisexuels.
+*Femmes vs hommes.* Les pratiques bisexuelles, les attirances et les
+identifications bisexuelles sont plus fréquentes chez les femmes ; les
+pratiques strictement homosexuelles le sont plus chez les hommes.
 
-    -   *Chevauchement IC entre identification homosexuelle et
-        bisexuelle chez les femmes*
+-   *Réserve : IC qui se chevauchent entre identification bisexuelle des
+    hommes et des femmes dans PG.*
 
-[Virage LGBT]{.underline}
+**Pistes d'interprétation**
 
--   Les identifications majoritaires sont les identifications
-    homosexuelles.
+-   Le gradient attirance \> pratique \> identification donne corps à
+    l'idée que l'identité bisexuelle ne repose pas d'abord sur des actes
+    mais sur une capacité, un « potentiel » : beaucoup déclarent des
+    attirances sans les actualiser, et moins encore endossent
+    l'étiquette (Rust 2000). Ce décrochage rejoint aussi l'invisibilité
+    bisexuelle et la moindre dicibilité des sexualités minoritaires
+    (Rich 1981 ; Rust 2002) — argument utile pour la limite ci-dessous.
 
--   Les pratiques et attirances homosexuelles sont plus fréquentes que
-    les pratiques et attirances bisexuelles chez les hommes.
+-   La dissymétrie femmes/hommes (pratiques et identifications bies plus
+    féminines, pratiques strictement homo plus masculines) peut se lire
+    via une sexualité androcentrée où les hommes affirment des choix
+    plus exclusifs (Trachman & Lejbowicz 2020), et via la valuation
+    genrée de la bisexualité : tolérée voire valorisée chez les femmes
+    tant qu'elle reste dans le cadre hétéro, disqualifiée chez les
+    hommes comme soupçon pesant sur la masculinité (Dusseau 2017 ;
+    histoire genrée : bisexualité féminine marquée par le mouvement
+    lesbien, masculine par le VIH, Rust 2002).
 
--   Les pratiques et attirances bisexuelles sont plus fréquentes que les
-    pratiques et attirances homosexuelles chez les femmes.
+-   Le contraste LGBT — femmes plutôt « bisexuelles », hommes plutôt «
+    homosexuels » — soutient votre hypothèse (accès masculin plus aisé à
+    une vie strictement homosexuelle / contrainte hétérosexuelle plus
+    forte pour les femmes : Rich 1981 ; androcentrisme, Trachman &
+    Lejbowicz 2020).
 
-    -   *Accès plus facile des hommes à une vie strictement homosexuelle
-        ? Contrainte à l'hétérosexualité plus forte chez les femmes ?*
-
-**Comparaison des hommes et des femmes selon le critère retenu**
-
--   Les pratiques bisexuelles sont plus fréquentes chez les femmes que
-    chez les hommes.
-
--   Les pratiques strictement homosexuelles sont plus fréquentes chez
-    les hommes que chez les femmes.
-
--   Les attirances et identifications bisexuelles sont plus fréquentes
-    chez les femmes que chez les hommes.
-
-    -   *Chevauchement IC entre identification bisexuelle hommes et
-        femmes dans PG*
+-   Déjà ici se dessinent « deux bisexualités » : dans PG la bisexualité
+    penche du côté du répertoire élargi au même sexe mais reste
+    polarisée sur l'autre sexe, alors que LGBT capte une frange plus
+    proche de l'homosexualité (Trachman & Lejbowicz 2020) — fil rouge
+    qu'on retrouvera dans les tableaux 3a/3b.
 
 **Limites**
 
 -   La part importante des réponses NSP/NVPD/Pas de rapport/Pas
-    d'attirance. Particulièrement vrai pour la question des pratiques.
-    On le sait, des pratiques, attirances ou identifications bisexuelles
-    ou homosexuelles sont moins dicibles car écartées de la norme
-    hétérosexuelle. On peut faire l'hypothèse qu'une partie au moins de
-    ces répondants sous-déclarent des attirances ou pratiques
-    homosexuelles ou bisexuelles, ce qui biaise les résultats à la
-    baisse.
+    d'attirance, particulièrement pour les pratiques. Les pratiques,
+    attirances ou identifications minoritaires étant moins dicibles car
+    écartées de la norme hétérosexuelle (Rich 1981 ; Rust 2002), on peut
+    faire l'hypothèse qu'une partie de ces répondant·es sous-déclarent,
+    ce qui biaise les résultats à la baisse.
 -   Le recodage des attirances bisexuelles englobe trois modalités,
-    effaçant la nuance qui existe entre déclarer des attirances surtout
-    pour le sexe opposé mais aussi pour le même sexe et inversement des
-    attirances surtout pour le même sexe mais aussi pour le sexe opposé.
-    Nous faisons le choix d'intégrer cette variation à la catégorie des
-    attirances bisexuelles.
+    effaçant la nuance entre attirances surtout pour le sexe opposé mais
+    aussi pour le même sexe, et inversement. Nous faisons le choix
+    d'intégrer cette variation à la catégorie des attirances
+    bisexuelles.
 
 ## Tableau 2 : caractéristiques sociodémographiques (Trachman, Lejbowicz, 2020)
 
@@ -302,38 +327,54 @@ tab2 = tbl_merge(
   )
 
 # Version FINALE (IC masqués)
-tab2 %>% 
-  modify_column_hide(columns = starts_with("ci_")) %>% 
-  as_flex_table()
+tab2 %>%
+  modify_column_hide(columns = starts_with("ci_")) %>%
+  as_flex_table() %>%
+  mise_en_forme_ft()
 ```
 
-**Questions et pistes d'analyse**
+**Lecture du tableau**
 
--   Des femmes bies plus jeunes et des hommes bis plus âgés. Moins
-    clivant dans Virage LGBT où les hommes bis sont surreprésentés dans
-    la catégorie la plus jeune et la plus âgée par rapport aux gays.
+-   *Âge.* Femmes bies plus jeunes, hommes bis plus âgés (PG). Le
+    clivage d'âge est moins net dans Virage LGBT, où les hommes bis sont
+    surreprésentés à la fois dans la classe la plus jeune et la plus
+    âgée par rapport aux gays.
 
-    -   effet de génération lié à un contexte plus favorable pour
-        déclarer une sexualité minoritaire (Trachman et Lejbowicz 2020)
-        ? Pas le cas pour les hommes bis dans PG ?
+-   *Diplôme.* Les hommes bis sont moins surdiplômés que les gays,
+    lesbiennes et bisexuelles : leur niveau de diplôme se rapproche de
+    celui des hétérosexuels.
 
-    -   contexte politique et social qui permet plus facilement une
-        identification bisexuelle qu’une identification gay pour la
-        génération d'hommes qui a entre 50 et 69 ans au moment de
-        l'enquête (Trachman et Lejbowicz 2020) ? Pas le cas pour les
-        femmes ?
+-   *Réserves.* PCS et territoire d'habitation : IC trop chevauchants
+    pour comparer les groupes. Statut migratoire : p-value insuffisante,
+    pas de commentaire.
 
--   Des hommes bisexuels moins surdiplômés que les gays, lesbiennes et
-    bisexuelles. Ils ont un niveau de diplôme proche des hétérosexuels.
+**Pistes d'interprétation**
 
--   Concernant les PCS et le territoire d'habitation les IC se
-    chevauchent trop pour effectuer des comparaisons intéressantes entre
-    groupes sociaux.
+-   La structure d'âge opposée des bis selon le genre est le résultat le
+    plus saillant. Côté femmes, l'identification bisexuelle décroît avec
+    l'âge car elle est socialement conçue comme transitoire, les femmes
+    étant en partie contraintes d'abandonner une identification jugée
+    illégitime (Yost & Thomas 2012, cités par Trachman & Lejbowicz
+    2020). Côté hommes, la surreprésentation aux âges élevés tient moins
+    à une affirmation tardive qu'à un effet de contexte : pour la
+    génération des 50-69 ans, s'identifier comme bisexuel a pu être plus
+    accessible que comme gay (Trachman & Lejbowicz 2020).
 
--   Les p-value ne permettent pas de commenter le lien entre
-    identification sexuelle et statut migratoire.
+-   Le profil « moins surdiplômé, proche des hétéros » des hommes bis
+    confirme un trait connu : la moitié des bisexuel·les sont employé·es
+    ou ouvrier·ères, plus proches des hétéros que des homosexuel·les
+    (plus diplômé·es, urbain·es, CSP+) (Trachman & Lejbowicz 2020). Que
+    ce trait subsiste dans LGBT — pourtant biaisée vers les fractions
+    diplômées — illustre que cette enquête accentue sans distordre :
+    elle conserve un nombre non négligeable d'hommes bis âgés et de
+    catégories populaires (Trachman & Lejbowicz 2020).
 
--   Position sociale des bisexuel·les varie selon le genre
+-   Que la position sociale des bisexuel·les varie selon le genre peut
+    être relié au fait que déclarer une homo-bisexualité reste adossé à
+    un certain niveau de ressources sociales (Rault & Lambert 2019),
+    avec une part d'ouvrières deux fois plus élevée chez lesbiennes et
+    bisexuelles que chez les hétérosexuelles (Trachman & Lejbowicz
+    2020).
 
 ## Tableau 3a : Situation matrimoniale et conjugale (sur l'ensemble)
 
@@ -401,7 +442,7 @@ tbl_3a_lgbth = lgbtnh %>%
   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
 
-tbl_3a = tbl_merge(
+tbl3a = tbl_merge(
   tbls = list(tbl_3a_pgf, tbl_3a_pgh, tbl_3a_lgbtf, tbl_3a_lgbth),
   tab_spanner = FALSE
 ) %>%
@@ -411,56 +452,77 @@ tbl_3a = tbl_merge(
   )
 
 # Version FINALE (IC masqués)
-tbl_3a %>% 
-  modify_column_hide(columns = starts_with("ci_")) %>% 
-  as_flex_table()
+tbl3a %>%
+  modify_column_hide(columns = starts_with("ci_")) %>%
+  as_flex_table() %>%
+  mise_en_forme_ft()
 ```
 
-**Questions et pistes d'analyse**
+**Lecture du tableau**
 
--   Des lesbiennes et bies moins souvent mariées que les hétérosexuelles
-    (PG). Peut-être expliqué par le cadre légal au moment de l'enquête
-    pour les lesbiennes (mariage autorisé 2 ans auparavant) mais pas
-    pour les bisexuelles qui sont 90% en couple avec un homme. 2 pistes
-    explicatives.
+*Femmes (PG).* Lesbiennes et bisexuelles sont moins souvent mariées et
+moins souvent en couple que les hétérosexuelles. L'écart de mariage avec
+les hétérosexuelles subsiste même après contrôle de l'âge.
 
-    -   Effet de structure d'âge : Elles sont plus jeunes que les
-        hétérosexuelles. En fait quand on contrôle par l'âge l'écart
-        avec les femmes hétérosexuelles reste important.
+*Femmes (LGBT).* L'écart lesbiennes/bisexuelles se creuse : les
+bisexuelles y sont moins souvent mariées et plus souvent célibataires.
 
-    -   Elles sont moins souvent en couple que les hétérosexuelles
+*Hommes (PG).* Les hommes bis sont plus souvent divorcés que les
+hétéros, deux fois moins souvent mariés, et majoritairement célibataires
+(à l'enquête comme sur 12 mois). Ce célibat est moins marqué dans LGBT.
 
--   Dans Virage LGBT l'écart entre lesbiennes et bisexuelles est plus
-    net : les bisexuelles sont moins souvent mariées et plus souvent
-    célibataires
+*Les deux.* Lesbiennes et bisexuelles plus souvent en union libre que
+les hétérosexuelles ; le pacs apparaît plus homosexuel que bisexuel. Les
+bisexuel·les sont moins souvent sans enfant que les homosexuel·les mais
+plus souvent que les hétérosexuel·les — la population LGBT étant
+majoritairement sans enfant.
 
--   Des hommes bisexuels plus souvent divorcés que les hétéros
+**Pistes d'interprétation**
 
-    -   Effet de structure d'âge : Ils sont plus âgés, avec l'hypothèse
-        que l'avancée en âge augmente les chances d'être divorcé
+-   Femmes bies en couple surtout avec un homme, mais moins mariées que
+    les hétéros (écart net même à âge contrôlé) : la contrainte
+    hétérosexuelle oriente vers le couple de sexe différent sans pour
+    autant conduire au mariage (Rich 1981) ; le mariage, institution
+    arrimée à la monogamie et au principe dyadique, est précisément ce
+    que la bisexualité vient déstabiliser (Klesse 2018). À noter qu'aux
+    États-Unis les femmes bies sont les plus souvent en couple des LGB
+    et accordent au mariage le même poids que les hétéros — la plupart
+    étant en couple hétéro (Gates 2015).
 
-    -   Toutefois ils sont deux fois moins souvent mariés que les
-        hétéros.
+-   Hommes bis : divorce plus fréquent + deux fois moins de mariages +
+    fort célibat. Le scénario « mariage hétéro d'abord, bisexualité
+    reconnue ensuite » correspond aux mixed-orientation marriages
+    décrits par Rust (2002), et au moment biographique « quarantaine et
+    plus » où, la vie sociale étant stabilisée, on se sent plus libre de
+    vivre une sexualité bisexuelle (Dusseau 2017). L'expérience
+    biographique, plus que la seule position sociale, façonne le rapport
+    au couple (Adam 1999). Leur fort célibat fait écho au constat que
+    7/10 des bis sont célibataires dans PG, dans une sexualité
+    androcentrée (Trachman & Lejbowicz 2020).
 
-    -   Rapport distancié institution mariage ? Difficultés relations
-        conjugales ?
+-   Enfants : les bisexuel·les se situent entre hétéros et homos. Cela
+    s'éclaire par le fait que les bi sont surtout parents au sein
+    d'unions de sexe différent (passées ou présentes), et que les
+    enfants vivant avec un couple de même sexe sont le plus souvent nés
+    d'une union de sexe différent antérieure (Gates 2015). La population
+    LGBT majoritairement sans enfant relève d'une frange dont la vie
+    s'organise davantage autour du même sexe (Trachman & Lejbowicz
+    2020).
 
-    -   Des trajectoires avec une première partie de vie mariés, en
-        relation hétérosexuelle puis la découverte d'une bisexualité
-        tardive ou du moins d'autres formes de pratiques et
-        identification ?
+-   Union libre / moindre mariage des lesbiennes et bies : les couples
+    de même sexe cohabitent à des niveaux proches des hétéros (surtout
+    les lesbiennes) mais leur reconnaissance institutionnelle est
+    récente (Gates 2015 ; Rault & Lambert 2019).
 
--   Des hommes bis majoritairement célibataires (au moment de l'enquête
-    et dans les 12 derniers mois) - moins net dans LGBT
+-   Bi hommes vs bi femmes : les femmes sont canalisées vers des couples
+    de sexe différent non mariés, les hommes vers des mariages dissous
+    et le célibat — dissymétrie genrée de la bisexualité (Dusseau 2017 ;
+    Rust 2002).
 
--   Les lesbiennes et bisexuelles plus souvent en union libre que les
-    hétérosexuelles
-
--   Le pacs comme pratique plus homosexuelle que bisexuelle
-
--   Des bisexuel·les moins souvent sans enfant que les homosexuel·les
-    mais plus souvent que les hétérosexuel·les - Population Virage LGBT
-    majoritairement sans enfant
+-   PG vs LGBT : LGBT durcit les écarts (bies plus célibataires / moins
+    mariées ; hommes bis moins célibataires) — cohérent avec « deux
+    bisexualités », celle de LGBT étant plus homosexualisée (Trachman &
+    Lejbowicz 2020).
 
 ## Tableau 3b : Cohabitation et enfants du couple (sous-pop en couple \> 4 mois dans les 12 derniers mois)
 
@@ -529,7 +591,7 @@ tbl_3b_lgbth = lgbtnh_conjugal %>%
   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
   modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
 
-tbl_3b = tbl_merge(
+tbl3b = tbl_merge(
   tbls = list(tbl_3b_pgf, tbl_3b_pgh, tbl_3b_lgbtf, tbl_3b_lgbth),
   tab_spanner = FALSE
 ) %>%
@@ -540,55 +602,83 @@ tbl_3b = tbl_merge(
   )
 
 # Version FINALE (IC masqués)
-tbl_3b %>% 
-  modify_column_hide(columns = starts_with("ci_")) %>% 
-  as_flex_table()
+tbl3b %>%
+  modify_column_hide(columns = starts_with("ci_")) %>%
+  as_flex_table() %>%
+  mise_en_forme_ft()
 ```
 
-**Questions et pistes d'analyse**
+**Lecture du tableau**
 
--   Les bisexuel·les sont moins souvent en couple cohabitant que les
-    hétérosexuel·les - Virage PG
+*Cohabitation.* Les bisexuel·les sont moins souvent en couple cohabitant
+que les hétérosexuel·les (PG). Dans LGBT, ils semblent moins cohabitants
+que les homosexuel·les.
 
--   Les bisexuel·les semblent moins souvent en couple cohabitant que les
-    homosexuel·les dans Virage LGBT
+-   *Réserve : dans LGBT, IC à peine disjoints et p-value faibles — à
+    formuler au conditionnel.*
 
-    -   *Les IC se chevauchent très légèrement et les p-value ne sont
-        pas très bonnes*
+*Enfants du couple.* Les bisexuel·les sont plus souvent sans enfant que
+les hétérosexuel·les (PG) ; mais les bisexuelles ont plus souvent des
+enfants que les lesbiennes (PG), et dans LGBT les hommes bis sont moins
+souvent sans enfant que les gays.
 
--   Les bisexuel·les sont plus souvent sans enfant que les
-    hétérosexuel·les. - Virage PG
+*Durée de la relation.* Bisexuelles et lesbiennes ont plus souvent des
+relations de moins de 4 ans (et de moins d'un an) et beaucoup moins
+souvent des relations de 20 ans et plus que les hétérosexuelles (PG,
+femmes). Dans LGBT, durées proches entre bisexuelles et lesbiennes, mais
+lesbiennes et gays atteignent plus souvent que les bis les durées
+longues (20 ans et plus, 10 ans et plus).
 
-    -   Effet d'âge pour les femmes ?
+-   *Réserve : chez les hommes dans PG, les IC se chevauchent dans
+    toutes les classes de durée — pas de lecture.*
 
--   Les bisexuelles ont plus souvent des enfants que les
-    homosexuelles. - Virage PG
+*Écart d'âge.* Bisexuelles et lesbiennes ont plus souvent un·e
+conjoint·e plus jeune de 5 à 9 ans que les hétérosexuelles ; les
+lesbiennes, plus souvent une conjointe plus jeune de 10 ans et plus
+(PG). Dans LGBT, les lesbiennes ont plus souvent une conjointe plus
+jeune de 5 à 9 ans que les bisexuelles.
 
--   Dans Virage LGBT les hommes bisexuels sont moins souvent sans enfant
-    que les hommes gays.
+-   *Réserve : les autres écarts d'âge dans LGBT ont des IC qui se
+    chevauchent.*
 
--   Les bisexuelles et homosexuelles ont plus souvent des relations qui
-    ont commencé il y a moins de 4 ans et il y a moins d'1 an que les
-    hétérosexuelles. Elles sont beaucoup moins souvent en relation de
-    plus de 20 ans que les hétérosexuelles. - Virage PG
+**Pistes d'interprétation**
 
--   Chez les hommes les différences sont moins marquées, les intervalles
-    se chevauchent dans toutes les catégories d'âge. - Virage PG
+-   L'écart d'âge est la piste la mieux étayée. Les couples hétéros
+    suivent le script genré de l'âge — femmes en couple avec des hommes
+    plus âgés, l'asymétrie d'âge traduisant une asymétrie de statut
+    (Bergström 2015 ; McKenzie 2021). Que lesbiennes et bisexuelles
+    dérogent à ce script (conjointe plus jeune) suggère que la
+    conjugalité de même sexe, ou bisexuelle féminine, est moins arrimée
+    à cette logique d'âge hétérosexuelle.
 
--   Dans Virage LGBT, les durées de relations des bisexuelles et
-    lesbiennes sont proches. Les lesbiennes sont plus souvent en couple
-    depuis plus de 20 ans que les bisexuelles. On observe la même chose
-    chez les hommes, les gays en couple sont plus souvent en couple
-    depuis plus de 20 ans et depuis plus de 10 ans que les bisexuels.
+-   Durées plus courtes, unions plus récentes : à relier à la
+    reconnaissance récente des couples de même sexe et à la hausse
+    récente des déclarations (Rault & Lambert 2019 ; Gates 2015), ainsi
+    qu'à la jeunesse structurelle des LGB (Trachman & Lejbowicz 2020).
+    Pour les hommes dans PG, ne pas sur-interpréter (IC chevauchants).
 
--   Les bisexuelles et homosexuelles ont plus souvent un·e conjoint·e
-    plus jeune de 5 à 9 ans que les hétérosexuelles. Les lesbiennes ont
-    plus souvent une conjointe plus jeune de 10 ans que les
-    hétérosexuelles. - Virage PG
+-   Enfants : bisexuelles avec plus d'enfants que les lesbiennes, hommes
+    bis moins sans enfant que les gays (LGBT) → conjugalité bisexuelle
+    plus souvent ancrée dans des unions de sexe différent (passées ou
+    présentes) où la procréation a eu lieu (Gates 2015). Position
+    intermédiaire entre hétéros et homos. Effet d'âge possible côté
+    femmes (à croiser avec la structure d'âge du tableau 2).
 
--   Dans Virage LGBT, les lesbiennes ont plus souvent des conjointes
-    plus jeune de 5 à 9 ans que les bisexuelles. Les autres IC se
-    chevauchent.
+-   Moindre cohabitation des bis : conjugalité bisexuelle un peu moins
+    institutionnalisée / plus souvent non cohabitante (couples de même
+    sexe historiquement plus souvent non cohabitants : Rault & Lambert
+    2019 ; Gates 2015). Pour l'écart bi/homo dans LGBT, conserver le
+    conditionnel (IC et p fragiles).
+
+-   Profil conjugal de l'enquête LGBT (synthèse). Dans LGBT, les durées
+    bies ressemblent à celles des lesbiennes, mais gays et lesbiennes
+    accèdent davantage aux durées longues : la conjugalité bisexuelle y
+    apparaît plus récente et moins durable que la conjugalité
+    homosexuelle. Cohérent avec une bisexualité LGBT plus «
+    homosexualisée » et plus récente dans sa reconnaissance — la «
+    frange durcie » de Trachman & Lejbowicz (2020) —, là où la
+    bisexualité de PG reste polarisée sur une conjugalité de sexe
+    différent, plus proche démographiquement des hétéros.
 
 <!-- # Annexes -->
 
@@ -619,7 +709,9 @@ tbl_3b %>%
 <!-- ## Tableau 3b avec IC -->
 
 <!-- ```{r} -->
+
 <!-- tbl_3b %>% as_flex_table() -->
+
 <!-- ``` -->
 
 <!-- ## Tests de Fisher (p-values exactes) -->

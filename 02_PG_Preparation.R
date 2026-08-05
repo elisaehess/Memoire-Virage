@@ -104,11 +104,21 @@ pg_base = pg %>%
     Dur_relconj,
     Typmen_5mod, 
     Typmen_9mod, 
-    C1,
-    C1a,
+    
+    # ↓ Styles de conjugalité 
+    CF1a, # tout faire ensemble
+    CF1b, # compromis 
+    SOC1a, 
+    SOC1b, 
+    SOC1c, 
+    SOC1d, 
+    SOC2a, 
+    SOC2b, 
+    SOC2c, 
+    SOC2d, 
     CF2, # tâches ménagères
-    CF3, # s'occuper des enfants 
-    SEX14,
+    CF3, # s'occuper des enfants
+    
     LGBT1e
   ) %>%
   mutate(
@@ -653,7 +663,25 @@ pg_base = pg %>%
                         "Patrimoine équivalent",
                         "Patrimoine moins important que celui du/de la conjoint·e",
                         "NVPD/NSP")) %>%
-      set_variable_labels("Patrimoine comparé à celui (ex) conjoint·e")
+      set_variable_labels("Patrimoine comparé à celui (ex) conjoint·e"),
+    fusion = fct_recode(
+      as_factor(CF1a), 
+      "D'accord" = "Tout à fait d'accord", 
+      "D'accord" = "Plutôt d'accord", 
+      "Pas d'accord" = "Plutôt pas d'accord", 
+      "Pas d'accord" = "Pas du tout d'accord", 
+      "NVPD/NSP" = "NVPD", 
+      "NVPD/NSP" = "NSP"
+    ), 
+    compromis = fct_recode(
+      as_factor(CF1b), 
+      "D'accord" = "Tout à fait d'accord", 
+      "D'accord" = "Plutôt d'accord", 
+      "Pas d'accord" = "Plutôt pas d'accord", 
+      "Pas d'accord" = "Pas du tout d'accord", 
+      "NVPD/NSP" = "NVPD", 
+      "NVPD/NSP" = "NSP"
+    )
   )
 
 #### Sous-pop principale filtrée sur l'identification (Trachman & Lejbowicz) ----

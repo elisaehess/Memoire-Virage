@@ -1,0 +1,180 @@
+---
+title: "Mémoire – Partie II"
+subtitle: "Les styles de conjugalité bisexuels"
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format:
+  docx:
+    toc: true
+    toc_depth: 5
+    fig-cap-location: "top"
+execute:
+  echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+  cache: true 
+editor: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+```{r setup}
+#| include: false
+
+# Librairies ---------------------------------------------------------------
+library(tidyverse)   # manipulation (plsrs packages)
+library(labelled)    # variables labellisées
+library(haven)       # import SAS
+library(questionr)   # quelques fonctions utiles
+library(survey)      # données pondérées
+library(srvyr)       # fournit select et filter aux données pondérées 
+library(gtsummary)   # tableaux de synthèse
+library(flextable)   # export Word des tableaux
+library(ggplot2)     # graphiques 
+library(GGally)      # graphiques (extension de ggplot2)
+library(broom)       # faire des tibble (pour le forest plot)
+library(extrafont)   # charger polices d'écriture 
+loadfonts(device = "win")
+
+# Préférences gtsummary
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+options(scipen = 999)
+
+# Import + préparation : on appelle les scripts existants -----------------
+source("01_PG_Import.R", encoding = "UTF-8")
+source("02_PG_Preparation.R", encoding = "UTF-8")
+source("03_LGBT_Import.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
+
+# Plans de pondération (PG uniquement) -----
+dw = svydesign(id = ~1, weights = pgn$poids_cal, data = pgn)
+dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
+dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
+
+```
+
+# Chapitre II : les styles de conjugalité bisexuels
+
+Dans cette deuxième partie nous nous intéressons aux différents types de
+fonctionnement conjugaux chez les personnes bisexuelles. Jean Kellerhals
+définit les styles d'interactions conjugales contemporains selon
+plusieurs dimensions : le degré d'autonomie/fusion des conjoints, le
+d'ouverture/clôture à l'environnement extérieur, l'orientation
+prioritaire donnée à la famille, le degré de sexuation des rôles
+conjugaux, le degré de différenciation du pouvoir décisionnel,
+l'investissement différentiel dans la sphère domestique et le degré de
+routinisation. Ces dimensions de cohésion et régulation du couple
+permettent d'établir cinq styles d'interactions conjugales grâce à une
+classfication hiérarchique ascendante [@widmer2004]. Contrairement aux théories qui postulent la fin de la famille traditionnelle et l'avénement du couple moderne standardisé et fondé sur la norme d'égalité, sa recherche montre qu'il existe bel et bien différents styles d'interactions au sein des couples. De plus ceux-ci sont inscrits dans la structure social, on observe pas les mêmes styles en fonction des milieux sociaux. Enfin les styles d'interactions influencent la nature et la fréquence des conflits, leurs modes de résolution ainsi que l'évaluation de la qualité des relations conjugales. 
+
+Maintenant qu'on a mieux cerné les situations conjugales dans lesquelles se trouvent les bisexuels, on va chercher à approcher leurs styles d'interactions conjugales. L'enquête Virage n'est pas pensée pour étudier des couples mais bien des individus au sein de couples. Ainsi, contrairement à la recherche de Kellerhalls, nous n'avons pas les réponses des deux conjoints. C'est pourquoi il nous est compliqué de parler de style d'interaction, ayant les déclaration d'une seule partie du couple. Nous parlerons plutôt que style de conjugalité, en se basant sur certaines observations faites par Kellerhalls. 
+
+On formule les hypothèses suivantes : 
+- le style de conjugalité, comme pour la configuration conjugale, est influencé par l'âge et la classe des individus. Kellerhalls le montre pour la classe sociale : les couples dotés économiquement et culturellement valorisant les modes de conjugalité autonomes et égalitaires. Alors que les milieux populaires ont plus tendance à la clôture et à la sexuation des rôles. Au contraire il dit que l'âge, ou du moins la génération ou la phase de la vie n'a pas d'impact sur le style de conjugalité. On le prendra quand même en compte avec l'idée que l'idéal égalitaire du couple (Bergström) touche plus les générations plus jeunes et peut mener à des conflits et évaluation du couple spécifiques. Kellerhalls montre que l'écart entre idéal égalitaire et persistance d'inégalités domestiques et professionnelles est source de conflit. 
+
+Question : est-ce que la bisexualité se distingue de l'hétérosexualité et de l'homosexualité du point de vue du style de conjugalité ? 
+
+Dans virage PG on a déjà vu que les femmes bisexuelles étaient moins souvent mariées et dans des relations longues que les hétérosexuelles. Cela laisse supposer des styles de conjugalité différents. Les hommes bisexuels quant à eux, surtout celibataires sont surreprésentés parmi les divorcés. Nous creuserons la question du divorce des hommes bi et du style conjugal si possible avec les échantillons. Qu'en est-il de la comparaison avec les couples de même sexe ? A voir dans Virage LGBT. 
+
+## Styles de conjugalité dans la bisexualité 
+
+pas accès au questionnaire entier de Kellerhalls pour reprendre indicateurs 
+- autonomie/fusion : dans un couple il faut tout faire ensemble ; dans un couple il faut faire des compromis (CF1a et CF1b)
+- ouverture/clôture : SOC1 (se confier à conjoint, famille, ami lors d'un pb perso), SOC2(sorties) 
+- prio famille : ? 
+- sexuation rôles conjugaux : CF2 et CF3
+- différenciation pouvoir décisionnel : ? 
+- investissement différentiel sphère domestique : ? 
+- degré routinisation : ? 
+
+Tableau global qui présente ces variables
+contrôler âge et classe et type couple 
+
+```{r}
+#| label: tbl-style-conjugalite
+#| tbl-cap: "Style de conjugalité selon l'identification sexuelle et le genre. Virage PG (pondéré)."
+
+# Tableau PG pondéré -- Femmes 
+tab3_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = Typmen_9mod,
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n({ci})") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**") %>%
+  modify_footnote( # notes bas de tableau 
+      p.value ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+# Tableau PG pondéré -- Hommes 
+tab3_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = Typmen_9mod,
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n({ci})") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**") %>%
+  modify_footnote( # notes bas de tableau 
+      p.value ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+# Fusion des sous-tableaux 
+tab3 = tbl_merge(
+  tbls = list(tab3_pg_f, tab3_pg_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+# Version FINALE 
+tab3 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "4", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+```
+
+
+
+## Satisfaction de la relation dans la bisexualité
+c1
+C1a
+C1a1
+SEX14
+LGBT1e
+
+## Conflits et modes de résolution 
+CF5 : série de variables sur les conflits dans le couple
+CF6 et CF7 : violence lors de conflits 
+CF8a_01 : conjoint alcoolisme ou drogue 
+CF8b_01 : conjoint TS
+
