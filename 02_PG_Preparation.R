@@ -733,7 +733,7 @@ pg_base = pg %>%
       NULL = "NVPD", 
       NULL = "NSP"
     ) %>% set_variable_labels("Dans un couple, il faut faire des compromis pour ne pas contrarier l'autre"), 
-    confidence = fct_recode( # filtré FCPL 01 et 02
+    confidence_cjt = fct_recode( # filtré FCPL 01 et 02
       as_factor(SOC1a),
       NULL = "",
       NULL = "NVPD", 
@@ -741,23 +741,55 @@ pg_base = pg %>%
     ) %>% 
       fct_relevel("Oui", "Non", "Ca dépend du problème") %>% 
       set_variable_labels("Se confie au partenaire lors d'un problème personnel"), 
+    confidence_famille = fct_recode( 
+      as_factor(SOC1b),
+      NULL = "",
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% 
+      fct_relevel("Oui", "Non", "Ca dépend du problème") %>% 
+      set_variable_labels("Se confie à un membre de la famille lors d'un problème personnel"),
+    confidence_amis = fct_recode( 
+      as_factor(SOC1c),
+      NULL = "",
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% 
+      fct_relevel("Oui", "Non", "Ca dépend du problème") %>% 
+      set_variable_labels("Se confie à un-e ami-e lors d'un problème personnel"),
     contact_famille = fct_recode( # non filtrée
       as_factor(SOC2a), 
+      "Peu ou pas de contact" = "Non", 
+      "Peu ou pas de contact" = "De temps en temps", 
+      "Contacts réguliers" = "Souvent", 
+      "Contacts réguliers" = "Très souvent",
       NULL = "NVPD", 
       NULL = "NSP"
     ) %>% set_variable_labels("Contacts avec la famille (12 derniers mois)"), 
     contact_amis = fct_recode( # non filtrée
       as_factor(SOC2b), 
+      "Peu ou pas de contact" = "Non", 
+      "Peu ou pas de contact" = "De temps en temps", 
+      "Contacts réguliers" = "Souvent", 
+      "Contacts réguliers" = "Très souvent",
       NULL = "NVPD", 
       NULL = "NSP"
     ) %>% set_variable_labels("Contacts avec des ami-es (12 derniers mois)"), 
     activites = fct_recode( # non filtrée
       as_factor(SOC2c), 
+      "Peu ou pas d'activité" = "Non", 
+      "Peu ou pas d'activité" = "De temps en temps", 
+      "Activités régulières" = "Souvent", 
+      "Activités régulières" = "Très souvent",
       NULL = "NVPD", 
       NULL = "NSP"
     ) %>% set_variable_labels("Activités sportives ou de loisirs (12 derniers mois)"), 
     assos = fct_recode( # non filtrée
       as_factor(SOC2d), 
+      "Peu ou pas d'activité" = "Non", 
+      "Peu ou pas d'activité" = "De temps en temps", 
+      "Activités régulières" = "Souvent", 
+      "Activités régulières" = "Très souvent",
       NULL = "NVPD", 
       NULL = "NSP"
     ) %>% set_variable_labels("Activités associatives, politiques ou syndicales (12 derniers mois)"), 
@@ -831,7 +863,8 @@ pg_base = pg %>%
       NULL = "Non concerné-e", #vide
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP"
-    ), 
+    ) %>% 
+      set_variable_labels("Le/la partenaire a connaissance de votre bisexualité"), 
     
     # ↓ Sujets de conflits
     conflit_taches = fct_recode(
