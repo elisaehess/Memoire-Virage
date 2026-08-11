@@ -320,7 +320,7 @@ des hétérosexuelles (p-valeur = 0,012). Lesbiennes et bisexuelles vivent
 moins souvent dans des agglomérations de moins de 20 000 habitants que
 les hétérosexuelles qui sont pour moitié dans cette situation.
 
-#### Une position économique floue 
+#### Une position économique floue
 
 Les lesbiennes et bisexuelles sont deux fois plus souvent ouvrières que
 les hétérosexuelles. Comme les gays elles sont plus souvent diplômées du
@@ -352,7 +352,7 @@ partie de ce chapitre. L’observation de l’homogamie, utilisée pour
 dresser des trajectoires sociales (Bozon 2006a), n’est pas mobilisable
 sur nos petits échantillons.
 
-#### Le célibat des hommes bisexuels et la conjugalité des femmes bisexuelles 
+#### Le célibat des hommes bisexuels et la conjugalité des femmes bisexuelles
 
 Intéressons-nous maintenant aux situations conjugales. Au moment de
 l’enquête les bisexuelles et lesbiennes sont moins souvent en couple que
@@ -559,7 +559,7 @@ hétérosexuels.
 [\[2\]](#_ftnref2) Enquête « rapport au sexe » (ERAS), 2023, Santé
 Publique France.
 
-### Les déterminants sociaux du couple 
+### Les déterminants sociaux du couple
 
 #### Une analyse bivariée
 
@@ -805,7 +805,7 @@ célibat masculin.
 modalité de référence du fait de la présence de beaucoup d’étudiant·es
 dans la première catégorie ainsi que de son effectif plus petit.
 
-## II. Le célibat des hommes bis : trajectoires plurielles et distance à la norme 
+## II. Le célibat des hommes bis : trajectoires plurielles et distance à la norme
 
 ### Les trajectoires des hommes bisexuels : profils individuels post-rupture
 
@@ -899,7 +899,7 @@ ggplot(pgnhbi_celibat_graph) +
   )
 ```
 
-#### Un noyau de célibataires longue durée après des unions parfois institutionnalisées 
+#### Un noyau de célibataires longue durée après des unions parfois institutionnalisées
 
 Chez les 44 bisexuels qui ont connu au moins une relation et une
 rupture, le graphique fait apparaître deux populations : un noyau de
@@ -1165,7 +1165,7 @@ constat se poursuit dans Virage, dont les effectifs bisexuels, bien que
 restreints, permettent au moins une approche descriptive. Nous terminons
 ce chapitre par l’étude des couples de femmes bisexuelles.
 
-## III. Les situations conjugales des femmes bisexuelles : entre inégalités internes au couple et faible institutionnalisation 
+## III. Les situations conjugales des femmes bisexuelles : entre inégalités internes au couple et faible institutionnalisation
 
 On a vu dans la première partie que les femmes bisexuelles sont aussi
 souvent célibataires que les lesbiennes, mais que lorsqu’elles sont en
@@ -1179,7 +1179,7 @@ comparés, revenu du ménage) et dans quelle mesure ce couple est
 institutionnalisé (mariage/Pacs, cohabitation, durée de la relation,
 enfants du couple) ?
 
-### Les configurations économiques et juridiques  
+### Les configurations économiques et juridiques 
 
 Pour analyser la conjugalité des femmes bisexuelles, nous resserrons
 l'observation sur la sous-population des répondantes ayant été engagées
@@ -1249,7 +1249,7 @@ lues comme des différences robustes ; les autres seront mentionnées
 comme suggestives ou non conclusives, conformément à la logique déjà
 retenue plus haut.
 
-#### L’alignement économique sur le modèle hétérosexuel avec une vulnérabilité spécifique 
+#### L’alignement économique sur le modèle hétérosexuel avec une vulnérabilité spécifique
 
 En matière de répartition des ressources économiques interne au couple,
 les femmes bisexuelles présentent un profil quasi identique à celui des
@@ -1283,7 +1283,7 @@ individuels inférieurs et des patrimoines plus faibles comparé au
 conjoint, elles semblent dans une situation de vulnérabilité spécifique,
 ici non contrôlé par l’âge.
 
-#### Une institutionnalisation juridique du couple moins fréquente 
+#### Une institutionnalisation juridique du couple moins fréquente
 
 C’est sur le plan du statut de couple actuel que les écarts sont les
 plus francs. Seules 25,3% des femmes bisexuelles en couple sont mariées
@@ -1297,7 +1297,7 @@ mariage au profit de l'union libre, affine l'hypothèse d'une distance
 singulière à l'égard de l'institution matrimoniale classique, que nous
 allons tester à l'aide de modélisations multivariées.
 
-#### Des relations plus courtes et moins souvent cohabitantes 
+#### Des relations plus courtes et moins souvent cohabitantes
 
 La cohabitation suit la même logique : Les femmes bisexuelles cohabitent
 significativement moins souvent avec leur partenaire que les
@@ -1311,7 +1311,7 @@ en partie, une structure d’âge plus jeune chez les bies et homos : un
 contrôle par l’âge est nécessaire avant de trancher entre effet propre
 de l’orientation et effet d’âge.
 
-#### Une parentalité moins fréquente 
+#### Une parentalité moins fréquente
 
 Les bisexuelles en couple sont plus de deux fois plus souvent sans
 enfant que les hétérosexuelles. Elles sont 39,2% à avoir un enfant dans
@@ -1467,7 +1467,7 @@ couple depuis plus de cinq ans) ; les points à droite, une probabilité
 plus élevée. L'intervalle de confiance est significatif au seuil de 5 %
 dès lors qu'il ne chevauche pas 0.
 
-#### Une mise à distance du mariage 
+#### Une mise à distance du mariage
 
 Le modèle du mariage (référence : ne pas être mariée) fait apparaître un
 lien nettement significatif avec l'identification bisexuelle : les
@@ -1480,7 +1480,7 @@ pour partie à un effectif plus restreint. Les autres prédicteurs vont
 dans le sens attendu : les difficultés financières réduisent la
 probabilité d'être mariée, avoir des enfants l'augmente fortement.
 
-#### Des durées d’union plus courtes 
+#### Des durées d’union plus courtes
 
 Le modèle de la durée de la relation (plus de cinq ans contre moins de
 cinq ans) fait réapparaître un effet propre de la bisexualité (-1,2, IC
@@ -1606,3 +1606,52 @@ tbl_reg_institutionnalisation %>%
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1) 
 ```
+
+Retours de Trachman : 
+Passeron raisonnement socio : ce que dit un tableau / vs ce qu'on en dit. interpréter : force à dire plus que le tableau. Plsrs façons d'interpréter. Variables ok mais des rapports sociaux. Très descriptif : manque un fil directeur. Peut etre descriptif mais poser une question au départ. 
+Même si trivial : c'est descriptif donc ça reste intéressant. 
+
+Envoi à Marie le 03/09 en pdf. possible que ce soit plus court.
+
+Reprise d'écriture. 
+Pas d'effet propre de la bisexualité : contrôle que par rapport aux variables disponibles; on ne croit pas qu'il y a d'effet propre en sociologie. Un raisonnement par variable qu'on a pas en quali. Qu'est-ce que ça veut dire un effet propre de la bisexualité ? Très abstrait : poser les questions de manière sociologique. comme au début de mon projet. 
+
+Partie socio-démo : résumer plus. Résumer les variables ou exp/ appartenances qui vont avoir un effet sur la conjugalité. 
+
+Mobilisation de la littérature Envie : délicat. changement de ce qu'on appelle bisexualité, en peu de temps. Pas évident de faire comme si on parlait des mêmes personnes. Evolution historique, différence d'enquête. Restait prudent dans la mobilisation de la littérature d'Envie. 
+
+figure 2 : ajouter note de lecture. + entre parenthèse (modalité de référence : en italique). On voit pas bien les intervalles de confiance. 
+
+figure 3 : la transparence n'est pas claire. Faire des hachures. Voir doc de travail de Bénédicte sur présentation des tableaux. Demander à Arno ou Bénedicte si j'ai un doute. Individuel mais quand même un classement. La tentative de mise en récit est bien. Impression qu'après le mariage le célibat est plus long : comme dans du quali. Je peux pas le montrer. Un package marié, un autre pacs et un autre union libre. L'idée de la longueur du célibat n'est pas la plus claire. L'ordre des lignes est pas parlante. Savoir ce que je veux en faire et en dire. 
+
+Le genre du célibat 
+
+Ne pas trop politiser les résultats. un biais qu'on a tous. 
+
+subversif / pas subversif : question générale et pas forcément empirique. pleins de raisons de se marier : signification sociale du mariage pas évidente. Les gens n'ont pas a être subversifs. 
+Pas avoir un raisonnement de a sur b. La mariage prend sens de manière variable dans des configurations de vie. 
+
+question de l'ACM : lien entre plusieurs variables. pas forcément faire. 
+
+Il y a pas une hétéronormativité, il y a pas qu'une seule bisexualité.
+Spécificité ou pas: des spécificités très genrées et l'enjeu c'est la comparaison. Les hétéros sont eux même une population très diverse. Comparer avec certains hétéros. Des groupes plus fins. est-ce que les gens mariés 
+Ne pas se censurer sur les interprétations : possible d'en proposer des différentes et opposées et ensuite trouver dans la base une qui accrédite plus que l'autre 
+Souvent pas moyen de trancher mais explorer .Reprendre à la fin. 
+
+voir ce qui se dégage dans les principales carcatéristiques, en partant de l'idsexu dans les variables. Voir ce qui tient à la bisexualité plutôt qu'à autre chose (âge, classe, enfants)
+l'effet de la taille d'agglo : moins net : pas forcément dans les modèles
+
+caractéristiques / spécificités conjugales / 
+
+le genre de la conjugalité / les spécificités relationnelles des bis / le nombre de partenaires sexuels dans l'année : donne des exemples de couples plus ou moins ouverts. / Nb de relations de couple dans la vie. 
+Sexualité / conjugalité : donne des éléments biographiques. 
+L'âge au premier rapport. 
+sexualité très liée à la conjugalité socialement. 
+
+relations entre les parents, tensions dans l'enfance au sein des parents. Peut être analysé comme : ce qui s'est passé pour les bis et comment ils se représentent la conjugalité de leurs parents.
+
+chapitre 3 : partir de pg et creuser avec lgbt. 
+
+expliciter à l'écrit que je creuse avec lgbt. 
+
+Littérature un peu faible manque de littérature anglophone. 

@@ -97,7 +97,51 @@ lgbtn = lgbt %>%
     FCPL, 
     Q12, 
     Q36, 
-    Q17
+    Q17,
+    # ↓ Styles de conjugalité 
+    CF1a, # tout faire ensemble
+    CF1b, # compromis 
+    SOC1a, 
+    SOC1b, 
+    SOC1c, 
+    SOC1d, 
+    SOC2a, 
+    SOC2b, 
+    SOC2c, 
+    SOC2d, 
+    CF2, # tâches ménagères
+    CF3, # s'occuper des enfants
+    
+    # ↓ Satisfaction relation  
+    C1,
+    C1a,
+    C1a1,
+    SEX14,
+    LGBT1e, 
+    
+    # ↓ Sujets de conflits 
+    CF5a, 
+    CF5b,
+    CF5c1,
+    CF5c2, 
+    CF5d, 
+    CF5e, 
+    CF5f, 
+    CF5g, 
+    CF5h, 
+    CF5i, 
+    CF5j, 
+    CF5k, 
+    CF5l, 
+    
+    # ↓ Situation avec parents 
+    EA9a, 
+    EA9b, 
+    EA9c, 
+    EA9d, 
+    EA9e, 
+    EA9f, 
+    EA9g
   ) %>%
   filter(
     !SEX10 %in% c("01", "88", "99", ""), # retire NSP/NVPD + hétéros
@@ -406,6 +450,17 @@ lgbtn = lgbt %>%
     ) %>% 
       set_variable_labels("Type de couple"),
     
+    # ↓ TYPECPL bi
+    typecplbi = case_when(
+      idsexu == "Bi" & typecpl == "En couple de même sexe" ~ "Bi en couple de même sexe",
+      idsexu == "Bi" & typecpl == "En couple de sexe différent" ~ "Bi en couple de sexe différent",
+      idsexu == "Bi" & typecpl == "Pas en couple" ~ "Bi célibataire", 
+      idsexu == "Homo" & typecpl == "En couple de même sexe" ~ "Homo en couple", 
+      idsexu == "Homo" & typecpl == "Pas en couple" ~ "Homo célibataire", 
+      TRUE ~ NA_character_
+    ) %>% 
+      set_variable_labels("Type de couple"),
+    
     # ↓ Statut couple au moment de l'enquête (ensemble)
     statutcouple = fct_recode(
       factor(Situmat, levels = c("01", "02", "03", "04", "88", "99")),
@@ -540,6 +595,280 @@ lgbtn = lgbt %>%
                         "Du même âge (± 4 ans)",
                         "Conjoint·e plus jeune (5-9 ans)",
                         "Conjoint·e plus jeune (10+ ans)")),
+    
+    # ↓ Styles de conjugalité
+    fusion = fct_recode( # non filtrée
+      as_factor(CF1a), 
+      "D'accord" = "Tout à fait d'accord", 
+      "D'accord" = "Plutôt d'accord", 
+      "Pas d'accord" = "Plutôt pas d'accord", 
+      "Pas d'accord" = "Pas du tout d'accord", 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Dans un couple, il faut tout faire ensemble"),  
+    compromis = fct_recode( # non filtrée
+      as_factor(CF1b), 
+      "D'accord" = "Tout à fait d'accord", 
+      "D'accord" = "Plutôt d'accord", 
+      "Pas d'accord" = "Plutôt pas d'accord", 
+      "Pas d'accord" = "Pas du tout d'accord", 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Dans un couple, il faut faire des compromis pour ne pas contrarier l'autre"), 
+    confidence = fct_recode( # filtré FCPL 01 et 02
+      as_factor(SOC1a),
+      NULL = "",
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% 
+      fct_relevel("Oui", "Non", "Ca dépend du problème") %>% 
+      set_variable_labels("Se confie au partenaire lors d'un problème personnel"), 
+    contact_famille = fct_recode( # non filtrée
+      as_factor(SOC2a), 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Contacts avec la famille (12 derniers mois)"), 
+    contact_amis = fct_recode( # non filtrée
+      as_factor(SOC2b), 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Contacts avec des ami-es (12 derniers mois)"), 
+    activites = fct_recode( # non filtrée
+      as_factor(SOC2c), 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Activités sportives ou de loisirs (12 derniers mois)"), 
+    assos = fct_recode( # non filtrée
+      as_factor(SOC2d), 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Activités associatives, politiques ou syndicales (12 derniers mois)"), 
+    taches_men = fct_recode( # filtré FCOHAB 01, 02, 03, 04
+      as_factor(CF2),
+      NULL = "",
+      "Une autre personne s'occupe des tâches ménagères" = "Une autre personne vivant au foyer s'occupe de l'essentiel des tâches ménagères", 
+      "Une autre personne s'occupe des tâches ménagères" = "Une autre personne rémunérée ou non s'occupe de l'essentiel des tâches",
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Répartition tâches ménagères"), 
+    taches_enf = fct_recode( # filtré FCOHAB 01, 02, 03, 04 et Q5b>00 (personnes de moins de 16 ans dans foyer)
+      as_factor(CF3),
+      NULL = "",
+      "Une autre personne s'occupe des enfants" = "Une autre personne vivant au foyer s'en occupe", 
+      "Une autre personne s'occupe des enfants" = "Une personne hors du foyer s'en occupe",
+      NULL = "77",
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% set_variable_labels("Répartition tâches enfants foyer"),
+    
+    
+    # ↓ Satisfaction conjugale 
+    satisfaction = fct_recode(
+      as_factor(C1), # filtrée FCPL = 01, 02
+      NULL = "", 
+      "Oui" = "Très satisfaisante",
+      "Oui" = "Satisfaisante",
+      "Non" = "Peu satisfaisante",
+      "Non" = "Pas du tout satisfaisante",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% set_variable_labels("Satisfait de la relation de couple actuelle"),
+    amoureux = fct_recode(
+      as_factor(SEX14), # filtrée FCPL = 01, 02
+      NULL = "", 
+      "Oui" = "Vous êtes très amoureux-se",
+      "Oui" = "Vous êtes amoureux-se",
+      "Non" = "Vous n’êtes plus amoureux-se",
+      "Non" = "Vous n’avez jamais été amoureux-se",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% set_variable_labels("Sentiment amoureux vis-à-vis partenaire"),
+    rupture = fct_recode(
+      as_factor(C1a), # filtrée FCPL = 01, 02
+      NULL = "", 
+      "Oui" = "Oui vous-même",
+      "Oui" = "Oui votre conjoint",
+      "Oui" = "Oui les deux",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>%
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("Intention de rompre (12 derniers mois)"),
+    rupture_suite = fct_recode( 
+      as_factor(C1a1), # filtrée FCPL = 01, 02
+      NULL = "", 
+      "Oui" = "Une demande de divorce",
+      "Oui" = "Une séparation   avec décohabitation",
+      "Oui" = "Une séparation  sans décohabitation",
+      "Non" = "Vous êtes toujours ensemble",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>%
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("Aboutissement intention de rupture"), 
+    
+    # ↓ Sujets de conflits
+    conflit_taches = fct_recode(
+      as_factor(CF5a), # filtrée FCOHAB 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Tâches vie quotidienne"),
+    conflit_enf = fct_recode(
+      as_factor(CF5b), # filtrée FCPL 01, 02, 03, 04 et ENF > 01 
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Enfants"),
+    conflit_argent = fct_recode(
+      as_factor(CF5d), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Argent"),
+    conflit_opinion = fct_recode(
+      as_factor(CF5e), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Politique, religion ou opinions"),
+    conflit_vacances = fct_recode(
+      as_factor(CF5f), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Sorties, loisirs ou vacances"),
+    conflit_famille = fct_recode(
+      as_factor(CF5g), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Relations famille"),
+    conflit_famille_cjt = fct_recode(
+      as_factor(CF5h), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Relations famille conjoint"),
+    conflit_amis = fct_recode(
+      as_factor(CF5i), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Relations amis"),
+    conflit_travail = fct_recode(
+      as_factor(CF5j), # filtrée FCPL 01, 02, 03, 04 et en emploi 
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Travail"),
+    conflit_travail_cjt = fct_recode(
+      as_factor(CF5k), # filtrée FCPL 01, 02, 03, 04 et en emploi 
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Travail conjoint"),
+    conflit_sexualite = fct_recode(
+      as_factor(CF5l), # filtrée FCPL 01, 02, 03, 04
+      NULL = "",
+      "Oui" = "Parfois", 
+      "Oui" = "Souvent",
+      NULL = "tout le temps ou presque", #vide
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Sexualité de couple"), 
+    
+    # ↓ Situation avec parents 
+    privation = fct_recode(
+      as_factor(EA9a), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Privations matérielles ou négligences graves"), 
+    conflit_pere = fct_recode(
+      as_factor(EA9b), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Conflit très grave avec le père"), 
+    conflit_mere = fct_recode(
+      as_factor(EA9c), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Conflit très grave avec la mère"),
+    fugue = fct_recode(
+      as_factor(EA9d), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Fugue ou mise à la porte"),
+    conflit_parents = fct_recode(
+      as_factor(EA9e), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Tensions graves ou climat de violence entre parents"),
+    aide_educ = fct_recode(
+      as_factor(EA9f), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Aide éducative à la maison"),
+    foyer = fct_recode(
+      as_factor(EA9g), 
+      NULL = "Non concerné-e",
+      NULL = "NVPD",
+      NULL = "NSP"
+    ) %>% 
+      set_variable_labels("Placement en foyer ou famille d'accueil"),
   ) %>%
   select(# variables temporaires
          -Q6_chr, -Q6a_chr, -Q7_chr, -Q7a_chr,
@@ -622,18 +951,33 @@ lgbtnh = lgbtn %>%
 # lgbt_aip_h = lgbt_aip %>% filter(genre == "Un homme")
 # 
 # #### Sous-pop en couple > 4 mois dans 12 DERNIERS MOIS (tableau 3b) ----
-# 
-# # lgbtn_conjugal = lgbtn filtrée sur FCPL %in% c("01","02", "03", "04") 
-# # en couple > 4 mois dans les 12 DERNIERS MOIS.
-# 
-# lgbtn_conjugal = lgbtn %>%
-#   filter(FCPL %in% c("01", "02", "03", "04")) %>%
-#   mutate(
-#     cohabitation  = fct_drop(cohabitation)
-#   )
-# 
-# lgbtnf_conjugal = lgbtn_conjugal %>%
-#   filter(genre == "Une femme")
-# 
-# lgbtnh_conjugal = lgbtn_conjugal %>%
-#   filter(genre == "Un homme")
+# lgbtn_conjugal = lgbtn filtrée sur FCPL %in% c("01","02", "03", "04") # en couple > 4 mois dans les 12 DERNIERS MOIS.
+
+lgbtn_conjugal = lgbtn %>%
+  filter(FCPL %in% c("01", "02", "03", "04")) %>%
+  mutate(
+    cohabitation  = fct_drop(cohabitation)
+  )
+
+lgbtnf_conjugal = lgbtn_conjugal %>%
+  filter(genre == "Une femme")
+
+lgbtnh_conjugal = lgbtn_conjugal %>%
+  filter(genre == "Un homme")
+
+#### Sous-pop personnes en couple (> 4 mois) AU MOMENT de l'enquête ----
+
+# lgbtn_couple = lgbtn filtrée sur FCPL %in% c("01", "02") + 
+# filtre NA satisfaction/amoureux/rupture. C'est la base appropriée pour les
+# questions posées aux personnes en couple AU MOMENT de l'enquête. 
+# /!\ On la conserve telle quelle pour ne pas casser les analyses existantes
+#     sur la satisfaction. 
+
+lgbtn_couple = lgbtn %>%
+  filter(FCPL %in% c("01", "02"))
+
+lgbtnf_couple = lgbtn_couple %>% # Création de la sous-population femmes
+  filter(genre == "Une femme")
+
+lgbtnh_couple = lgbtn_couple %>% # Création de la sous-population hommes
+  filter(genre == "Un homme")
