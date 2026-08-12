@@ -20,3 +20,4 @@ Data/
 *.rdb
 *.rdx
 *.rdb2
+*_files/
