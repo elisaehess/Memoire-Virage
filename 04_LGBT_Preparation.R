@@ -117,6 +117,7 @@ lgbtn = lgbt %>%
     C1a,
     C1a1,
     SEX14,
+    S2a_02, 
     LGBT1e, 
     
     # ↓ Sujets de conflits 
@@ -158,14 +159,12 @@ lgbtn = lgbt %>%
     
     # ↓ Nouvelle variable croisée genre et identification sexuelle 
     genre_idsexu = case_when(
-      genre == "Un homme" & idsexu == "Hétéro" ~ "Hétéro", 
       genre == "Un homme" & idsexu == "Bi" ~ "Bi", 
       genre == "Un homme" & idsexu == "Homo" ~ "Gay",
-      genre == "Une femme" & idsexu == "Hétéro" ~ "Hétéra", 
       genre == "Une femme" & idsexu == "Bi" ~ "Bie", 
       genre == "Une femme" & idsexu == "Homo" ~ "Lesbienne"
     ) %>% 
-      fct_relevel ("Hétéro", "Hétéra", "Bi", "Bie", "Gay", "Lesbienne"),
+      fct_relevel ("Bi", "Bie", "Gay", "Lesbienne"),
     
     # ↓ tranches d'âge alignées sur PG (4 modalités : 20-29, 30-39, 40-49, 50-69)
     age = as_factor(Q19E_age_rec),
@@ -749,6 +748,13 @@ lgbtn = lgbt %>%
     ) %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("Aboutissement intention de rupture"), 
+    depression = case_when( #décalage code / label dans la base source 
+      haven::zap_labels(S2a_02) == "01" ~ "Oui",
+      haven::zap_labels(S2a_02) == "00" ~ "Non",
+      haven::zap_labels(S2a_02) %in% c("77", "88", "99") ~ NA_character_
+    ) %>%
+      factor(levels = c("Oui", "Non")) %>%
+      set_variable_labels("Dépression ou anxiété au moment de l'enquête"), 
     comingoutconjoint = fct_recode(
       as_factor(LGBT1e), # filtrée Q6 = 01, 02
       NULL = "",

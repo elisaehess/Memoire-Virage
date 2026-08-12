@@ -124,6 +124,7 @@ pg_base = pg %>%
     C1a,
     C1a1,
     SEX14,
+    S2a_02, 
     LGBT1e, 
     
     # ↓ Sujets de conflits 
@@ -855,6 +856,13 @@ pg_base = pg %>%
     ) %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("Aboutissement intention de rupture"),
+    depression = fct_recode(
+      as_factor(S2a_02), 
+      NULL = "NVPD", 
+      NULL = "NSP"
+    ) %>% 
+      fct_relevel("Oui", "Non") %>% 
+      set_variable_labels("Dépression ou anxiété au moment de l'enquête"), 
     comingoutconjoint = fct_recode(
       as_factor(LGBT1e), # filtrée Q6 = 01, 02
       NULL = "",
