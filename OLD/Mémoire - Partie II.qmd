@@ -1,0 +1,1037 @@
+---
+title: "Mémoire – Partie II"
+subtitle: "Les styles de conjugalité bisexuels"
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format:
+  docx:
+    toc: true
+    toc_depth: 5
+    fig-cap-location: "top"
+execute:
+  echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+  cache: false 
+editor: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+```{r setup}
+#| include: false
+
+# Librairies ---------------------------------------------------------------
+library(tidyverse)   # manipulation (plsrs packages)
+library(labelled)    # variables labellisées
+library(haven)       # import SAS
+library(questionr)   # quelques fonctions utiles
+library(survey)      # données pondérées
+library(srvyr)       # fournit select et filter aux données pondérées 
+library(gtsummary)   # tableaux de synthèse
+library(flextable)   # export Word des tableaux
+library(ggplot2)     # graphiques 
+library(GGally)      # graphiques (extension de ggplot2)
+library(broom)       # faire des tibble (pour le forest plot)
+library(extrafont)   # charger polices d'écriture 
+loadfonts(device = "win")
+
+# Préférences gtsummary
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+options(scipen = 999)
+
+# Import + préparation : on appelle les scripts existants -----------------
+source("01_PG_Import.R", encoding = "UTF-8")
+source("02_PG_Preparation.R", encoding = "UTF-8")
+source("03_LGBT_Import.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
+
+# Plans de pondération (PG uniquement) -----
+dw = svydesign(id = ~1, weights = pgn$poids_cal, data = pgn)
+dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
+dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
+
+```
+
+# Chapitre II : les styles de conjugalité bisexuels
+
+Dans cette deuxième partie nous nous intéressons aux différents types de
+fonctionnement conjugaux chez les personnes bisexuelles. Jean Kellerhals
+définit les styles d'interactions conjugales contemporains selon
+plusieurs dimensions : le degré d'autonomie/fusion des conjoints, le
+d'ouverture/clôture à l'environnement extérieur, l'orientation
+prioritaire donnée à la famille, le degré de sexuation des rôles
+conjugaux, le degré de différenciation du pouvoir décisionnel,
+l'investissement différentiel dans la sphère domestique et le degré de
+routinisation. Ces dimensions de cohésion et régulation du couple
+permettent d'établir cinq styles d'interactions conjugales grâce à une
+classfication hiérarchique ascendante [@widmer2004]. Contrairement aux théories qui postulent la fin de la famille traditionnelle et l'avénement du couple moderne standardisé et fondé sur la norme d'égalité, sa recherche montre qu'il existe bel et bien différents styles d'interactions au sein des couples. De plus ceux-ci sont inscrits dans la structure social, on observe pas les mêmes styles en fonction des milieux sociaux. Enfin les styles d'interactions influencent la nature et la fréquence des conflits, leurs modes de résolution ainsi que l'évaluation de la qualité des relations conjugales. 
+
+Maintenant qu'on a mieux cerné les situations conjugales dans lesquelles se trouvent les bisexuels, on va chercher à approcher leurs styles d'interactions conjugales. L'enquête Virage n'est pas pensée pour étudier des couples mais bien des individus au sein de couples. Ainsi, contrairement à la recherche de Kellerhalls, nous n'avons pas les réponses des deux conjoints. C'est pourquoi il nous est compliqué de parler de style d'interaction, ayant les déclaration d'une seule partie du couple. Nous parlerons plutôt que style de conjugalité, en se basant sur certaines observations faites par Kellerhalls. 
+
+On formule les hypothèses suivantes : 
+- le style de conjugalité, comme pour la configuration conjugale, est influencé par l'âge et la classe des individus. Kellerhalls le montre pour la classe sociale : les couples dotés économiquement et culturellement valorisant les modes de conjugalité autonomes et égalitaires. Alors que les milieux populaires ont plus tendance à la clôture et à la sexuation des rôles. Au contraire il dit que l'âge, ou du moins la génération ou la phase de la vie n'a pas d'impact sur le style de conjugalité. On le prendra quand même en compte avec l'idée que l'idéal égalitaire du couple (Bergström) touche plus les générations plus jeunes et peut mener à des conflits et évaluation du couple spécifiques. Kellerhalls montre que l'écart entre idéal égalitaire et persistance d'inégalités domestiques et professionnelles est source de conflit. 
+
+Question : est-ce que la bisexualité se distingue de l'hétérosexualité et de l'homosexualité du point de vue du style de conjugalité ? 
+
+Dans virage PG on a déjà vu que les femmes bisexuelles étaient moins souvent mariées et dans des relations longues que les hétérosexuelles. Cela laisse supposer des styles de conjugalité différents. Les hommes bisexuels quant à eux, surtout celibataires sont surreprésentés parmi les divorcés. Nous creuserons la question du divorce des hommes bi et du style conjugal si possible avec les échantillons. Qu'en est-il de la comparaison avec les couples de même sexe ? A voir dans Virage LGBT. 
+
+Dans cette partie, nous travaillons sur des effectifs encore plus petit qu'en chapitre 1 : en couple au moment de l'enquête, en couple au cours des 12 derniers mois. Ainsi, même quand les p-valeurs sont significatives, elles ne disent pas un résultat généralisable outre mesure. Par souci de transparence, nous affichons les effectifs non pondérés associés aux pourcentages quand les bases sont filtrées. Les lectures à partir de maintenant seront des lectures descriptives de tendance. 
+
+## Styles de conjugalité dans la bisexualité 
+
+pas accès au questionnaire entier de Kellerhalls pour reprendre indicateurs 
+- autonomie/fusion : dans un couple il faut tout faire ensemble ; dans un couple il faut faire des compromis (CF1a et CF1b)
+- ouverture/clôture : SOC1 (se confier à conjoint, famille, ami lors d'un pb perso), SOC2(sorties) 
+- prio famille : ? 
+- sexuation rôles conjugaux : statut activité comparé ?
+- différenciation pouvoir décisionnel : ? 
+- investissement différentiel sphère domestique : CF2 et CF3 
+- degré routinisation : ? 
+
+Supprimer ce tableau ensuite 
+```{r}
+#| label: tbl-style-conjugalite
+#| tbl-cap: "Style de conjugalité selon l'identification sexuelle et le genre. Virage PG (pondéré)."
+
+# Liste commune des variables à inclure
+tab3_vars = c("fusion", "compromis", "confidence",  "contact_amis", "contact_famille", "activites", "assos", "taches_men", "taches_enf")
+
+# Tableau PG pondéré -- Femmes
+tab3_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab3_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab3_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab3_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab3_lgbt_f = lgbtnf %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab3_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab3_lgbt_h = lgbtnh %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab3_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab3 = tbl_merge(
+  tbls = list(tab3_pg_f, tab3_pg_h, tab3_lgbt_f, tab3_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.", 
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab3 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
+### Conceptions de la conjugalité 
+
+```{r}
+#| label: tbl-conceptions-conjugalite
+#| tbl-cap: "Conceptions de la conjugalité selon l'identification sexuelle et le genre. Virage PG (pondéré)."
+
+# Liste commune des variables à inclure
+tab4_vars = c("fusion", "compromis")
+
+# Tableau PG pondéré -- Femmes
+tab4_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab4_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab4_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab4_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Fusion des tableaux 
+tab4 = tbl_merge(
+  tbls = list(tab4_pg_f, tab4_pg_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab4 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires.\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
+Les bisexuelles et lesbiennes sont moins souvent d'accord que les hétérosexuelles qu'il faut tout faire ensemble dans un couple (52,2% et 53,5% contre 68,5%). Chez les hommes en revanche, les bisexuels (66,9%) sont plus proches des hétérosexuels (77,8%), ce sont les gays qui se différencient, 49,8%.  Le lien statistique entre l'identification sexuelle et la question sur les compromis est moins évident.  Les personnes bisexuelles semblent avoir une approche moins fusionnelle des relations amoureuses que les personnes hétérosexuelles et que les homosexuelles pour Les femmes bisexuelles. Ce constat témoigne-t-il d’un rapport plus individuel au couple ? D’une autre vision de la place du couple dans la vie ? D’une moindre capacité à s’engager comme le sous entendent les représentations associées aux personnes bisexuelles ?
+
+On peut interpréter ce résultat comme l'appartenance d'une partie des personnes bisexuelles aux styles d'interactions conjugales privilégiant l'autonomie sur la fusion. 
+
+```{r}
+#| label: fig-fusion-compromis
+#| fig-cap: "Adhésion aux normes de fusion et de compromis conjugal, selon le genre et l'identification sexuelle. Virage PG (pondéré)."
+#| fig-width: 8
+#| fig-height: 5
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph2 = function(var, label){
+  pgn %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(genre_idsexu) == F) %>% 
+    group_by(genre_idsexu, modalite) %>% 
+    summarise(eff = sum(poids_cal)) %>% 
+    group_by(genre_idsexu) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "D'accord") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph2 = base_graph2("fusion", "Il faut tout faire\nensemble") %>% 
+  bind_rows(base_graph2("compromis", "Il faut faire des compromis\npour ne pas contrarier l'autre"))
+
+base_graph2 = base_graph2 %>% 
+  mutate(genre_idsexu = factor(genre_idsexu, levels = rev(c("Hétéro", "Hétéra", "Bi", "Bie", "Gay", "Lesbienne"))))
+
+# Créer graphique
+graphique2 = ggplot(base_graph2, aes(x = genre_idsexu, y = pct)) +
+  geom_segment(aes(xend = genre_idsexu, yend = 0),
+               color = "darkseagreen", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "darkseagreen", size = 2) +
+  coord_flip() + 
+  facet_wrap(vars(variable), scales = "free") +
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.x = element_blank(),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen")
+        )
+graphique2
+```
+
+Une réserve d'abord. Les p-valeurs du tableau testent chaque bloc de genre séparément : trois groupes (Homo/Bi/Hétéro) chez les femmes, trois chez les hommes, mais pas les six groupes croisés entre eux. Autrement dit, le test valide bien un gradient au sein des femmes et au sein des hommes, mais ne dit rien statistiquement sur l'écart Bi/Bie que le graphique donne à voir visuellement. Pour la lecture qui suit, nous nous en tenons donc aux comparaisons validées par les p-valeurs (intra-genre), et nous signalons la comparaison Bi/Bie comme une piste descriptive, pas un résultat testé.
+
+« Il faut tout faire ensemble » — un gradient net et robuste (p<0,001 chez les femmes et chez les hommes)
+
+L'adhésion à la norme de fusion est la plus forte chez les hommes hétérosexuels (77,8%), suivi des femmes hétéros (68,5%) puis des hommes bis proches (68,5%). Les lesbiennes, bisexuelles puis gays déclarent moins souvent et dans proportions proches entre les trois groupes (53,5%, 52,2% puis 49,8%).
+
+Les personnes bisexuelles ont une position propre vis-à-vis de cet indicateur de fusion. Ils ne sont pas réductibles à l'hétérosexualité ou l'homosexualité, les hommes bisexuels plus proches des réponses hétérosexuels tandis que les femmes bisexuelles plus proches des réponses homosexuelles. Un résultat cohérent avec les positions sociales et les configurations conjugales observées en chapitre 1. L'écart Bi/Bie (66,9 vs 52,2, soit près de 15 points) est le plus large de tous les couples homme/femme du graphique — plus large que l'écart Hétéro/Hétéra (77,8 vs 68,5, environ 9 points). Les femmes bies, qui on l'a vu pratiquent une moindre institutionnalisation matrimoniale, sont aussi à distance de la norme fusionnelle du couple.
+
+« Il faut faire des compromis pour ne pas contrarier l'autre » — un item qui ne discrimine pas (p=0,11 femmes, p=0,4 hommes)
+
+Les niveaux d'accord sont très élevés partout (85% à 96%) et les écarts entre groupes ne sont pas significatifs. Cet item fonctionne à l'inverse du précédent : plutôt qu'un marqueur de style conjugal, c'est une norme de compromis quasi consensuelle, qui ne varie pas selon l'identification sexuelle. La fusion et le compromis, bien que tous deux mobilisables pour approcher la dimension autonomie/clôture produite par Kellerhalls, ne se comportent pas de la même façon empiriquement dans Virage. 
+
+```{r}
+
+# Liste commune des variables à inclure
+tab5_vars = c("fusion", "compromis")
+
+# Tableau LGBT -- Femmes
+tab5_pg_f = lgbtnf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab5_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT  -- Hommes
+tab5_pg_h = lgbtnh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab5_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Fusion des tableaux 
+tab5 = tbl_merge(
+  tbls = list(tab5_pg_f, tab5_pg_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test exact de Fisher.",
+      p.value_2 ~ "Test exact de Fisher.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab5 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)
+```
+
+```{r}
+#| label: fig-fusion-compromis-lgbt
+#| fig-cap: "Adhésion aux normes de fusion et de compromis conjugal, selon le genre et l'identification sexuelle. Virage PG (pondéré)."
+#| fig-width: 8
+#| fig-height: 5
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph3 = function(var, label){
+  lgbtn %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+    group_by(genre, typecplbi, modalite) %>% 
+    summarise(eff = n()) %>% 
+    group_by(genre, typecplbi) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "D'accord") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph3 = base_graph3("fusion", "Il faut tout faire\nensemble") %>% 
+  bind_rows(base_graph3("compromis", "Il faut faire des compromis\npour ne pas contrarier l'autre"))
+
+ordre_typecplbi = c("Homo célibataire", "Homo en couple",
+                     "Bi célibataire", "Bi en couple de même sexe", "Bi en couple de sexe différent")
+
+base_graph3 = base_graph3 %>% 
+  mutate(typecplbi = factor(typecplbi, levels = rev(ordre_typecplbi)))
+
+# Créer graphique
+graphique3 = ggplot(base_graph3, aes(x = typecplbi, y = pct)) +
+  geom_segment(aes(xend = typecplbi, yend = 0),
+               color = "darkseagreen", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "darkseagreen", size = 2) +
+  coord_flip() + 
+  facet_grid(rows = vars(genre), cols = vars(variable)) +
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.x = element_blank(),
+        axis.text = element_text(family = "serif", size = 11, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen")
+        )
+graphique3
+```
+Dans Virage LGBT, les répondants sont moins souvent d'accord avec l'affirmation. Les bisexuelles sont seulement 22,2% contre 28,4%. Dans Virage LGBT on observe une proportion légèrement plus faible de personnes bisexuelles d'accord avec l'affirmation : 75,7% des femmes et 82,5% des hommes contre 81,8% des lesbiennes et 90,5% des lesbiennes.
+
+Le graphique LGBT apporte un élément que le PG ne peut pas montrer : l'effet du type de couple, pas seulement de l'identification.
+
+Deux points saillants (à l'œil sur le graphique — vérifier et ajouter les valeurs exactes) :
+
+Chez les femmes, sur la question des compromis, celles en couple de sexe différent répondent le moins souvent par l'affirmative, y compris derrière « Bi célibataire ». Alors que le compromis n'était pas discriminant entre groupe en population général, il semble ici plus parlant, chez les femmes du moins. Ce résultat triangule avec l'observation en population générale. : dans les deux enquêtes, ce sont les femmes bisexuelles en couple avec un homme s'écartent particulièrement de la norme fusionnelle. Chez les hommes, les bisexuels répondent moins souvent que homos par l'affirmative. Ce sont les homos en couple qui sont le plus souvent d'accord avec l'affirmation sur les compromis. 
+
+« Bi en couple de même sexe » est nettement au-dessus de « Bi en couple de sexe différent » chez les femmes. Autrement dit, ce n'est pas l'identification bisexuelle en tant que telle qui abaisse l'adhésion à la fusion, c'est cette identification combinée au fait d'être en couple avec un homme. Ça va dans le sens de l'hypothèse 3 (le type de couple structure le style conjugal) plus que d'un effet propre de la bisexualité. On peut proposer une piste d'interprétation : les femmes bisexuelles seraient également plus féministes (voir Envie) et chercherait donc à s'éloigner davantage des normes conjugales, particulièrement quand elles sont en couple avec un homme.  
+Côté hommes, l'écart entre les trois modalités bi est resserré — le type de couple semble moins discriminant chez eux que chez les femmes sur cet item.
+
+Sur l'item de tout faire ensemble en couple, l'écart entre hommes est encore une fois moins saillant. Les moins souvent d'accord avec l'affirmation sont les gays célibataires. Chez les femmes ce sont les lesbiennes et bies célibataires également. Dans Virage LGBT c'est le fait d'être célibataire qui semble conditionner la plus grande distance vis-à-vis de cette vision fusionnelle du couple qui fait tout ensemble. Parmi les personnes en couple les bies en couple de sexe différent sont encore une fois les plus à distance de l'affirmation. Cela rejoint nos précédentes observations.
+
+### Sociabilité externe au couple 
+
+Les femmes bisexuelles déclarent nettement moins que les lesbiennes se confier au conjoint lors d'un problème personnel : 49,7% contre 83,9%. Les lesbinnes se confient également plus souvent que les hétérosexuelles : 64,6%. Dans Virage LGBT, où les femmes bisexuelles sont plus souvent en couple de même sexe, elles déclarent autant que les lesbiennes se confier lors d'un problème personnel. Les hommes bisexuels le déclarent moins souvent que les gays dans Virage LGBT : 43,8% contre 58,9%. Les personnes bisexuelles sont nombreuses à sélectionner les problèmes qu'iels évoquent avec leurs partenaires. Ici encore on peut l'interpréter comme un rapport moins fusionnel au couple, avec d'autres personnes de l'entourage à qui confier ses problèmes avant son conjoint. Cela peut aussi témoigner de difficultés spécifiques aux bisexuel-les dans le couple, qui les empêche de se confier.  
+
+!!! Reprendre contacts amis / famille : peu ou pas de contacts VS contacts réguliers !!!
+
+### sexuation des rôles domestiques 
+
+```{r}
+
+# Plans de pondération 
+dw_conjugal = svydesign(id = ~1, weights = pgn_conjugal$poids_cal, data = pgn_conjugal)
+dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf_conjugal)
+
+# Liste commune des variables à inclure
+tab6_vars = c("confidence", "taches_men", "taches_enf")
+
+# Tableau PG pondéré -- Femmes
+tab6 = dwf_conjugal %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab6_vars),
+    statistic = all_categorical() ~ "{p} ({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**") 
+
+ # Version FINALE 
+tab6 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+```
+Se confier au/à la partenaire (PG Femmes, p=0,008). Les bisexuelles sont minoritaires à répondre « oui » sans condition (49,7%, contre 83,9% chez les homosexuelles et 64,6% chez les hétérosexuelles), mais elles sont massivement les plus nombreuses à répondre « ça dépend du problème » (44,0%, contre 15,7% et 29,7%). Ce n'est donc pas un simple retrait de la confidence conjugale : plutôt une conditionnalité plus marquée, qui prolonge le résultat déjà noté sur la fusion : un rapport plus sélectif, moins automatique, au partenaire.
+
+Tâches ménagères (p=0,13, non significatif). Uniquement une tendance : les lesbiennes partagent le plus (75,7%), bisexuelles et hétérosexuelles se ressemblent sur la prise en charge exclusive (38,5% vs 35,2%).
+
+Tâches liées aux enfants du foyer (p<0,001). Ligne à manier avec beaucoup de précaution : la cellule homosexuelles « vous avez pris en charge l'essentiel » repose sur 1 seul répondant non pondéré (6,0% [1,0]) — un p<0,001 global ne rend pas cette case-là interprétable individuellement. Cela dit, l'écart bi/hétéro est net et repose sur des effectifs moins fragiles (11 vs 1077 non pondérés) : 69,3% des bisexuelles prennent en charge seules l'essentiel des tâches liées aux enfants, contre 29,5% des hétérosexuelles — plus du double. Combiné au résultat du chapitre 1 sur la moindre cohabitation et la moindre durée des couples bis, ça dessine une hypothèse : les femmes bisexuelles en couple avec enfants assument un poids domestique plus important, y compris dans des configurations conjugales par ailleurs moins institutionnalisées. Nous formulons ici une hypothèse très prudente au vu des effectifs. Il est toutefois intéressant de se demander si la moindre institutionnalisation n'est pas synonyme de plus grande vulnérabilité chez les femmes bisexuelles. Moins mariées et partageant moins souvent leur patrimoine avec le partenaire, elles sont aussi exposées à des charges domestiques importantes. 
+```{r}
+
+# Liste commune des variables à inclure
+tab7_vars = c("confidence", "taches_men", "taches_enf")
+
+lgbtnf_conjugal = lgbtnf %>% 
+  filter(!typecplbi %in% c("Bi célibataire", "Homo célibataire")) %>% 
+  mutate(typecplbi = fct_relevel(typecplbi, "Homo en couple", "Bi en couple de même sexe", "Bi en couple de sexe différent"))
+         
+# Tableau LGBT -- Femmes
+tab7 = lgbtnf_conjugal %>%
+  tbl_summary(
+    by = typecplbi,
+    include = all_of(tab7_vars),
+    statistic = all_categorical() ~ "{p} ({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**") 
+
+ # Version FINALE 
+tab7 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+```
+Un même motif ressort assez nettement des trois variables — et il fait écho à ce qu'on observait déjà sur la fusion et sur le type de couple.
+
+Se confier au/à la partenaire
+
+les bisexuelles en couple de sexe différent se confient sans condition moins souvent que les lesbiennes (62,5% contre 73,1%). C'était déjà le cas en population générale, aussi par rapport aux hétérosexuelles mêmes si les IC se recoupent tout juste. Dans Virage LGBT on voit que les bies en couple de même sexe (78,4%) se confient davantage que les lesbiennes (73,1%) et plus que les bies en couple de sexe différent (62,5%), qui sont aussi de loin les plus nombreuses à répondre « ça dépend » (36,9%, contre 21,1% pour les bies même sexe et 24,8% pour les lesbiennes).
+
+Le résultat PG (bisexuelles globalement moins condifentes que les hétéras) et le résultat LGBT (bisexuelles en couple différent nettement en retrait, bisexuelles en couple de même sexe alignées voire au-dessus des lesbiennes) racontent donc la même histoire vue sous deux angles : ce n'est pas l'identification bisexuelle qui abaisse la confidence conjugale, c'est le fait d'être en couple avec un homme. Un résultat qui consolident ceux sur la fusion : en faire un résultat consolidé.
+
+Tâches ménagères
+
+LGBT (p<0,001). Même motif que pour la confidence : les bies en couple de même sexe (77,8% de tâches partagées) sont très proches des lesbiennes (75,6%), tandis que les bies en couple différent décrochent (56,5% de partage, 25,9% de prise en charge exclusive contre 10-12% pour les deux autres groupes).
+
+Tâches liées aux enfants du foyer
+
+LGBT (p=0,033). Le sens va dans la même direction (31,3% bi-différent, 24,0% bi-même sexe, 13,2% homo pour la prise en charge exclusive), mais les effectifs sont ici extrêmement fragiles (n=5, 6 et 32 non pondérés) — plus fragiles encore que la cellule homo du PG. (utiliser comme tendance cohérente avec le reste ou supprimer ?)
+
+Une piste de rédaction
+
+Le fil qui traverse maintenant quatre tableaux différents (Kellerhals PG, Kellerhals LGBT par type de couple, confidence PG, confidence et tâches LGBT) est cohérent : le type de couple (même sexe / sexe différent) structure le style conjugal des bisexuelles plus que l'identification elle-même, et ce sont spécifiquement les bisexuelles en couple avec un homme qui s'écartent — vers moins de fusion, moins de confidence inconditionnelle, moins de partage des tâches.
+
+### représentation de la conjugalité des parents 
+EA9a, EA9b, EA9c, EA9d, EA9e, EA9F, EA9g
+
+```{r}
+#| label: tbl-situation-parents
+#| tbl-cap: "Situation parentale selon l'identification sexuelle et le genre. Virage PG (pondéré) et Virage LGBT."
+
+# Liste commune des variables à inclure
+tab7b_vars = c("privation", "conflit_pere", "conflit_mere",  "fugue", "conflit_parents", "aide_educ", "foyer")
+
+# Tableau PG pondéré -- Femmes
+tab7b_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab7b_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab7b_lgbt_f = lgbtnf %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab7b_lgbt_h = lgbtnh %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab7b = tbl_merge(
+  tbls = list(tab7b_pg_f, tab7b_pg_h, tab7b_lgbt_f, tab7b_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.", 
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab7b %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
+## Satisfaction de la relation dans la bisexualité
+c1
+C1a
+C1a1
+SEX14
+LGBT1e
+
+```{r}
+#| label: tbl-satisfaction-couple
+#| tbl-cap: "Satisfaction du couple actuel selon l'identification sexuelle et le genre. Virage PG (pondéré)."
+
+# Plans de pondération 
+dwf_couple = svydesign(id = ~1, weights = pgnf_couple$poids_cal, data = pgnf_couple)
+
+# Liste commune des variables à inclure
+tab8_vars = c("satisfaction", "amoureux", "rupture")
+
+# Tableau PG pondéré -- Femmes
+tab8 = dwf_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab8_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+ # Version FINALE 
+tab8 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (effectifs non pondérés)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)
+
+tab8
+
+```
+
+```{r}
+#| label: fig-satisfaction-pg
+#| fig-cap: "Satisfaction relationnelle chez les femmes bisexuelles. Virage PG (pondéré)."
+#| fig-width: 8
+#| fig-height: 5
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph4 = function(var, label){
+  pgnf_couple %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(idsexu) == F) %>% 
+    group_by(idsexu, modalite) %>% 
+    summarise(eff = sum(poids_cal)) %>% 
+    group_by(idsexu) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "Oui") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph4 = base_graph4("satisfaction", "Satisfaite relation\nactuelle") %>% 
+  bind_rows(base_graph4("amoureux", "Amoureuse partenaire\nactuelle")) %>% 
+  bind_rows(base_graph4("rupture", "Intention rupture\n(12 derniers mois)")) 
+
+# Créer graphique
+graphique4 = ggplot(base_graph4, aes(x = idsexu, y = pct)) +
+  geom_segment(aes(xend = idsexu, yend = 0),
+               color = "darkseagreen", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "darkseagreen", size = 2) +
+  coord_flip() + 
+  facet_wrap(vars(variable), scales = "free") +
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.x = element_blank(),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen")
+        )
+graphique4
+```
+```{r}
+#| label: fig-satisfaction-lgbt
+#| fig-cap: "Satisfaction relationnelle chez les femmes bisexuelles. Virage LGBT."
+#| fig-width: 8
+#| fig-height: 5
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph5 = function(var, label){
+  lgbtn_couple %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+    group_by(genre, typecplbi, modalite) %>% 
+    summarise(eff = n()) %>% 
+    group_by(genre, typecplbi) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "Oui") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph5 = base_graph5("satisfaction", "Satisfaite relation\nactuelle") %>% 
+  bind_rows(base_graph5("amoureux", "Amoureuse partenaire\nactuelle")) %>% 
+  bind_rows(base_graph5("rupture", "Intention rupture\n(12 derniers mois)")) 
+
+# Créer graphique
+graphique5 = ggplot(base_graph5, aes(x = typecplbi, y = pct)) +
+  geom_segment(aes(xend = typecplbi, yend = 0),
+               color = "darkseagreen", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "darkseagreen", size = 2) +
+  coord_flip() + 
+ facet_grid(rows = vars(genre), cols = vars(variable)) +  
+  scale_y_continuous(limits = c(0, 100)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.x = element_blank(),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen")
+        )
+graphique5
+
+```
+
+Observations : Les bisexuelles déclarent moins souvent être amoureuses de leur partenaire actuel que les hétérosexuelles et homosexuelles. Les femmes bisexuelles déclarent moins souvent que les lesbiennes être satisfaites de leur relation actuelle. Les femmes bisexuelles déclarent également nettement plus souvent avoir eu l’intention de mettre un terme à la relation ou que leur conjoint·e ait eu cette intention.
+
+Interprétation : les personnes bisexuelles sont moins satisfaites en amour ? N’attendent pas les mêmes choses des relations amoureuses ? Ont des relations plus violences / conflictuelles ? La satisfaction plus faible chez les femmes bisexuelles reflète-t-elle des relations plus violentes ? Plus de réflexivité sur les relations ? Plus de difficultés à vivre en couple en tant que bi ? Prudence, pour l'instant aucune donnée ne permet de trancher entre ces pistes. Nous allons creuser la dimension conflictuelle. 
+
+### Connaissance de la bisexualité
+
+```{r}
+#| label: fig-comingout-bi
+#| fig-cap: "Connaissance de la bisexualité par le/la partenaire, personnes bisexuelles en couple. Virage PG (pondéré) et Virage LGBT (non pondéré)."
+#| fig-width: 8
+#| fig-height: 4
+
+# PG : comingoutconjoint chez les bi, par genre
+base_pg = pgn %>% 
+  filter(idsexu == "Bi", is.na(comingoutconjoint) == F, is.na(genre) == F) %>% 
+  group_by(genre, comingoutconjoint) %>% 
+  summarise(eff = sum(poids_cal)) %>% 
+  group_by(genre) %>% 
+  mutate(pct = eff * 100 / sum(eff)) %>% 
+  rename(modalite = comingoutconjoint) %>% 
+  mutate(groupe = paste("PG -", genre))
+
+# LGBT : à adapter une fois la variable confirmée
+base_lgbt = lgbtn %>%
+  filter(idsexu == "Bi", is.na(comingoutconjoint) == F, is.na(genre) == F) %>%
+  group_by(genre, comingoutconjoint) %>%
+  summarise(eff = n()) %>%
+  group_by(genre) %>%
+  mutate(pct = eff * 100 / sum(eff)) %>%
+  rename(modalite = comingoutconjoint) %>%
+  mutate(groupe = paste("LGBT -", genre))
+
+base_comingout = base_pg %>% bind_rows(base_lgbt)
+
+base_comingout = base_comingout %>% 
+  mutate(groupe = factor(groupe, levels = rev(c("PG - Un homme", "PG - Une femme",
+                                                  "LGBT - Un homme", "LGBT - Une femme"))))
+
+ggplot(base_comingout, aes(x = groupe, y = pct)) +
+  geom_segment(aes(xend = groupe, yend = 0),
+               color = "darkseagreen", linewidth = 0.75, alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "darkseagreen", size = 2) +
+  coord_flip() +
+  facet_wrap(vars(modalite)) +
+  scale_y_continuous(limits = c(0, 100)) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen"))
+
+```
+
+Observations : la part de personnes bisexuelles qui déclarent que leur conjoint·e ne connaît pas leur bisexualité est importante (plus de 10%), particulièrement chez les hommes qui sont 18 % dans ce cas et 11 % à ne pas vouloir ou savoir dire. Cette non connaissance de la bisexualité est-elle une cause, une conséquences des apparentes moins bonnes relations des personnes bisexuelles ?
+
+## Conflits et modes de résolution 
+CF5 : série de variables sur les conflits dans le couple : je retire celle sur l'idée d'avoir des enfants et contraception (CF5c1 et CF5c2) car effectifs trop petits. 
+CF6 : violence lors de conflits -> abandon : trop petits effectifs et violence conjugale traité plus tard
+CF7 : violence globale -> abandon : ne documente pas un mode de résolution de conflit dans le couple mais plutôt une propension à la violence
+CF8a_01 : conjoint alcoolisme ou drogue -> abandon : trop petits effectifs 
+CF8b_01 : conjoint TS -> abandon : trop petits effectifs 
+
+Dans cette partie nous ne croiserons par avec le type de couple (même sexe / sexe différent) : les effectifs sont trop petits pour le faire. Compromis pour garder des items exploitables, quitte à perdre la granularité que l'on avait sur la fusion. 
+
+Nous prenons la sous-base : personnes en couple dans les 12 derniers mois. Toutefois certaines questions sont filtrées sur une base plus petite (cohabitant, avec enfants, en emploi..) expliquant des effectifs non correspondant au total indiqué par groupe. 
+
+```{r}
+#| label: tbl-sujets-conflits
+#| tbl-cap: "Sujets de conflits selon l'identification sexuelle et le genre. Virage PG (pondéré) et Virage LGBT."
+
+# Plans de pondération 
+dw_conjugal = svydesign(id = ~1, weights = pgn_conjugal$poids_cal, data = pgn_conjugal)
+dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf_conjugal)
+dwh_conjugal = svydesign(id = ~1, weights = pgnh_conjugal$poids_cal, data = pgnh_conjugal)
+
+# Liste commune des variables à inclure
+tab9_vars = c("conflit_taches", "conflit_enf", "conflit_argent",  "conflit_opinion", "conflit_vacances", "conflit_famille", "conflit_famille_cjt", "conflit_amis", "conflit_travail", "conflit_travail_cjt", "conflit_sexualite")
+
+# Tableau PG pondéré -- Femmes
+tab9_pg_f = dwf_conjugal %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab9_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab9_pg_h = dwh_conjugal %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab9_vars),
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab9_lgbt_f = lgbtnf_conjugal %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab9_vars),
+    statistic = all_categorical() ~ "{p}({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab9_lgbt_h = lgbtnh_conjugal %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab9_vars),
+    statistic = all_categorical() ~ "{p}({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab9 = tbl_merge(
+  tbls = list(tab9_pg_f, tab9_pg_h, tab9_lgbt_f, tab9_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.", 
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab9 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : 20-69 ans, France métropolitaine, ménages ordinaires. Pour Virage PG : pourcentages pondérés.\nLecture : 30,9% des femmes homosexuelles dans l'enquête Virage en population générale ont entre 20 et 29 ans, avec un intervalle de confiance à 95% de [20% - 45%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
+!! CHANGEMENT POPULATION : sous population en couple. Demander à claude comment faire pour les différentiels de population. !!
+
+PG Femmes — le seul panel avec des résultats robustes
+
+En appliquant ta propre règle (p<0,05 et IC non chevauchants), cinq domaines sur onze passent le test :
+
+Domaine	Bi	Hétéro	Robuste ?
+Tâches vie quotidienne	51,7% [35-68]	27,2% [26-28]	Oui
+Relations amis	34,7% [22-50]	10,6% [9,9-11]	Oui, écart le plus large en proportion
+Travail (conjoint·e)	28,1% [17-42]	14,1% [13-15]	Oui
+Sexualité de couple	37,0% [24-52]	10,4% [9,7-11]	Oui, écart le plus large en points
+Travail (soi-même)	26,0% [15-40]	14,7% [14-16]	Non — p=0,013 mais IC [15-40] et [14-16] se chevauchent tout juste (15-16). Bon exemple à citer explicitement comme cas p-significatif-mais-non-robuste, cohérent avec la prudence que tu appliques déjà ailleurs.
+
+Les femmes bisexuelles ne se distinguent quasiment jamais des lesbiennes sur ces items (IC largement chevauchants à chaque fois) — l'écart robuste est spécifiquement bi/hétéro, pas bi/homo. C'est le même clivage que celui observé sur la fusion, la confidence et le partage des tâches : les bisexuelles en population générale (donc trois quarts en couple avec un homme) rapportent plus de conflits que les hétérosexuelles, sur des domaines variés et non redondants entre eux (tâches, amitiés, travail, sexualité) — ce qui donne un signal plus solide qu'un résultat isolé.
+
+Une exception qui vaut la peine d'être signalée : sur « Enfants », les bisexuelles sont moins souvent en conflit que les hétérosexuelles (26,1% vs 28,6%, non significatif). Le contraste avec le tableau précédent sur la répartition des tâches parentales (où les bisexuelles assumaient bien plus souvent seules l'essentiel) est intéressant à noter : une charge inégale ne se traduit pas nécessairement par plus de conflit déclaré sur ce sujet précis. Une piste à formuler comme question ouverte plutôt que trancher.
+
+PG Hommes — rien de robuste à retenir
+
+Aucune ligne fiable en dehors de la ligne dupliquée (à écarter pour l'instant). Cohérent avec ce qu'on a déjà constaté ailleurs dans ce chapitre : le n hommes bis PG en couple est trop fragile pour ce niveau de détail. Je ne bâtirais pas d'argument sur ce panel.
+
+LGBT — triangulation, pas preuve
+
+En gardant le cadrage Fisher/interne que tu appliques déjà (pas d'IC affiché ici, à raison) :
+
+Tâches vie quotidienne (p=0,004) : bies 57,5% vs homos 47,8% — même sens que le résultat PG robuste.
+Sexualité de couple (p=0,034) : bies 44,7% vs homos 39,1% — même sens, mais écart bien plus resserré qu'en PG (5,6 points contre 26,6 points face aux hétéros). Logique : la comparaison change de groupe de référence (homos, pas hétéros).
+Argent (n.s. des deux côtés, PG et LGBT) : direction identique (bies plus souvent en conflit) sans être significatif nulle part — à mentionner comme convergence suggestive, pas comme résultat.
+LGBT Hommes : rien de significatif, cohérent avec l'absence de signal côté PG Hommes.
+Pour la rédaction
+
+Le point le plus solide à mettre en avant n'est pas une seule ligne à p<0,001, mais la convergence : sur quatre à cinq domaines distincts, dans les deux enquêtes, la direction est la même (bisexuelles plus souvent en conflit), et elle rejoint ce que tu as déjà établi sur la fusion, la confidence conditionnelle et le partage des tâches. Avec une dizaine de tests par panel, quelques p<0,05 isolés relèveraient du hasard (pas de correction multiple ici) — mais un faisceau de résultats cohérents entre eux et entre enquêtes est un argument bien plus solide qu'un test pris isolément. Je formulerais la synthèse sur ce registre plutôt que sur le décompte des lignes significatives.
+
+Dis-moi une fois le doublon corrigé si les deux lignes concernées changent la lecture.
+
+voici la ligne corrigée. Peux-tu me proposer un ou plusieurs paragraphes de lectures de ce tableau ? Même si il s'agit plutôt d'une convergence que de résultats
+
+Disséqua données statistiques et identifiait patterns significatifs
+Disséqua données statistiques et identifiait patterns significatifs
+
+Ces deux items racontent une histoire différente des précédents — c'est justement ce qui en fait un bon test de la solidité du fil que tu es en train de tirer.
+
+Sorties, loisirs ou vacances — un effet PG qui s'efface en LGBT
+
+PG Femmes (p<0,001). L'écart bi/hétéro est net et robuste : 42,3% [29%-57%] contre 18,0% [17%-19%], intervalles disjoints. Face aux homosexuelles (25,1% [15%-39%]), le chevauchement est en revanche réel (15-39 et 29-57 se recoupent entre 29 et 39) — pas de différence localisable ici, seulement face aux hétérosexuelles.
+
+PG Hommes (p=0,029) — un cas à citer explicitement comme exemple de ta propre règle de prudence : le test global est significatif, mais aucune paire n'est robuste à l'IC. L'intervalle bi [13%-47%] est si large qu'il recouvre à la fois celui des homosexuels [18%-40%] et celui des hétérosexuels [16%-18%]. Un p<0,05 qui ne localise aucun écart précis — bon exemple pédagogique de la distinction que tu établis entre test omnibus et comparaison par paire.
+
+LGBT (Femmes p=0,8 ; Hommes p=0,5). Et c'est là le point le plus intéressant : l'écart quasi disparaît. Bi et homo femmes sont à 32,8% et 32,1% — pratiquement identiques. Même chose côté hommes (38,2% vs 35,2%).
+
+Le contraste est net : cet item ne suit pas le motif de convergence bi/hétéro vu jusqu'ici. Il ressemble plutôt à un effet propre à l'échantillon PG, qui s'évanouit dès qu'on change de population de référence (LGBT). Une hypothèse à formuler avec prudence : ce n'est peut-être pas la bisexualité en tant que telle qui génère ce conflit sur les sorties/loisirs, mais quelque chose de plus spécifique à la position des femmes bisexuelles en population générale — leur profil d'âge plus jeune, leur moindre stabilité résidentielle ou budgétaire déjà documentée au chapitre 1, davantage que l'identification elle-même. Je ne trancherais pas plus loin sans variable de contrôle, mais je le signalerais explicitement comme un résultat qui ne généralise pas entre les deux enquêtes — ce qui est en soi une information utile pour nuancer le tableau d'ensemble.
+
+Politique, religion ou opinions — un signal genré et asymétrique
+
+PG Femmes (p=0,3, non significatif) — rien à en tirer, malgré une direction cohérente (21,3% bi contre 14,1% hétéro).
+
+PG Hommes (p=0,018), mais un autre cas de test global significatif sans paire robuste : bi [5,0%-29%] chevauche largement homo [13%-32%] et hétéro [10%-12%]. Ce qui frappe surtout, c'est le sens : les hommes bis (12,7%) sont ici plus proches des hétérosexuels (11,1%) que des homosexuels (20,8%) — direction inverse de tout ce qu'on a observé jusqu'ici sur les autres items. À ne pas sur-interpréter vu l'absence de robustesse, mais à noter comme signal potentiellement contraire au motif dominant.
+
+LGBT Femmes (p<0,001) — ici un résultat propre, sans besoin de corroboration PG : 34,0% des bies rapportent ce type de conflit contre 25,5% des lesbiennes, sur des effectifs solides (151 et 446 répondantes). C'est un résultat autonome de l'échantillon LGBT, dans le sens attendu (bi > homo), qui prolonge partiellement — sans le confirmer statistiquement — le signal directionnel (non significatif) observé en PG.
+
+LGBT Hommes (p=0,8) — rien.
+
+Pour la rédaction
+
+Contrairement aux items précédents (tâches, confidence, amis, sexualité de couple), où PG et LGBT pointaient dans la même direction, ces deux domaines n'apportent pas de convergence propre. Je les présenterais comme un contrepoint volontaire dans ton texte plutôt que comme un résultat de plus dans la liste : ils montrent que le clivage bi/hétéro observé ailleurs n'est pas générique à tous les sujets de désaccord — il est spécifique à certains domaines (charge domestique, sexualité, sociabilité amicale, travail) et absent sur d'autres (loisirs, politique/religion), avec en prime une possible spécificité de genre sur ce dernier point chez les hommes. Formulé ainsi, ça renforce plutôt qu'affaiblit l'argument d'ensemble : la convergence que tu documentes sur les autres domaines n'est pas un artefact généralisé à toute mesure de conflit, elle est ciblée sur des dimensions précises de la vie conjugale.
+
+!! Faire graphique + voir si possible séparer type couple LGBT !! 
