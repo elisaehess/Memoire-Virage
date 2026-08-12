@@ -16,3 +16,7 @@ Data/
 *.RData
 *.sav
 *.dta
+*_cache/
+*.rdb
+*.rdx
+*.rdb2
