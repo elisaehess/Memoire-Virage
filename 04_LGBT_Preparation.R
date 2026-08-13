@@ -71,6 +71,7 @@ lgbtn = lgbt %>%
     Q29E_rec,
     CS_E_rec,
     Q25E,
+    Q25C, 
     Q3_rec, 
     Q22E_01,
     Q22E_02,
@@ -78,6 +79,7 @@ lgbtn = lgbt %>%
     EA1, 
     EA2, 
     REV2, # Revenu individuel
+    REV3, 
     REV4, # Revenu subjectif
     Q2_rec, # Reconstruire territoire
     Q3_rec,  # Reconstruire territoire
@@ -287,6 +289,34 @@ lgbtn = lgbt %>%
     ) %>%
       fct_relevel("Actif·ve", "Inactif·ve", "NSP/NVPD") %>% 
       set_variable_labels("En activité"),
+    
+    statut_act2_conjoint = fct_recode( #filtré FCPL 01, 02, 03, 04
+      as_factor(Q25C),
+      "Actif·ve" = "En emploi (y compris intérim, congé de maternité/paternité, arrêt maladie, mais pas étudiant en stage rémunéré)",
+      "Actif·ve" = "Au chômage avec indemnités",
+      "Actif·ve" = "Au chômage sans indemnités",
+      "Inactif·ve" = "A la retraite",
+      "Inactif·ve" = "Etudiant-e, élève",
+      "Inactif·ve" = "Etudiant-e, élève avec emploi y compris petit boulot ou stage rémunéré",
+      "Inactif·ve" = "Etudiant-e, élève avec stage non rémunéré",
+      "Inactif·ve" = "Inactif-ve ou au foyer ayant déjà travaillé (ayant eu un contrat de travail y compris congé maladie longue durée de 5 ans ou plus)",
+      "Inactif·ve" = "Inactif-ve ou au foyer n'ayant jamais travaillé (n'ayant jamais eu de contrat de travail)",
+      "Inactif·ve" = "En congé parental, de solidarité familiale",
+      "Inactif·ve" = "Autre congé de longue durée (Anné sabbatique, congé de création d'entreprise, congé LONGUE MALADIE de moins de 5 ans)",
+      NULL = "NSP",
+      NULL = "NVPD", 
+      NULL = ""
+    ) %>%
+      fct_relevel("Actif·ve", "Inactif·ve") %>% 
+      set_variable_labels("Conjoint-e en activité"), 
+    
+    # Statut d'activité comparé couple 
+    statut_act_compare = case_when(
+      statut_act2 == "Actif·ve" & statut_act2_conjoint == "Actif·ve" ~ "Couple actif", 
+      statut_act2 == "Actif·ve" & statut_act2_conjoint == "Inactif·ve" ~ "Ego actif / Partenaire inactif", 
+      statut_act2 == "Inactif·ve" & statut_act2_conjoint == "Actif·ve" ~ "Ego inactif / Partenaire actif", 
+      statut_act2 == "Inactif·ve" & statut_act2_conjoint == "Inactif·ve" ~ "Couple inactif"
+    ),
    
      # Revenu individuel 
     revenu = fct_recode(
@@ -318,6 +348,21 @@ lgbtn = lgbt %>%
       NULL = ""
     ) %>% 
       set_variable_labels("Situation financière"), 
+    
+    # ↓ Revenu du ménage (REV3), en tranches. Champ : ménage cohabitant
+    #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre du ménage).
+    revenu_menage = case_when(
+      REV3 %in% c("00", "01", "02", "03") ~ "Moins de 1 800€",
+      REV3 %in% c("04", "05")       ~ "De 1 800 à moins de 3 000€",
+      REV3 %in% c("06")             ~ "De 3 000 à moins de 4 000€", 
+      REV3 %in% c("07", "08")       ~ "4 000€ et plus",
+      REV3 %in% c("10", "88", "99") ~ "Pas de budget commun/NVPD/NSP",
+      TRUE                          ~ NA_character_
+    ) %>%
+      factor(levels = c("Moins de 1 800€", "De 1 800 à moins de 3 000€",
+                        "De 3 000 à moins de 4 000€", "4 000€ et plus",
+                        "Pas de budget commun/NVPD/NSP")) %>%
+      set_variable_labels("Revenu du ménage"),
     
     # ↓ Territoire 
     taille_agglo = fct_recode(
@@ -546,20 +591,27 @@ lgbtn = lgbt %>%
     enf_ego = factor(Enf1, levels = c("Oui", "Non")) %>% 
       set_variable_labels("A des enfants"), 
     
-    # ↓ Nombre d'enfants du couple (à partir de ENF2_REC qui existe en LGBT)
+    # (filtré sur pers. en couple à l'enquête et avec au moins 1 enfant)
     enf_couple = fct_recode(
       as_factor(ENF2_rec),
-      NULL    = "",
-      NULL = "NC", 
-      "0"     = "00",
-      "1"     = "01",
-      "2"     = "02",
-      "3+"     = "03",
-      "3+"    = "4 et plus",
+      "Sans enfant" = "",
+      "Enfant(s) d'une précédente union" = "00",
+      "Enfant(s) dans le couple" = "01",
+      "Enfant(s) dans le couple" = "02",
+      "Enfant(s) dans le couple" = "03",
+      "Enfant(s) dans le couple" = "04",
+      "Enfant(s) dans le couple" = "05",
+      "Enfant(s) dans le couple" = "06",
+      "Enfant(s) dans le couple" = "07",
+      "Enfant(s) dans le couple" = "08",
+      "Enfant(s) dans le couple" = "09",
+      "Enfant(s) dans le couple" = "10",
+      "Enfant(s) dans le couple" = "11",
       NULL = "NVPD",
       NULL = "NSP"
     ) %>%
-      fct_relevel("0", "1", "2", "3+"), 
+      fct_relevel("Sans enfant", "Enfant(s) dans le couple", "Enfant(s) d'une précédente union") %>% 
+      set_variable_labels("Situation parentale"),
     
     # ↓ Durée de la relation actuelle (en mois → années, catégorisée)
     # Q11_DUREE_REC est en caractère pour LGBT. Pour FCPL=01,02 = relation

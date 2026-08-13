@@ -1143,6 +1143,372 @@ Chez les femmes, les écarts entre lesbiennes et bisexuelles sont plutôt faible
 
 Faire régression type celle de kellerhalls ? avec formation, revenu couple, taux activité, âge (pour phase de la vie), cohabitation. Faire pour les 4 variables cote à cote et pour hommes et femmes. Par idsexu dans PG et par typecpl dans LGBT. 
 
+```{r}
+#| label: tbl-regression-evaluation
+#| tbl-cap: "Régression logistique des indicateurs d'évaluation conjugale et psychologique sur l'identification sexuelle et diverses variables de structuration sociale."
+
+# Base reg  
+pg_reg_evaluation = pgn_couple %>%
+  mutate(satisfaction = fct_relevel(satisfaction, "Non"),
+         amoureux = fct_relevel(amoureux, "Non"),
+         rupture = fct_relevel(rupture, "Non"),
+         depression = fct_relevel(depression, "Non"),
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"),
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         revenu_menage = fct_relevel(revenu_menage, "4 000€ et plus"),
+         revenu_menage = fct_drop(as.factor(na_if(revenu_menage, "Pas de budget commun/NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         cohabitation = fct_relevel(cohabitation, "En couple non cohabitant"),
+         enf_couple = fct_relevel(enf_ego, "Enfant(s) dans le couple"), 
+         statut_act_compare = fct_relevel(statut_act_compare, "Couple actif")
+         ) 
+
+pgf_reg_evaluation = pg_reg_evaluation %>% 
+  filter(genre == "Une femme")
+
+pgh_reg_evaluation = pg_reg_evaluation %>% 
+  filter(genre == "Un homme")
+
+# Pondération  
+dwf_reg_evaluation = svydesign(id = ~1, weights = pgf_reg_evaluation$poids_cal, data = pgf_reg_evaluation)
+
+dwh_reg_evaluation = svydesign(id = ~1, weights = pgh_reg_evaluation$poids_cal, data = pgh_reg_evaluation)
+
+# Regressions  
+regf_satisfaction = svyglm(
+  satisfaction ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_satisfaction = svyglm(
+  satisfaction ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+regf_amoureux = svyglm(
+  amoureux ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_amoureux = svyglm(
+  amoureux ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+regf_rupture = svyglm(
+  rupture ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_rupture = svyglm(
+  rupture ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+regf_depression = svyglm(
+  depression ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_depression = svyglm(
+  depression ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+# Sous-tableaux  
+
+tbl_satisfaction_f = tbl_regression(
+  regf_satisfaction,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nFemme**") 
+
+tbl_satisfaction_h = tbl_regression(
+  regh_satisfaction,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nHomme**")
+
+tab_satisfaction = tbl_merge(
+  tbls = list(tbl_satisfaction_f, tbl_satisfaction_h), 
+  tab_spanner = FALSE
+)
+
+tbl_amoureux_f = tbl_regression(
+  regf_amoureux,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nFemme**") 
+
+tbl_amoureux_h = tbl_regression(
+  regh_amoureux,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nHomme**")
+
+tab_amoureux = tbl_merge(
+  tbls = list(tbl_amoureux_f, tbl_amoureux_h), 
+  tab_spanner = FALSE
+)
+
+tbl_rupture_f = tbl_regression(
+  regf_rupture,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nFemme**") 
+
+tbl_rupture_h = tbl_regression(
+  regh_rupture,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nHomme**")
+
+tab_rupture = tbl_merge(
+  tbls = list(tbl_rupture_f, tbl_rupture_h), 
+  tab_spanner = FALSE
+)
+
+tbl_depression_f = tbl_regression(
+  regf_depression,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nFemme**") 
+
+tbl_depression_h = tbl_regression(
+  regh_depression,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nHomme**")
+
+tab_depression = tbl_merge(
+  tbls = list(tbl_depression_f, tbl_depression_h), 
+  tab_spanner = FALSE
+)
+
+# Tableau final 
+
+tab_evaluation = tbl_merge(
+  tbls = list(tab_satisfaction, tab_amoureux, tab_rupture, tab_depression), 
+  tab_spanner = FALSE
+)
+
+tab_evaluation %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : identification sexuelle, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
+VERIFIER PARCE QUE PAS LES MEMES VARIABLES DE CONTROLE EST CE QUE CA CHANGE LES SIGNIFICATIVITE ? 
+Lecture par groupe (référence : hétéro)
+
+Bisexuel·les (n probablement faible, à vérifier)
+
+Chez les femmes bi, le pattern est cohérent et significatif sur presque tous les indicateurs :
+
+Satisfaction conjugale : coefficient très négatif et significatif (b = -1,8 ; p < 0,001)
+Sentiment amoureux : négatif et significatif (b = -1,8 ; p = 0,003)
+Projet de séparation : positif et significatif (b = 1,6 ; p < 0,001)
+Dépression/anxiété : positif et significatif (b = 1,3 ; p < 0,001)
+
+Chez les hommes bi, l'effet est présent uniquement sur le sentiment amoureux (b = -1,6 ; p = 0,008), tous les autres coefficients ne sont pas significatifs (IC larges qui traversent 0).
+
+Cette asymétrie de genre est le résultat le plus saillant du tableau : à caractéristiques sociodémographiques comparables, les femmes bisexuelles présentent un profil relationnel et de santé mentale nettement plus dégradé que les hétérosexuelles, alors que les hommes bisexuels ne se distinguent des hétérosexuels que sur un seul indicateur. C'est cohérent avec une partie de la littérature sur le minority stress qui documente une exposition différenciée selon le genre chez les personnes bi (invisibilisation, biphobie perçue différemment selon le sexe).
+
+Homosexuel·les
+
+Aucun coefficient significatif, à une exception près : « Amoureux Femme » = 13, IC [12–13], p < 0,001. Cette valeur doit vous alerter plutôt que se lire comme un effet substantiel : un coefficient aussi extrême avec un IC quasi ponctuel (12–13, alors que tous les autres IC de la colonne font 1 à 2 points de large) est la signature classique d'une quasi-séparation complète — probablement une modalité de la variable dépendante où (quasi) 100 % des femmes homosexuelles de l'échantillon se trouvent dans une seule catégorie de réponse. glm diverge dans ce cas et produit des coefficients gonflés sans valeur interprétable. > Lié au fait que 100% des lesbiennes en couple se déclarent amoureuses de leur partenaire. 
+
+Le message sociologique robuste ici, une fois le problème homo/amoureux mis de côté, est : c'est chez les femmes bisexuelles, et spécifiquement chez elles, que se concentrent les écarts significatifs — satisfaction et sentiment amoureux plus faibles, projet de séparation et détresse psychologique plus élevés — après contrôle de l'âge, du revenu, du diplôme, du statut marital/cohabitant/parental et d'activité. Les hommes bi et les personnes homosexuelles des deux sexes ne se distinguent pas significativement des hétéros sur ces indicateurs (une fois la cellule suspecte corrigée). Cela va dans le sens d'une spécificité du vécu conjugal des femmes bisexuelles plutôt que d'un effet générique de la non-hétérosexualité — un point qui peut structurer utilement votre discussion du cadre de Kellerhals (fusion/autonomie) en le mettant en tension avec les indicateurs de bien-être.
+
+
+Bisexual men who experience binegativity have worse relationship satisfaction than those who do not, and bisexual men in relationships with women report more frequent intimate partner aggression than those in relationships with men [34]. Younger bisexual men may encounter fewer negative experiences in relationships than older bisexual men [11] and mixed-orientation relationships can take diverse forms [35]. The different experiences of bisexual men according to age are attributed to sustained trends in attitudes toward gender and sexuality [11].
+
+```{r}
+#| label: tbl-regression-evaluation-lgbt
+#| tbl-cap: "Régression logistique des indicateurs d'évaluation conjugale et psychologique sur le type de couple et diverses variables de structuration sociale."
+
+# Base reg  
+lgbt_reg_evaluation = lgbtn_couple %>%
+  mutate(satisfaction = fct_relevel(satisfaction, "Non"),
+         amoureux = fct_relevel(amoureux, "Non"),
+         rupture = fct_relevel(rupture, "Non"),
+         depression = fct_relevel(depression, "Non"),
+         typecplbi = fct_relevel(typecplbi, "Homo en couple"),
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         revenu_menage = fct_relevel(revenu_menage, "4 000€ et plus"),
+         revenu_menage = fct_drop(as.factor(na_if(revenu_menage, "Pas de budget commun/NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         cohabitation = fct_relevel(cohabitation, "En couple non cohabitant"),
+         enf_couple = fct_relevel(enf_ego, "Enfant(s) dans le couple"), 
+         statut_act_compare = fct_relevel(statut_act_compare, "Couple actif")
+         ) 
+
+lgbtf_reg_evaluation = lgbt_reg_evaluation %>% 
+  filter(genre == "Une femme")
+
+lgbth_reg_evaluation = lgbt_reg_evaluation %>% 
+  filter(genre == "Un homme")
+
+# Regressions  
+regf_satisfaction_lgbt = glm(
+  satisfaction ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_satisfaction_lgbt = glm(
+  satisfaction ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+regf_amoureux_lgbt = glm(
+  amoureux ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_amoureux_lgbt = glm(
+  amoureux ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+regf_rupture_lgbt = glm(
+  rupture ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_rupture_lgbt = glm(
+  rupture ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+regf_depression_lgbt = glm(
+  depression ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_depression_lgbt = glm(
+  depression ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+# Sous-tableaux  
+
+tbl_satisfaction_f_lgbt = tbl_regression(
+  regf_satisfaction_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nFemme**") 
+
+tbl_satisfaction_h_lgbt = tbl_regression(
+  regh_satisfaction_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nHomme**")
+
+tab_satisfaction_lgbt = tbl_merge(
+  tbls = list(tbl_satisfaction_f_lgbt, tbl_satisfaction_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+tbl_amoureux_f_lgbt = tbl_regression(
+  regf_amoureux_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nFemme**") 
+
+tbl_amoureux_h_lgbt = tbl_regression(
+  regh_amoureux_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nHomme**")
+
+tab_amoureux_lgbt = tbl_merge(
+  tbls = list(tbl_amoureux_f_lgbt, tbl_amoureux_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+tbl_rupture_f_lgbt = tbl_regression(
+  regf_rupture_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nFemme**") 
+
+tbl_rupture_h_lgbt = tbl_regression(
+  regh_rupture_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nHomme**")
+
+tab_rupture_lgbt = tbl_merge(
+  tbls = list(tbl_rupture_f_lgbt, tbl_rupture_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+tbl_depression_f_lgbt = tbl_regression(
+  regf_depression_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nFemme**") 
+
+tbl_depression_h_lgbt = tbl_regression(
+  regh_depression_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nHomme**")
+
+tab_depression_lgbt = tbl_merge(
+  tbls = list(tbl_depression_f_lgbt, tbl_depression_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+# Tableau final 
+
+tab_evaluation_lgbt = tbl_merge(
+  tbls = list(tab_satisfaction_lgbt, tab_amoureux_lgbt, tab_rupture_lgbt, tab_depression_lgbt), 
+  tab_spanner = FALSE
+)
+
+tab_evaluation_lgbt %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : type de couple, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
 ### Connaissance de la bisexualité
 
 ```{r}

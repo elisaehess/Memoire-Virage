@@ -14,7 +14,7 @@ execute:
   echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
   warning: false
   message: false
-  cache: true 
+  cache: false 
 editor: 
   markdown: 
     wrap: 72
@@ -37,6 +37,7 @@ library(ggplot2)     # graphiques
 library(GGally)      # graphiques (extension de ggplot2)
 library(broom)       # faire des tibble (pour le forest plot)
 library(extrafont)   # charger polices d'écriture 
+library(ggtext)      # mise en forme de texte
 loadfonts(device = "win")
 
 # Préférences gtsummary
@@ -577,9 +578,10 @@ logistique distinguant les hommes et les femmes (Figure 2).
 
 ```{r}
 #| label: fig-en-couple
-#| fig-cap: "En couple, au moins 4 mois, au cours des 12 derniers mois. Virage PG (pondéré)."
-#| fig-width: 10
-#| fig-height: 10
+#| fig-cap: "En couple, au moins 4 mois, au cours des 12 derniers mois."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
 
 # Créer fonction graph 
 
@@ -617,17 +619,19 @@ base_graph1 = base_graph1 %>%
 
 graphique1 = ggplot(base_graph1, aes(x = modalite, y= pct)) +
   geom_segment(aes(xend = modalite, yend = 0),
-               color = "darkseagreen", linewidth = 0.75, 
+               color = "#9B4F96", linewidth = 0.75, 
                alpha = 0.75, linetype = "dotted") +
-  geom_point(color = "darkseagreen", size = 2) +
+  geom_point(color = "#9B4F96", size = 2.5) +
   coord_flip()  + 
   facet_wrap(vars(variable), scales = "free") +
-  scale_y_continuous(limits = c(0, 100)) + 
-  theme_minimal() + 
-  theme(panel.grid.major.x = element_blank(), # supprime lignes verticales de la grille
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
+  theme_minimal(base_size = 13) + 
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
         axis.text = element_text(family = "serif", size = 12, color = "black"),
         axis.title = element_blank(),
-        strip.text = element_text(face = "italic",family = "serif", size = 12, color = "darkseagreen")
+        strip.text = element_text(face = "bold.italic",family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")  # évite que les facettes se touchent
         )
 graphique1
 ```
@@ -691,45 +695,55 @@ teste donc la probabilité d’être en couple.
 
 ```{r}
 #| label: fig-regression-en-couple
-#| fig-cap: "Probabilité d'être en couple plutôt que célibataire (régression logistique). Virage PG (données pondérées)."
-#| fig-width: 6.3
-#| fig-height: 7.5
+#| fig-cap: "Probabilité d'être en couple plutôt que célibataire (régression logistique)."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
 
-# Reg hommes 
-pgh_reg = pgnh %>%
+# Base reg  
+pg_reg = pgn %>%
   mutate(couple12mois = fct_relevel(couple12mois, "Non"),
          idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"),
-         age = fct_relevel(age, "30-39"),
+         age = fct_recode(as_factor(age), 
+                          "20-29 ans" = "20-29", 
+                          "30-39 ans" = "30-39", 
+                          "40-49 ans" = "40-49", 
+                          "50-69 ans" = "50-69") %>% 
+           fct_relevel("30-39 ans", "20-29 ans", "40-49 ans", "50-69 ans"),
          diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
-         revenu = fct_drop(as.factor(fct_relevel(revenu, "De 1 000 à moins de 2 000€") %>%
-                                       na_if("NVPD/NSP"))), 
+         revenu = fct_recode(as_factor(revenu), 
+                             "De 1 000€ à moins de 2 000€ / mois" = "De 1 000 à moins de 2 000€",
+                             "Moins de 1 000€ / mois" = "Moins de 1 000€",
+                             "2 000€ et plus / mois" = "2 000€ et plus") %>% 
+           fct_relevel("De 1 000€ à moins de 2 000€ / mois"), 
+         revenu = fct_drop(as.factor(na_if(revenu, "NVPD/NSP"))), 
          revenu_sub = fct_drop(as.factor(na_if(revenu_sub, "NVPD/NSP"))),
+         taille_agglo = fct_recode(as_factor(taille_agglo), 
+                                   "Moins de 20 000 hab." = "Moins de 20 000", 
+                                   "de 20 000 hab. à 200 000 hab." = "De 20 000 à 200 000", 
+                                   "200 000 hab. et plus" = "200 000 et plus"), 
          taille_agglo = fct_drop(as.factor(na_if(taille_agglo, "NVPD/NSP"))),
-         enf_ego = fct_relevel(enf_ego, "Non")
-         ) 
+         enf_ego = fct_recode(as_factor(enf_ego), 
+                              "Sans enfant" = "Non", 
+                              "Avec enfant(s)" = "Oui") %>% fct_relevel("Sans enfant")
+  ) 
 
+pgh_reg = pg_reg %>% 
+  filter(genre == "Un homme")
+
+pgf_reg = pg_reg %>% 
+  filter(genre == "Une femme")
+
+# Pondération 
 dwh_reg = svydesign(id = ~1, weights = pgh_reg$poids_cal, data = pgh_reg)
+dwf_reg = svydesign(id = ~1, weights = pgf_reg$poids_cal, data = pgf_reg)
 
+# Regressions 
 regh = svyglm(
   couple12mois ~ idsexu + age + diplome + revenu + revenu_sub + taille_agglo + enf_ego,
   family = binomial(),
   design = dwh_reg
 )
-
-# Reg femmes 
-pgf_reg = pgnf %>%
-  mutate(couple12mois = fct_relevel(couple12mois, "Non"),
-         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"),
-         age = fct_relevel(age, "30-39"),
-         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
-         revenu = fct_drop(as.factor(fct_relevel(revenu, "De 1 000 à moins de 2 000€") %>%
-                                       na_if("NVPD/NSP"))), 
-         revenu_sub = fct_drop(as.factor(na_if(revenu_sub, "NVPD/NSP"))),
-         taille_agglo = fct_drop(as.factor(na_if(taille_agglo, "NVPD/NSP"))),
-         enf_ego = fct_relevel(enf_ego, "Non")
-         ) 
-
-dwf_reg = svydesign(id = ~1, weights = pgf_reg$poids_cal, data = pgf_reg)
 
 regf = svyglm(
   couple12mois ~ idsexu + age + diplome + revenu + revenu_sub + taille_agglo + enf_ego,
@@ -737,12 +751,22 @@ regf = svyglm(
   design = dwf_reg
 )
 
-ggcoef_compare(list("Homme" = regh, "Femme" = regf), exponentiate = T, type = "faceted") + 
-  theme(panel.grid.major.x = element_blank(), # supprime lignes verticales de la grille
-        axis.text = element_text(family = "serif", color = "black"),
+# Graphique 
+ggcoef_compare(list("Homme" = regh, "Femme" = regf), 
+               exponentiate = T, 
+               type = "faceted", 
+               facet_row = NULL, 
+               add_reference_rows = FALSE,
+               categorical_terms_pattern = "{level}<br>*(ref: {reference_level})*") + 
+  scale_x_log10(breaks = c(0.1, 0.25, 0.5, 1, 2, 5, 10)) +
+  theme(panel.grid.major.x = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text.x = element_text(family = "serif", size = 12, color = "black"),
+        axis.text.y = element_markdown(family = "serif", size = 12, color = "black"),
         axis.title = element_blank(),
-        strip.text.x = element_text(face = "italic",family = "serif", size = 12, color = "darkseagreen"),
-        strip.text.y = element_text(face = "italic",family = "serif", size = 12, color = "darkgrey")
+        strip.text.x = element_text(face = "bold",family = "serif", size = 13)
   )
 ```
 
@@ -842,21 +866,29 @@ dernière union et la durée écoulée depuis sa rupture.
 
 ```{r}
 #| label: fig-celibat-hommes-bi
-#| fig-cap: "Trajectoire des hommes bisexuels célibataires après rupture. Virage PG (pondéré)."
-#| fig-width: 6.3
-#| fig-height: 7.5
+#| fig-cap: "Les hommes bisexuels célibataires après rupture."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+library(ggpattern)
+library(sf)
 
 # Sélectionner les variables
 
 pgnhbi_celibat = pgnhbi_celibat %>% 
   select(
-    ID, couple_celib, statut_derniere_relation, etat_matrimonial_atteint, motif_fin_relation, nb_mariages_vie, cohabitation_derniere_relation, duree_cohabitation_mois, duree_derniere_relation, duree_depuis_rupture, sexe_dernier_conjoint, nb_enfants_ego) 
+    ID, couple_celib, statut_derniere_relation, etat_matrimonial_atteint, motif_fin_relation, nb_mariages_vie, cohabitation_derniere_relation, duree_cohabitation_mois, duree_derniere_relation, duree_depuis_rupture, sexe_dernier_conjoint, enf_ego) 
 
 # Préparer les données pour le graphique
 
 pgnhbi_celibat_graph = pgnhbi_celibat %>%
-  filter(couple_celib == "Célibataire après rupture") %>% #on garde que les hommes célib après rupture
-  mutate(ID = fct_reorder(as.character(ID), duree_depuis_rupture)) #ordonner selon durée du célibat
+  filter(couple_celib == "Célibataire après rupture") %>% # garde célib après rupture
+  mutate(statut_derniere_relation = factor(statut_derniere_relation, 
+                                            levels = c("Union libre", "Pacs", "Mariage"))) %>%
+  filter(!is.na(statut_derniere_relation)) %>% #retire 1 NA 
+  arrange(statut_derniere_relation, ID) %>%   # bloc, puis ordre arbitraire (ID) dans le bloc
+  mutate(ID = factor(as.character(ID), levels = unique(as.character(ID))))
 
 # Graphique (pas sur données pondérées puisqu'on prend chaque cas, individuellement, pas de %)
 ggplot(pgnhbi_celibat_graph) +
@@ -864,35 +896,54 @@ ggplot(pgnhbi_celibat_graph) +
     x = duree_depuis_rupture,
     y = ID,
     fill = statut_derniere_relation, 
-    alpha = nb_enfants_ego > 0 # transparence de la barre
+    pattern = enf_ego # transparence de la barre
   ) +
-  geom_bar(stat = "summary", fun = "sum", width = 0.7) + # isoler chaque parcours sur une ligne distincte
-  scale_alpha_manual(
-    values = c("FALSE" = 0.6, "TRUE" = 1), # niveau de transparence
-    labels = c("Sans enfant", "Avec enfant(s)"), 
-    name = " "
+  geom_bar_pattern(
+    stat = "summary", fun = "sum", width = 0.7,
+    pattern_fill = "black", 
+    pattern_density = 0.05, 
+    pattern_spacing = unit(0.15, "cm"),
+    pattern_linewidth = 0.1,
+    pattern_angle = 45,
+    color = "grey30", linewidth = 0.1
+  ) +
+  scale_pattern_manual(
+  values = c("Non" = "none", "Oui" = "stripe"),
+  name = "A des enfants",
+  breaks = "Oui", 
+  guide = guide_legend(
+    override.aes = list(
+      pattern_spacing = unit(0.05, "cm"),  # hachures plus resserrées dans la légende
+      pattern_density = 0.1,
+      pattern_linewidth = 0.3
+    ))
   ) +
   scale_fill_manual(
-    values = c("Union libre" = "#A5D1C2",
-    "Pacs" = "#E0A989",
-    "Mariage" = "#D39191"), 
+    values = c("Union libre" = "#E7D0E5",
+    "Pacs" = "#B8CFFF",
+    "Mariage" = "#FEB8DD"), 
     name = "Statut dernière relation"
+  ) +
+  guides(
+    fill = guide_legend(override.aes = list(pattern = "none"))
   ) +
   scale_x_continuous(
     breaks = seq(0, 480, by = 60),       # Un repère tous les 60 mois (5 ans)
     labels = function(x) paste0(x / 12, " ans") # Divise par 12 pour l'affichage en années 
   ) +
+  facet_grid(rows = vars(statut_derniere_relation), scales = "free_y", space = "free", switch = "y") +
   labs(
-    x = "Durée depuis la rupture (années)",
-    y = "Chaque ligne = Un parcours individuel",
-    caption = "Lecture : 40 hommes ayant eu une relation par le passé. 21 hommes supplémentaires n'ont jamais eu de relation de couple au cours de la vie (non représentés ici). "
+    x = "Durée depuis la rupture (années)"
   ) +
   theme_minimal() +
   theme(
     legend.position = "bottom",
-    plot.caption = element_text(family = "serif", face = "italic", size = 12, hjust = 0),
+    legend.text = element_text(family = "serif", size = 12),
+    legend.title = element_text(family = "serif", size = 12),
     axis.text.y = element_blank(), # masque numéros ID 
-    axis.text = element_text(family = "serif", size = 12), 
+    axis.text = element_text(family = "serif", size = 12),
+    axis.title.x = element_text(family = "serif", face = "bold", size = 13), 
+    axis.title.y = element_blank(), 
     strip.text.x = element_text(family = "serif", size = 12),
     strip.text.y = element_text(family = "serif", size = 12),
     panel.grid.major.y = element_blank() # masque lignes grille horizontales

@@ -1067,10 +1067,7 @@ pgnhbi = pgnh %>%
 #### Sous-pop homme bi célibataire ----
 
 pgnhbi_celibat = pgnhbi %>% 
-  filter(Q6 %in% c("03", "04")) %>% 
-  arrange(couple_celib, desc(duree_depuis_rupture))
-
-pgnhbi_celibat
+  filter(Q6 %in% c("03", "04")) 
 
 #### Sous-pop sans filtre sur l'identification (Bajos et id-attir-prat) ----
 
