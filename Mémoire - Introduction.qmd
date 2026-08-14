@@ -23,7 +23,33 @@ editor:
 
 -   bisexualité
 
+    Rust (2002) : Ces changements historiques ont placé la bisexualité
+    dans sa position paradoxale : la bisexualité comme attirance
+    sexuelle pour les deux genres ne peut pas conçue avant que la
+    sexualité ne passe d’une compréhension purement procréative à une
+    reconnaissance du rôle de l’attirance sexuelle et du désir dans la
+    sexualité mais aussi par une construction du désir comme attirances
+    envers des individus genrés. Sans cette distinction d’une attirance
+    envers les hommes ou les femmes, l’idée d’être attiré par les deux
+    genres n’existerait pas. Paradoxalement cette même conceptualisation
+    du genre au 19e siècle produit également l’idée que l’attirance
+    sexuelle doit être dirigée soit vers les hommes soit vers les
+    femmes. Aujourd’hui nous sommes toujours contraints de classer les
+    personnes en deux genre et on se réfère toujours aux hommes et aux
+    femmes comme deux genre opposés. Si les personnes doivent être
+    genrées et que les genres sont opposés alors les attirances envers
+    les hommes et les femmes sont également opposées puisqu’un homme est
+    tout ce que n’est pas une femme et rien de ce qu’elle est. Ainsi la
+    bisexualité est uniquement concevable comme une bi-sexualité et en
+    même temps singulièrement inconcevable comme une bi-sexualité.
+
+<!-- -->
+
 -   enquêtes et conjugalité et minorités sexuelles
+
+-   topo sur la différence de bisexualité captée dans Virage, Virage
+    LGBT et Enive : manier résultats d'envie avec précaution car la
+    bisexualité évolue vite.
 
 ## Méthode
 
@@ -32,3 +58,19 @@ editor:
 -   limites enquêtes : en lien avec le sujet
 
 -   présomption hétéro
+
+Faire un topo une fois pour toute de : Avant toute lecture, une réserve
+s’impose : les groupes homo (n=65) et bi (n=77) sont de petite taille,
+ce qui se traduit par des IC parfois très larges. Seules les lignes où
+le Chi2 est significatif et où l’IC d’un groupe minoritaire ne recoupe
+pas celui des hétérosexuelles seront lues comme des différences robustes
+; les autres seront mentionnées comme suggestives ou non conclusives,
+conformément à la logique déjà retenue plus haut. + quand les bases sont
+réduites par rapport à la base initiale nous indiquons les effectifs
+entre parenthèse dans les cases.
+
+-   faire un topo sur pourcentages pondérés et effectifs non pondérés pg
+    et lgbt pour pas avoir à le remettre en note de tableau à chaque
+    fois
+
+-   idem les tests appliqués : ne pas avoir à le réecrire à chaque fois

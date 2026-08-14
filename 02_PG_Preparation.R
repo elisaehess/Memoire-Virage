@@ -74,7 +74,7 @@ pg_base = pg %>%
     Q19C1, # écart âge 
     Migbis_C, # statut migratoire (ex)partenaire 
     Q25C, # en emploi ou au chômage (ex)partenaire 
-    Q29C, # diplôme (ex)partenaire 
+    Q29c_5gr, # diplôme (ex)partenaire 
     CS_C_Niv3, # CSP (ex)partenaire
     CS_C_Niv1, 
     Q29c_9gr, # diplôme (ex)partenaire
@@ -241,7 +241,33 @@ pg_base = pg %>%
         "Supérieur à Bac+3",
         "NVPD/NSP"
       ) %>% 
-      set_variable_labels("Diplôme"), 
+      set_variable_labels("Diplôme"),
+    
+    diplome_conjoint = fct_recode(
+      as_factor(Q29c_5gr),
+      "Lycée ou inférieur" = "Aucun diplôme",
+      "Lycée ou inférieur" = "BEPC/BEP/CAP",
+      "Bac / Bac+3" = "Baccalauréat",
+      "Bac / Bac+3" = "Dipl. du supérieur 1er cycle",
+      "Supérieur à Bac+3" = "Dipl. du supérieur 2e et 3e cycle",
+      "NVPD/NSP" = "Ne souhaite pas répondre",
+      "NVPD/NSP" = "Ne sais pas"
+    ) %>%
+      fct_relevel(
+        "Lycée ou inférieur",
+        "Bac / Bac+3",
+        "Supérieur à Bac+3",
+        "NVPD/NSP"
+      ) %>% 
+      set_variable_labels("Diplôme"),
+    
+    diplome_compare = case_when(
+      diplome == "Lycée ou inférieur" & diplome_conjoint == "Lycée ou inférieur" |
+      diplome == "Bac / Bac+3" & diplome_conjoint == "Bac / Bac+3" |
+      diplome == "Supérieur à Bac+3" & diplome_conjoint == "Supérieur à Bac+3" |
+      diplome == "NVPD/NSP" & diplome_conjoint == "NVPD/NSP" ~ "Même niveau de diplôme", 
+      TRUE ~ "Niveau de diplôme différent"
+    ), 
     
     # ↓ Recodages classe 
     csp = fct_recode(
@@ -665,8 +691,19 @@ pg_base = pg %>%
     ) %>% 
       set_variable_labels("Catégorie socioprofessionnelle (ex) conjoint·e"),
     
+    # ↓ CSP comparé
+    csp_compare = case_when(
+      csp == "Agriculteur·rice exploitant·e" & csp_conjoint == "Agriculteur·rice exploitant·e" | 
+      csp == "Artisan·e, commerçant·e, chef d'entreprise" & csp_conjoint == "Artisan·e, commerçant·e, chef d'entreprise" | 
+      csp == "Cadre, profession intellect. sup." & csp_conjoint == "Cadre, profession intellect. sup." |
+      csp == "Profession intermédiaire" & csp_conjoint == "Profession intermédiaire" |
+      csp == "Employé·e" & csp_conjoint == "Employé·e" |
+      csp == "Ouvrier·e" & csp_conjoint == "Ouvrier·e" ~ "Même PCS", 
+      TRUE ~ "PCS différente"
+    ), 
+    
     # ↓ Revenu du ménage (REV3), en tranches. Champ : ménage cohabitant
-    #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre du ménage).
+    #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre dans ménage).
     revenu_menage = case_when(
       REV3 %in% c("00", "01", "02", "03") ~ "Moins de 1 800€",
       REV3 %in% c("04", "05")       ~ "De 1 800 à moins de 3 000€",

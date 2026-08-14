@@ -92,7 +92,7 @@ pas accès au questionnaire entier de Kellerhalls pour reprendre indicateurs
 - investissement différentiel sphère domestique : CF2 et CF3 
 - degré routinisation : ? 
 
-### Les conceptions de la conjugalité
+## Les conceptions de la conjugalité
 
 Pour commencer nous mobilisons deux variables qui touchent à la conception de la conjugalité. Les questions posées sont les suivantes : Dites-moi si vous êtes tout-à-fait d'accord, plutôt d'accord, pas du tout d'accord avec cette proposition : < Dans un couple, il faut tout faire ensemble > et < Dans un couple, il faut faire des compromis pour ne pas contrarier l'autre >. 
 
@@ -185,7 +185,7 @@ tab4 = tbl_merge(
     ) 
 
  # Version FINALE 
-tab4 %>%
+tab4 = tab4 %>%
   # modify_column_hide(columns = starts_with("ci_")) %>% 
   as_flex_table() %>% 
   footnote( # note de bas de tableau 
@@ -197,7 +197,9 @@ tab4 %>%
   ) %>% 
   add_footer_lines("Champ : Ensemble des répondant-es de l'enquête Virage ; Répondant-es de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
   fontsize(size = 7, part = "all") %>%
-  set_table_properties(layout = "autofit", width = 1)  
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab4, path = "tab4.docx")
 
 ```
 
@@ -222,8 +224,9 @@ On retiendra plutôt le premier item, qui cerne mieux la dimension fusion / auto
 ```{r}
 #| label: fig-fusion-compromis-lgbt
 #| fig-cap: "Adhésion aux normes de fusion et de compromis conjugal, selon le genre et l'identification sexuelle. Virage LGBT."
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
 
 # Créer fonction graph (% d'accord par genre_idsexu)
 base_graph3 = function(var, label){
@@ -251,19 +254,19 @@ base_graph3 = base_graph3 %>%
 # Créer graphique
 graphique3 = ggplot(base_graph3, aes(x = typecplbi, y = pct)) +
   geom_segment(aes(xend = typecplbi, yend = 0),
-               color = "darkseagreen", linewidth = 0.75, 
+               color = "#9B4F96", linewidth = 0.75, 
                alpha = 0.75, linetype = "dotted") +
-  geom_point(color = "darkseagreen", size = 2) +
+  geom_point(color = "#9B4F96", size = 2.5) +
   coord_flip() + 
   facet_grid(rows = vars(genre), cols = vars(variable)) +
-  scale_y_continuous(limits = c(0, 100)) + 
-  labs(caption = "Champ : Ensemble des répondant-es âgé-es de 20 à 69 ans à l'enquête Virage LGBT.\nLecture : Parmi les hommes, les gays en couple répondent plus souvent qu'il faut faire des compromis pour ne pas contrarier l'autre.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") +
-  theme_minimal() + 
-  theme(panel.grid.major.x = element_blank(),
-        axis.text = element_text(family = "serif", size = 11, color = "black"),
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
+  theme_minimal(base_size = 13) + 
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
         axis.title = element_blank(),
-        plot.caption = element_text(hjust = 0),
-        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen")
+        strip.text = element_text(face = "bold.italic", family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")
         )
 graphique3
 ```
@@ -309,7 +312,8 @@ regf_fusion = svyglm(
 tbl_fusion = tbl_regression(
   regf_fusion,
   include = c(idsexu),
-  label = idsexu ~ "Identification sexuelle"
+  label = idsexu ~ "Identification sexuelle", 
+  exponentiate = TRUE
 ) %>%
   modify_header(estimate ~ "**Fusion OR**") %>% 
   as_flex_table() %>% 
@@ -317,6 +321,7 @@ tbl_fusion = tbl_regression(
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1)  
 print(tbl_fusion)
+save_as_docx(tbl_fusion, path = "tbl_fusion.docx")
 
 # Reg femmes - LGBT 
 lgbtf_reg_fusion = lgbtnf %>%
@@ -345,7 +350,8 @@ reglgbtf_fusion = glm(
 tbl_fusion_lgbt = tbl_regression(
   reglgbtf_fusion,
   include = c(typecplbi),
-  label = typecplbi ~ "Type de couple"
+  label = typecplbi ~ "Type de couple", 
+  exponentiate = TRUE
 ) %>%
   modify_header(estimate ~ "**Fusion OR**") %>% 
   as_flex_table() %>% 
@@ -353,6 +359,7 @@ tbl_fusion_lgbt = tbl_regression(
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1)  
 print(tbl_fusion_lgbt)
+save_as_docx(tbl_fusion_lgbt, path = "tbl_fusion_lgbt.docx")
 ```
 
 #### Le célibat est déterminant dans l'autonomie déclarée et les femmes bisexuelles en couple avec un homme adhèrent moins à la fusion dans le couple  
@@ -364,7 +371,7 @@ Piste d'interprétation : les femmes bisexuelles seraient également plus fémin
 
 Pour approfondir les styles de conjugalité nous nous intéressons maintenant au degré d'ouverture / clôture du couple sur son environnement proche. 
 
-### La sociabilité externe au couple 
+## La sociabilité externe au couple 
 
 Pour capter la dimension d'ouverture / clôture des couples nous étudions des variables liées à la sociabilité. Il sera d'abord intéressant d'observer la probabilité de se confier à son conjoint quand on est en couple. Ensuite des variables de sociabilité familiales, amicales, associatives et sportives seront étudiées. 
 
@@ -460,7 +467,7 @@ tab5 = tbl_merge(
     ) 
 
  # Version FINALE 
-tab5 %>%
+tab5 = tab5 %>%
   # modify_column_hide(columns = starts_with("ci_")) %>% 
   as_flex_table() %>% 
   footnote( # note de bas de tableau 
@@ -474,6 +481,7 @@ tab5 %>%
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1)  
 
+save_as_docx(tab5, path = "tab5.docx")
 ```
 
 Les femmes bisexuelles déclarent nettement moins que les lesbiennes se confier au conjoint lors d'un problème personnel : 49,7% contre 83,9%. Elles sont minoritaires à répondre « oui » sans condition. Les lesbiennes se confient également plus souvent que les hétérosexuelles : 64,6%. Dans Virage LGBT, où les femmes bisexuelles sont plus souvent en couple de même sexe, elles déclarent autant que les lesbiennes se confier lors d'un problème personnel. 
@@ -487,8 +495,9 @@ Ici encore on peut l'interpréter comme un rapport moins fusionnel au couple, à
 ```{r}
 #| label: fig-confidence-conjoint-lgbt
 #| fig-cap: "Se confier au partenaire lors d'un problème personnel selon le type de couple."
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
 
 # Créer fonction graph 
 base_graph2 = function(var, label){
@@ -515,19 +524,19 @@ base_graph2 = base_graph2 %>%
 # Créer graphique
 graphique2 = ggplot(base_graph2, aes(x = typecplbi, y = pct)) +
   geom_segment(aes(xend = typecplbi, yend = 0),
-               color = "darkseagreen", linewidth = 0.75, 
+               color = "#9B4F96", linewidth = 0.75, 
                alpha = 0.75, linetype = "dotted") +
-  geom_point(color = "darkseagreen", size = 2) +
+  geom_point(color = "#9B4F96", size = 2) +
   coord_flip() + 
   facet_grid(rows = vars(genre), cols = vars(variable)) +
-  scale_y_continuous(limits = c(0, 100)) + 
-  labs(caption = "Champ : Répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans.\nLecture : Parmi les hommes, les gays en couple se confient plus à leur partenaire lors d'un problème personnel.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
   theme_minimal() + 
-  theme(panel.grid.major.x = element_blank(),
-        axis.text = element_text(family = "serif", size = 11, color = "black"),
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
         axis.title = element_blank(),
-        plot.caption = element_text(hjust = 0), 
-        strip.text = element_text(face = "italic", family = "serif", size = 12, color = "darkseagreen")
+        strip.text = element_text(face = "bold.italic", family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")
         )
 graphique2
 ```
@@ -658,7 +667,7 @@ Ce qui nous intéresse ici est la population en couple, les questions ci-dessus 
 
 La sociabilité extérieure au couple est difficile à saisir et ne nous permet pas d'affirmer de résultat net sur le degré d'ouverture / clôture des personnes bisexuelles comparativement aux autres groupes sociaux. 
 
-### La sexuation des rôles domestiques 
+## La sexuation des rôles domestiques 
 
 Pour approcher ce que Kellerhalls appelle la sexuation des rôles domestiques (Widmer) nous mobilisons deux questions : une question sur la répartition des tâches ménagères et une autre sur la répartition des tâches concernant les enfants du foyer. Ces questions sont posées aux personnes en couple cohabitant et en couple cohabitant avec enfant au domicile (enfant du couple, d'ego ou du conjoint). Les effectifs de la deuxième question sont réduits à une dizaine de personnes pour les homo-bi, invitant à la lecture purement descriptive. 
 
@@ -860,7 +869,7 @@ Les tâches liées aux enfants vont dans le même sens, (31,3% bi-différent, 24
 
 Un fil rouge traverse nos différentes dimensions des styles de conjugalité : le type de couple (même sexe / sexe différent) structure le style conjugal des bisexuelles au-delà de l'identification elle-même, et ce sont spécifiquement les bisexuelles en couple avec un homme qui s'écartent — vers moins de fusion, moins de confidence inconditionnelle, moins de partage des tâches. !!! Re rédiger mieux : pas vrai et pas complet !!!
 
-### Les représentations de la conjugalité des parents 
+## Les représentations de la conjugalité des parents 
 EA9a, EA9b, EA9c, EA9d, EA9e, EA9F, EA9g
 
 Afin d'affiner la compréhension des styles de conjugalité des personnes bisexuelles il est légitime de se demander de quels modèle conjugal et représentations de la conjugalité ont-elles héritées. Un ensemble de questions sont posées sur la situation familiales dans l'enfance. Nous en reprenons certaines ici. 
@@ -1310,23 +1319,23 @@ tab_evaluation = tbl_merge(
 
 tab_evaluation %>% 
   as_flex_table() %>% 
-  add_footer_lines("Variables de contrôle : identification sexuelle, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  add_footer_lines("Variables de contrôle : identification sexuelle, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles en couple ont moins de chance d'être satisfaites de leur relation que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1)  
 
 ```
 
-VERIFIER PARCE QUE PAS LES MEMES VARIABLES DE CONTROLE EST CE QUE CA CHANGE LES SIGNIFICATIVITE ? 
 Lecture par groupe (référence : hétéro)
 
 Bisexuel·les (n probablement faible, à vérifier)
 
-Chez les femmes bi, le pattern est cohérent et significatif sur presque tous les indicateurs :
+Chez les femmes bi, le pattern est cohérent et significatif sur tous les indicateurs :
 
 Satisfaction conjugale : coefficient très négatif et significatif (b = -1,8 ; p < 0,001)
 Sentiment amoureux : négatif et significatif (b = -1,8 ; p = 0,003)
 Projet de séparation : positif et significatif (b = 1,6 ; p < 0,001)
 Dépression/anxiété : positif et significatif (b = 1,3 ; p < 0,001)
+coeff plus les mêmes pck on est passé en OR, pas log(OR)
 
 Chez les hommes bi, l'effet est présent uniquement sur le sentiment amoureux (b = -1,6 ; p = 0,008), tous les autres coefficients ne sont pas significatifs (IC larges qui traversent 0).
 
@@ -1503,11 +1512,17 @@ tab_evaluation_lgbt = tbl_merge(
 
 tab_evaluation_lgbt %>% 
   as_flex_table() %>% 
-  add_footer_lines("Variables de contrôle : type de couple, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") %>%
+  add_footer_lines("Variables de contrôle : type de couple, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans.\nLecture : Les femmes bisexuelles en couple de même sexe ont moins de chance d'être satisfaites de leur relation actuelle que les homosexuelles en couple, à variables de contrôle équivalentes.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") %>%
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1)  
 
 ```
+Satisfaction : femmes bis en couple de même sexe moins satisfaites. Hommes bis en couple de sexe différent moins satisfaits. que Homo en couple. 
+Amoureux : Bi en couple de sexe différent moins amoureuses que homo en couple. Idem hommes. 
+Separation : femmes bies, quelque soit type de couple ont plus souvent eu l'intention d'une rupture dans l'année que les femmes homo en couple. Plus encore celles en couple de sexe différent. 
+Depression : femmes bies en couple de sexe différent BCP plus de chance de déclarer depression ou anxiété que femmes homo en couple. Hommes bis en couple de même sexe BCP plus de chance de déclarer dépression ou anxiété que hommes homo en couple. 
+
+On voit globalement une prévalence d'évaluation conjugale négative chez les personnes bisexuelles. Les déclarations de depression / anxiété sont particulièrement hautes, elles ne sont pas nécessairement directement liées à leur couple mais disent quelque chose du minority stress (à utiliser ?) auquel ces personnes font face. Spécifique par rapport aux personnes homosexuelles car pouvant s'exprimer même dans le couple. C'est pourquoi nous observons maintenant la connaissance de la bisexualité au sein du couple. 
 
 ### Connaissance de la bisexualité
 
@@ -1617,6 +1632,8 @@ Le fait de ne pas être out auprès de son/sa partenaire concerne surtout les ho
 
 Observations : la part de personnes bisexuelles qui déclarent que leur conjoint·e ne connaît pas leur bisexualité est importante (plus de 10%), particulièrement chez les hommes qui sont 18 % dans ce cas et 11 % à ne pas vouloir ou savoir dire. Cette non connaissance de la bisexualité est-elle une cause, une conséquences des apparentes moins bonnes relations des personnes bisexuelles ?
 
+Ce tableau nous dessine une spécificité bisexuelle dans le couple : la possibilité de dissimuler son identification sexuelle à son/sa partenaire et la possibilité de subir des discriminations liées à son identification sexuelle au sein même du couple. Là où le couple est un lieu potentiel de refuge contre l'homophobie pour les personnes homosexuelles (même si il les expose en même temps plus que quand ils sont célibataires) 
+
 ```{r}
 #| label: fig-connaissance-bisexualite-lgbt
 #| fig-cap: "Connaissance de la bisexualité par le partenaire au moment de l'enquête, selon le type de couple."
@@ -1669,6 +1686,8 @@ On voit que les hommes concernés par le fait de ne pas être out sont ceux en c
 La part plus élevée de femmes concernées dans PG que dans LGBT peut également être liée au fait qu'elles sont plus en couple avec des hommes. 
 
 *"Il faut distinguer l’évaluation de la qualité des relations conjugales, définie comme un jugement personnel, plus ou moins positif, effectué par les conjoints à propos de leur union, des processus relationnels sous-jacents à cette évaluation, comme les problèmes et les conflits ouverts (Finchman et Bradbury, 1987). Dans certains couples, le conflit conjugal coexiste avec un niveau de satisfaction relativement élevé, alors que dans d’autres, il est lié à une évaluation très négative de la vie conjugale."*
+
+
 
 ## Conflits et modes de résolution 
 CF5 : série de variables sur les conflits dans le couple : je retire celle sur l'idée d'avoir des enfants et contraception (CF5c1 et CF5c2) car effectifs trop petits. 
@@ -1787,7 +1806,7 @@ tab9 %>%
 
 ```
 
-!! CHANGEMENT POPULATION : sous population en couple. Demander à claude comment faire pour les différentiels de population. !!
+!! CHANGEMENT POPULATION : préciser en note de bas de tableau que pour tâches cela s'applique sur pop en couple cohab et pour enf : couple avec enfant. Les autres en couple dans l'année. 
 
 PG Femmes — le seul panel avec des résultats robustes
 
@@ -1854,6 +1873,9 @@ Pour la rédaction
 Contrairement aux items précédents (tâches, confidence, amis, sexualité de couple), où PG et LGBT pointaient dans la même direction, ces deux domaines n'apportent pas de convergence propre. Je les présenterais comme un contrepoint volontaire dans ton texte plutôt que comme un résultat de plus dans la liste : ils montrent que le clivage bi/hétéro observé ailleurs n'est pas générique à tous les sujets de désaccord — il est spécifique à certains domaines (charge domestique, sexualité, sociabilité amicale, travail) et absent sur d'autres (loisirs, politique/religion), avec en prime une possible spécificité de genre sur ce dernier point chez les hommes. Formulé ainsi, ça renforce plutôt qu'affaiblit l'argument d'ensemble : la convergence que tu documentes sur les autres domaines n'est pas un artefact généralisé à toute mesure de conflit, elle est ciblée sur des dimensions précises de la vie conjugale.
 
 !! Faire graphique + voir si possible séparer type couple LGBT !! 
+Voir si on garde les hommes si rien n'est significatif 
+2e graphique mieux que premier pour comparer. Mais attention la comparaison homme femme n'est pas pertinente. 
+Idee à vérifier : virer les hommes pck pas assez en couple dans PG. Faire le graphique 2 et garder le tableau avec IC en annexe ou ajouter IC au graphique.
 
 ```{r}
 #| label: fig-sujets-conflits
@@ -1993,7 +2015,7 @@ graphique_conflits_pg = ggplot(base_conflits_pg,
   )
 graphique_conflits_pg
 ```
-
+Pour LGBT attention : déjà faire un tableau pour voir ce qui est significatif. Ensuite faire un graphique homme et un graphique femme si on garde les deux. 
 ```{r}
 #| label: fig-sujets-conflits-lgbt-typecpl
 #| fig-cap: "Sujets de conflits selon le type de couple. Virage LGBT (non pondéré)."

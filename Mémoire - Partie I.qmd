@@ -1247,8 +1247,8 @@ terminée récemment. Ce qui explique les cas « pas en couple » dans la
 variable de statut conjugal au moment de l’enquête.
 
 ```{r}
-#| label: tbl-conjugalite-femmes-bi
-#| tbl-cap: "Les couples des femmes selon l'identification sexuelle, parmi les celles en couple dans l'année. Virage PG (pondéré)."
+#| label: tbl-conjugalite-femmes-bi-économique
+#| tbl-cap: "Les configurations économiques des femmes bis en couple."
 
 # Plan de pondération -- femmes en couple > 4 mois (12 derniers mois)
 dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf_conjugal)
@@ -1257,18 +1257,18 @@ dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf
 ### Avec qui, et sous quelle forme ? 
 
 # Variables à inclure
-tab2_vars = c("typecpl", "revenu_compare", "patrimoine_compare", "revenu_menage", "ecart_age", "statutcouple", "cohabitation", "duree_rel", "enf_couple")
+tab2_vars = c("typecpl", "revenu_compare", "revenu_menage", "statut_act_compare", "patrimoine_compare", "csp_compare", "diplome_compare")
 
 # Tableau PG pondéré -- Femmes en couple
 tab2 = dwf_conjugal %>%
   tbl_svysummary(
     by = idsexu,
-    include = all_of(tab4_vars),
-    statistic = all_categorical() ~ "{p}",
-    digits = all_categorical() ~ 1,
+    include = all_of(tab2_vars),
+    statistic = all_categorical() ~ "{p}% ({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0),
     missing = "no"
   ) %>%
-  add_ci(pattern = "{stat}\n({ci})") %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%
   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
   bold_labels() %>%
   modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
@@ -1283,15 +1283,65 @@ tab2 %>%
   footnote( # note de bas de tableau 
     i = 2, 
     j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Effectifs non pondérés) [Intervalle de confiance à 95%]."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Répondantes en couple, au moins 4 mois, au cours des 12 derniers mois de l'enquête Virage.\nLecture : Parmi les femmes bisexuelles en couple dans l'enquête Virage en population générale, 8,9% sont en couple de même sexe, avec un intervalle de confiance à 95% de [4,6% - 17%].\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab2, path = "tab2.docx")
+```
+
+```{r}
+#| label: tbl-conjugalite-femmes-bi
+#| tbl-cap: "Les configurations conjugales des femmes en couple."
+
+# Plan de pondération -- femmes en couple > 4 mois (12 derniers mois)
+dwf_conjugal = svydesign(id = ~1, weights = pgnf_conjugal$poids_cal, data = pgnf_conjugal)
+
+
+### Avec qui, et sous quelle forme ? 
+
+# Variables à inclure
+tab2b_vars = c("typecpl", "ecart_age", "statutcouple", "cohabitation", "duree_rel", "enf_couple")
+
+# Tableau PG pondéré -- Femmes en couple
+tab2b = dwf_conjugal %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab2b_vars),
+    statistic = all_categorical() ~ "{p}% ({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0),
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes en couple**") %>%
+  modify_footnote( # notes bas de tableau 
+      p.value ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+tab2b = tab2b %>%
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
     value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
     ref_symbols = "3", 
     part = "body"
   ) %>% 
-  add_footer_lines("Champ : femmes de 20-69 ans en couple, au moins 4 mois, au cours des 12 derniers mois.\nLecture : Parmi les femmes bisexuelles en couple dans l'enquête Virage en population générale, 8,9% sont en couple de même sexe, avec un intervalle de confiance à 95% de [4,6% - 17%].") %>%
+  add_footer_lines("Champ : Répondantes en couple, au moins 4 mois, au cours des 12 derniers mois de l'enquête Virage.\nLecture : Parmi les femmes bisexuelles en couple dans l'enquête Virage en population générale, 8,9% sont en couple de même sexe, avec un intervalle de confiance à 95% de [4,6% - 17%].\nSource : Enquête Virage PG, Ined, 2015.") %>%
   fontsize(size = 7, part = "all") %>%
   set_table_properties(layout = "autofit", width = 1) 
-```
 
+save_as_docx(tab2b, path = "tab2b.docx")
+
+```
 Avant toute lecture, une réserve s’impose : les groupes homo (n=65) et
 bi (n=77) sont de petits effectifs, ce qui se traduit par des IC parfois
 très larges. Seules les lignes où le Chi2 est significatif et où l’IC
@@ -1392,9 +1442,10 @@ n°2](#X148e7e3ab6dde3cb9666d238763c9d8f27cdb71).
 
 ```{r}
 #| label: fig-institutionnalisation-couple-femmes-bi
-#| fig-cap: "Institutionnalisation du couple chez les femmes bisexuelles en couple dans l'année (régression logistique). Virage PG (pondéré)."
-#| fig-width: 6.3
-#| fig-height: 7.5
+#| fig-cap: "Institutionnalisation du couple chez les femmes bisexuelles en couple dans l'année (régression logistique)."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
 
 # Reg mariage
 
@@ -1488,25 +1539,38 @@ forest_data = bind_rows( # empile verticalement les tableaux de résultats les u
 
 # Forest plot
 
-ggplot(forest_data, aes(x = estimate, y = modele, color = modalite)) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") + # ligne verticale positionnée à 0
+forest_data = forest_data %>%
+  mutate(
+    estimate = exp(estimate),
+    conf.low = exp(conf.low),
+    conf.high = exp(conf.high)
+  )
+
+ggplot(forest_data, 
+       aes(x = estimate, y = modele, color = modalite)) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "grey50") +
   geom_pointrange( # dessine le point (estimation) et IC 
     aes(xmin = conf.low, xmax = conf.high),
     position = position_dodge(width = 0.5), # décale ligne Bi et Homo 
     size = 0.7
   ) +
-  labs(
-    x = "log(OR) (réf. Hétéro)",
-    y = NULL,
-    color = "Identification\nsexuelle", 
-    caption = "Coefficients ajustés (âge, type de couple, revenu, enfants). Virage PG pondéré."
+  scale_color_manual(
+    values = c("Bi" = "#9B4F96", "Homo" = "#D42C00"),
+    name = "Identification\nsexuelle"
   ) +
-  theme_minimal(base_size = 12) +
+  scale_x_log10(breaks = c(0.25, 0.5, 1, 2, 4, 8)) +
+  labs(
+    x = "OR (réf. Hétéro)",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 13) +
   theme(panel.grid.minor = element_blank(), 
-        plot.caption = element_text(family = "serif", size = 12, hjust = 0),
-        axis.text.y = element_text(family = "serif", face = "bold", color = "darkseagreen"),
-        axis.text.x = element_text(family = "serif", size = 12), 
-        strip.text.x = element_text(family = "serif", size = 12)
+        axis.text.y = element_text(family = "serif", face = "bold", color = "black"),
+        axis.text.x = element_text(family = "serif", size = 13), 
+        axis.title.x = element_text(family = "serif", size = 13),
+        strip.text.x = element_text(family = "serif", size = 13), 
+        legend.title = element_text(family = "serif", face = "bold", size = 13),
+        legend.text = element_text(family = "serif", size = 13)
         ) 
 
 ```
