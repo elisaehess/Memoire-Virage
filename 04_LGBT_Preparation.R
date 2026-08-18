@@ -512,7 +512,7 @@ lgbtn = lgbt %>%
       idsexu == "Bi" & typecpl == "Pas en couple" ~ "Bi célibataire", 
       idsexu == "Homo" & typecpl == "En couple de même sexe" ~ "Homo en couple", 
       idsexu == "Homo" & typecpl == "Pas en couple" ~ "Homo célibataire", 
-      TRUE ~ NA_character_
+      TRUE ~ NA_character_ # on perd 37 homo en couple de sexe différent et 5 NVPD/NSP et 11 Bi NVPD/NSP
     ) %>% 
       set_variable_labels("Type de couple"),
     
@@ -599,14 +599,7 @@ lgbtn = lgbt %>%
       "Enfant(s) dans le couple" = "01",
       "Enfant(s) dans le couple" = "02",
       "Enfant(s) dans le couple" = "03",
-      "Enfant(s) dans le couple" = "04",
-      "Enfant(s) dans le couple" = "05",
-      "Enfant(s) dans le couple" = "06",
-      "Enfant(s) dans le couple" = "07",
-      "Enfant(s) dans le couple" = "08",
-      "Enfant(s) dans le couple" = "09",
-      "Enfant(s) dans le couple" = "10",
-      "Enfant(s) dans le couple" = "11",
+      "Enfant(s) dans le couple" = "4 et plus",
       NULL = "NVPD",
       NULL = "NSP"
     ) %>%
