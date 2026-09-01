@@ -10,7 +10,6 @@
 # - Sous-population par genre (femmes / hommes)
 # - Variables sociodémo recodées (pour tableau Trachman & Lejbowicz)
 # - Variables d'attirance/pratique/identification (pour tableau Bajos & Beltzer)
-# - Variables de situation conjugale (pour tableau couple) :
 #     * Sur l'ensemble (pgn) : etatmat, couple12mois, statutcouple, nb_enf_ego
 #     * Sur les pers. en couple > 4 mois dans les 12 derniers mois (pgn_conjugal) :
 #       cohabitation, nb_enf_couple
@@ -147,7 +146,30 @@ pg_base = pg %>%
     EA9d, 
     EA9e, 
     EA9f, 
-    EA9g
+    EA9g, 
+    
+    # ↓ Violences 
+    
+    # Couple 12 derniers mois 
+    C12m_cible, 
+    C_physc12m,  
+    C_psysc12m,  
+    C_sexsc12m, 
+    C_totsc12m, 
+    
+    # Couple ou ex avant 12 derniers mois 
+    Cve_cible, 
+    C_physcve, 
+    C_psyscve, 
+    C_sexscve, 
+    C_totscve,
+    
+    # Ex 12 derniers mois 
+    E12m_cible,
+    E_totsc12m, 
+    
+    C9, 
+    C15
   ) %>%
   mutate(
     genre = fct_drop(as_factor(Q1)) %>%
@@ -504,6 +526,19 @@ pg_base = pg %>%
                         "En couple de sexe différent",
                         "Pas en couple",
                         "NSP/NVPD")) %>%
+      set_variable_labels("Type de couple"),
+    
+    # ↓ TYPECPL bi
+    typecplbi = case_when(
+      idsexu == "Bi" & typecpl == "En couple de même sexe" ~ "Bi en couple de même sexe",
+      idsexu == "Bi" & typecpl == "En couple de sexe différent" ~ "Bi en couple de sexe différent",
+      idsexu == "Bi" & typecpl == "Pas en couple" ~ "Bi célibataire", 
+      idsexu == "Homo" & typecpl == "En couple de même sexe" ~ "Homo en couple", 
+      idsexu == "Homo" & typecpl == "Pas en couple" ~ "Homo célibataire", 
+      idsexu == "Hétéro" & typecpl == "En couple de sexe différent" ~ "Hétéro en couple",
+      idsexu == "Hétéro" & typecpl == "Pas en couple" ~ "Hétéro célibataire",
+      TRUE ~ NA_character_ 
+    ) %>% 
       set_variable_labels("Type de couple"),
     
     # ↓ Célibat et dernière relation 
@@ -1073,6 +1108,129 @@ pg_base = pg %>%
       NULL = "NSP"
     ) %>% 
       set_variable_labels("Placement en foyer ou famille d'accueil"),
+    
+    # ↓ Violences couple 12 mois 
+    violence_couple = fct_recode(
+      as_factor(C_totsc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence dans le couple au cours des 12 derniers mois"), 
+    violence_couple_phys = fct_recode(
+      as_factor(C_physc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence physique dans le couple au cours des 12 derniers mois"), 
+    violence_couple_psy = fct_recode(
+      as_factor(C_psysc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence psychique dans le couple au cours des 12 derniers mois"), 
+    violence_couple_sex = fct_recode(
+      as_factor(C_sexsc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence sexuelle dans le couple au cours des 12 derniers mois"), 
+    violence_couple_vie = fct_recode(
+      as_factor(C_totscve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_vie_phys = fct_recode(
+      as_factor(C_physcve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence physique dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_vie_psy = fct_recode(
+      as_factor(C_psyscve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence psycique dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_vie_sex = fct_recode(
+      as_factor(C_sexscve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence sexuelle dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_ex = fct_recode(
+      as_factor(E_totsc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence de la part d'un-e ex-conjoint-e dans les 12 derniers mois"), 
+    mepris = fct_recode(
+      as_factor(C9), 
+      NULL = "", 
+      NULL = "NVPD", 
+      NULL = "NSP", 
+      "Non" = "Non", 
+      "Oui" = "Une fois", 
+      "Oui" = "Quelques fois (2 à 5 fois)", 
+      "Oui" = "Souvent (6 fois ou plus)", 
+      "Oui" = "Presque toutes les semaines", 
+      "Oui" = "Tous les jours ou presque"
+    ), 
+    contrainte_depense = fct_recode(
+      as_factor(C15), 
+      NULL = "", 
+      NULL = "NVPD", 
+      NULL = "NSP", 
+      "Non" = "Non", 
+      "Oui" = "Une fois", 
+      "Oui" = "Quelques fois (2 à 5 fois)", 
+      "Oui" = "Souvent (6 fois ou plus)", 
+      "Oui" = "Presque toutes les semaines", 
+      "Oui" = "Tous les jours ou presque"
+    ),
   )
 
 #### Sous-pop principale filtrée sur l'identification (Trachman & Lejbowicz) ----
@@ -1156,6 +1314,35 @@ pgnf_couple = pgn_couple %>% # Création de la sous-population femmes
   filter(genre == "Une femme")
 
 pgnh_couple = pgn_couple %>% # Création de la sous-population hommes
+  filter(genre == "Un homme")
+
+#### Sous-pop violences ----
+
+pgn_violence_couple = pgn %>% 
+  filter(C12m_cible == 01)
+
+pgnf_violence_couple = pgn_violence_couple %>% 
+  filter(genre == "Une femme")
+
+pgnh_violence_couple = pgn_violence_couple %>% 
+  filter(genre == "Un homme")
+
+pgn_violence_vie = pgn %>% 
+  filter(Cve_cible == 01)
+
+pgnf_violence_vie = pgn_violence_vie %>% 
+  filter(genre == "Une femme")
+
+pgnh_violence_vie = pgn_violence_vie %>% 
+  filter(genre == "Un homme")
+
+pgn_violence_ex = pgn %>% 
+  filter(E12m_cible == 01)
+
+pgnf_violence_ex = pgn_violence_ex %>% 
+  filter(genre == "Une femme")
+
+pgnh_violence_ex = pgn_violence_ex %>% 
   filter(genre == "Un homme")
 
 #### Sauvegarde des nouvelles bases ----

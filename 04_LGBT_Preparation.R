@@ -65,6 +65,7 @@ library(questionr) # fonctions utiles
 ## (les effectifs Hétéro sont très faibles dans le volet LGBT).
 lgbtn = lgbt %>%
   select(
+    ID, 
     Q1,
     SEX10,
     Q19E_age_rec, # âge ego en tranches 
@@ -144,7 +145,15 @@ lgbtn = lgbt %>%
     EA9d, 
     EA9e, 
     EA9f, 
-    EA9g
+    EA9g,
+    
+    # ↓ Violences
+    C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12, C13, 
+    C15,C16,C14a,C14b,
+    C18a,C18b, C18c,C18d,C18e,C18f,C18g,
+    C24,C26, 
+    C20,C21,C22, C23,
+    C30,C31, C34
   ) %>%
   filter(
     !SEX10 %in% c("01", "88", "99", ""), # retire NSP/NVPD + hétéros
@@ -977,6 +986,65 @@ lgbtn = lgbt %>%
   select(# variables temporaires
          -Q6_chr, -Q6a_chr, -Q7_chr, -Q7a_chr,
          -Q9_chr, -Q9a_chr, -Q13_chr, -Q13a_chr)
+
+## recodage violence 
+
+# Fonction générique : binarise un item Virage (00=Non, 01-05=Oui, 77/88/99/NA -> NA)
+recode_item_virage <- function(x) {
+  case_when(
+    x == "00" ~ 0L,
+    x %in% c("01","02","03","04","05") ~ 1L,
+    x %in% c("77","88","99") ~ NA_integer_,
+    is.na(x) ~ NA_integer_,
+    TRUE ~ NA_integer_
+  )
+}
+
+items_psy <- c("C2","C3","C4","C5","C6","C7","C8","C9","C10","C11","C12",
+               "C15","C16","C14a","C14b",
+               "C18a","C18b","C18c","C18d","C18e","C18f","C18g",
+               "C24","C26")
+
+items_phy <- c("C20","C21","C22","C23")
+items_sex <- c("C30","C31")
+
+lgbt_violence <- lgbtn %>%
+  mutate(across(all_of(c(items_psy, items_phy, items_sex)),
+                recode_item_virage, .names = "{.col}_bin"))
+
+lgbt_violence <- lgbt_violence %>%
+  mutate(
+    psy_oui  = case_when(
+      rowSums(across(all_of(paste0(items_psy, "_bin"))), na.rm = TRUE) > 0 ~ "Oui",
+      rowSums(!is.na(across(all_of(paste0(items_psy, "_bin"))))) == 0 ~ NA_character_,
+      TRUE ~ "Non"
+    ), 
+    phy_oui  = case_when(
+      rowSums(across(all_of(paste0(items_phy, "_bin"))), na.rm = TRUE) > 0 ~ "Oui",
+      rowSums(!is.na(across(all_of(paste0(items_phy, "_bin"))))) == 0 ~ NA_character_,
+      TRUE ~ "Non"
+    ), 
+    sex_oui  = case_when(
+      rowSums(across(all_of(paste0(items_sex, "_bin"))), na.rm = TRUE) > 0 ~ "Oui",
+      rowSums(!is.na(across(all_of(paste0(items_sex, "_bin"))))) == 0 ~ NA_character_,
+      TRUE ~ "Non"
+    )
+  )
+
+lgbtf_violence = lgbt_violence %>% 
+  filter(genre == "Une femme")
+
+lgbth_violence = lgbt_violence %>% 
+  filter(genre == "Un homme")
+
+lgbt_violence_conjugal = lgbt_violence %>%
+  filter(FCPL %in% c("01", "02", "03", "04")) 
+
+lgbtf_violence_conjugal = lgbtf_violence %>%
+  filter(FCPL %in% c("01", "02", "03", "04"))
+
+lgbth_violence_conjugal = lgbth_violence %>%
+  filter(FCPL %in% c("01", "02", "03", "04"))
 
 ## Sous-populations femmes et hommes (Virage LGBT)
 

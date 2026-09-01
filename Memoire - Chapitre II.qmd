@@ -116,6 +116,7 @@ tab4_pg_f = dwf %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
+  add_overall(last = TRUE) %>%
   add_ci(pattern = "{stat}\n[{ci}]") %>%  
   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
   bold_labels() %>%
@@ -131,6 +132,7 @@ tab4_pg_h = dwh %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
+  add_overall(last = TRUE) %>%
   add_ci(pattern = "{stat}\n[{ci}]") %>% 
   add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
   bold_labels() %>%
@@ -146,6 +148,7 @@ tab4_lgbt_f = lgbtnf %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
+  add_overall(last = TRUE) %>%
   add_p(
   test = all_categorical() ~ "fisher.test",
   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
@@ -163,6 +166,7 @@ tab4_lgbt_h = lgbtnh %>%
     digits = all_categorical() ~ 1,
     missing = "no"
   ) %>%
+  add_overall(last = TRUE) %>%
   add_p(
   test = all_categorical() ~ "fisher.test",
   test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
