@@ -11,7 +11,6 @@
 #   nombreux dans LGBT et ne sont pas analysés dans le tableau 2a)
 # - Recodage des variables sociodémo dans les mêmes catégories que PG
 # - Variables de situation conjugale (pour tableau 3 mémoire) :
-#     * Sur l'ensemble (lgbtn) : etatmat, couple12mois, statutcouple, nb_enf_ego
 #     * Sur les pers. en couple > 4 mois dans les 12 derniers mois (lgbtn_conjugal) :
 #       cohabitation, nb_enf_couple
 # /!\ Les noms des variables conjugales (Etatmat, Situmat, FCPL, FCOHAB, Enf1,

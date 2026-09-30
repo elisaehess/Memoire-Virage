@@ -1,0 +1,775 @@
+---
+title: "Mémoire – Partie III"
+subtitle: "Les violences conjugales "
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format:
+  docx:
+    toc: true
+    toc_depth: 5
+    fig-cap-location: "top"
+execute:
+  echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+  cache: false 
+editor: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+```{r setup}
+#| include: false
+
+# Librairies ---------------------------------------------------------------
+library(tidyverse)   # manipulation (plsrs packages)
+library(labelled)    # variables labellisées
+library(haven)       # import SAS
+library(questionr)   # quelques fonctions utiles
+library(survey)      # données pondérées
+library(srvyr)       # fournit select et filter aux données pondérées 
+library(gtsummary)   # tableaux de synthèse
+library(flextable)   # export Word des tableaux
+library(ggplot2)     # graphiques 
+library(GGally)      # graphiques (extension de ggplot2)
+library(broom)       # faire des tibble (pour le forest plot)
+library(extrafont)   # charger polices d'écriture 
+loadfonts(device = "win")
+
+# Préférences gtsummary
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+options(scipen = 999)
+
+# Import + préparation : on appelle les scripts existants -----------------
+source("01_PG_Import.R", encoding = "UTF-8")
+source("02_PG_Preparation.R", encoding = "UTF-8")
+source("03_LGBT_Import.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
+
+# Plans de pondération (PG uniquement) -----
+dw = svydesign(id = ~1, weights = pgn$poids_cal, data = pgn)
+dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
+dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
+
+```
+
+[**Relation de couple au cours des douze derniers mois**]{.underline}
+
+*Commentaires :
+1. 210 personnes ont refusé de répondre à Q6 (Actuellement, avez-vous
+une relation de couple ?) et 7 ont déclaré
+ne pas savoir. Pour ces 217 personnes, FCPL=6 « non indiqué ». Elles ne
+sont pas passées dans le module couple.
+2. Dans la programmation de FCPL, des imprécisions sur les limites de
+durées à prendre en compte (par exemple
+une relation conjugale de « plus de 4 mois » ou de « 4 mois ou plus »)
+ont engendré des erreurs en début de
+collecte qui ont été corrigées par la suite. De plus, 46 individus dont
+la relation s’était terminée depuis moins d’un
+mois (Q6=03 et Q16=000) ont été oubliés dans la modalité 4 de FCPL. Au
+total, 107 personnes ne sont donc pas
+passées dans le module couple, bien que le calcul corrigé de FCPL
+indique les modalités 01, 03 ou 04 pour elles.
+Par ailleurs, 39 personnes passées dans le module « Couple » accumulent
+les réponses « ne veut pas dire » ou « non
+concerné » à la plupart des 20 questions de faits de violence destinées
+à tou·te·s (dont 21 personnes pour les 20
+questions et 9 pour 16 à 19 questions). Il faut considérer que leurs
+réponses à ce module sont inexploitables*
+
+--\> L'entrée dans ce module n'est pas claire. Nb équivaut grosso modo à
+FCPL = 01, 02, 03, 04
+
+[**Relations avec ex au cours des douze derniers mois**]{.underline}
+
+label E12m_cible="Filtre d'entr e du module Ex 12 mois"; filex=0; if
+Q6='01' and SEX1='02' and Q7a ne '04' then filex=1; \* en couple, avec
+un ex et pas veuf/ve ; else if Q6='02' and Q9a ne '04' then filex=1; \*
+en couple avec plusieurs personnes, pas veuve ; else if Q6='03' and
+SEX1='01' and Q13b='01' then filex=1; \* pas en couple mais d j t , un
+ex, pas d c s de l'ex ; else if Q6 in ('01','02') and '02'\<SEX1\<'88'
+then filex=1; \* en couple avec une ou plusieurs personnes, plus de deux
+relations ;\
+else if Q6='03' and '01'\<SEX1\<'88' then filex=1; \* plus en couple,
+plus d'une relation ;
+
+```         
+E12m_cible=filex;
+if filex=1 and (E1 in (" " "00") or (E1 in ("88" "99") and E1a in ("88" "99"))) then  E12m_cible=0 ;
+```
+
+E12m_cible_bis. Filtre d'entrée du module Ex 12 mois : contacts avec ex
+au cours des 12 derniers mois (seulement 2500 personnes, compliqué)
+
+[**Famille / proches au cours de la vie (y compris douze derniers
+mois)**]{.underline}
+
+tout le monde
+
+[**vie entière avant les douze derniers mois :**]{.underline}
+
+tout une partie de questions posée à tout le monde qui permet ensuite
+faire sous catégorie
+
+-   dans le couple :
+
+label Cve_cible="Filtre d'entr e du module Couple VE"; if q6 in
+("04","88","99") then Cve_cible=0; else Cve_cible=1;
+
+-   ex conjoints :
+
+label Eve_cible="Filtre d'entr e du module Ex VE"; if Q6='01' &
+SEX1='02' & Q7a ne '04' then Eve_cible=1; else if Q6='02' & Q9a ne '04'
+then Eve_cible=1; else if Q6='03' & SEX1='01' & Q13b='01' then
+Eve_cible=1; else if Q6 in ('01','02')& '02'\<SEX1\<'88' then
+Eve_cible=1; else if Q6='03' & '01'\<SEX1\<'88' then Eve_cible=1; else
+Eve_cible=0;
+
+[**Focus fait marquant**]{.underline}
+
+[**Variables construites : violences sexuelles, module couple, module
+ex**]{.underline}
+
+Pas de détail sur la construction des variables construites et des
+niveaux (atteintes modérées, atteintes fréquentes ou graves, atteintes
+très grave..).
+
+Indicateur global de violence couple (dans les 12 deniers mois)
+
+Indicateur global de violence Ex (dans les 12 deniers mois)
+
+Indicateur global de violence dans le couple avant les 12 derniers mois
+(Q6 01, 02, 03). Couple actuel ou ex avant les 12 derniers mois
+
+Commencer par les indicateurs globaux. Voir ce qui est significatif ou
+non. Ensuite voir si ces indicateurs existent dans LGBT. Sinon on va pas
+les refaire, pas le tps et on sait pas comment les premiers ont été
+fait. Utiliser LGBT pour creuser certains types de violences ?
+
+Tableau 1 : toutes violences 12 derniers mois / Ex 12 mois / au cours de
+la vie (voir les populations concernées : même tableau ou 2 séparés).
+QUE PG. Il y a pas les variables construites dans LGBT
+
+Ensuite expliquer que femmes et que comparaison Bi / Hétéro
+
+Tableau 2 : types de violences
+
+Possibilité régression : voir les facteurs qui amènent à plus déclarer
+de violences (diplome ?).
+
+## Violence global PG 
+
+```{r}
+#| label: tbl-indicateur-global-violence
+#| tbl-cap: "Indicateur global de violence dans le couple dans les 12 derniers mois."
+
+# pondération 
+dwf_violence_couple = svydesign(id = ~1, weights = pgnf_violence_couple$poids_cal, data = pgnf_violence_couple)
+dwh_violence_couple = svydesign(id = ~1, weights = pgnh_violence_couple$poids_cal, data = pgnh_violence_couple)
+
+# Tableau PG pondéré -- Femmes
+tab10_pg_f = dwf_violence_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = violence_couple,
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Femmes
+tab10_pg_h = dwh_violence_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = violence_couple,
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Fusion des tableaux 
+tab10 = tbl_merge(
+  tbls = list(tab10_pg_f, tab10_pg_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab10 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Répondant-es en couple dans les 12 mois de l'enquête Virage.Données pondérées\nLecture : 98,4% des femmes homosexuelles dans l'enquête Virage en population générale n'ont pas vécu de violence dans le couple dans les 12 mois précédent l'enquête, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+```
+Les femmes bisexuelles déclarent plus de violences dans le couple dans les 12 derniers mois, au global, que les hétérosexuelles et les lesbiennes. Elles sont 20,9% contre 5,2% et 1,6%. Chez les hommes, le résultat n’est pas significatif. 
+Nous nous demandons maintenant si la tendance se confirme au cours de la vie. 
+
+```{r}
+#| label: tbl-indicateur-global-violence_vie
+#| tbl-cap: "Indicateur global de violence dans le couple avant les 12 derniers mois."
+
+# pondération 
+dwf_violence_couple = svydesign(id = ~1, weights = pgnf_violence_couple$poids_cal, data = pgnf_violence_couple)
+dwh_violence_couple = svydesign(id = ~1, weights = pgnh_violence_couple$poids_cal, data = pgnh_violence_couple)
+
+# Tableau PG pondéré -- Femmes
+tab10_pg_f = dwf_violence_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = violence_couple,
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Femmes
+tab10_pg_h = dwh_violence_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = violence_couple,
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Fusion des tableaux 
+tab10 = tbl_merge(
+  tbls = list(tab10_pg_f, tab10_pg_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab10 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Répondant-es en couple dans les 12 mois de l'enquête Virage.Données pondérées\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+```
+
+Ici encore, les bisexuelles déclarent plus de violence dans le couple, avant les 12 derniers mois, cette fois-ci le résultat n’est significatif que par rapport hétérosexuelles. 15,8% des bisexuelles en déclarent contre 6,1% des hétérosexuelles. Cette fois-ci les résultats sont significatifs chez les hommes : les hommes bis déclarent également plus de violence dans le couple que les hétérosexuels (9,6% contre 2,2%). 
+A noter qu’ici, les déclarations de violence des lesbiennes, gays et bisexuels ne dépassent pas 10 individus en population générale. Il en résulte une difficulté de produire des résultats statistiques intéressants. Nous utiliserons donc l’enquête PG pour comparer les bisexuelles aux hétérosexuelles avant d’approfondir l’étude des autres groupes avec l’enquête LGBT. 
+
+## Type violence PG 
+
+```{r}
+#| label: tbl-violence-type-12m
+#| tbl-cap: "Violence dans le couple dans les 12 derniers mois selon la nature des violence."
+
+# Base 
+pgnfbi_violence_couple = pgnf_violence_couple %>% 
+  filter(idsexu %in% c("Bi", "Hétéro")) %>% 
+  droplevels()
+
+# pondération 
+dwfbi_violence_couple = svydesign(id = ~1, weights = pgnfbi_violence_couple$poids_cal, data = pgnfbi_violence_couple)
+
+# variables
+tab10_vars = c("violence_couple_phys", "violence_couple_psy", "violence_couple_sex")
+
+# Tableau PG pondéré -- Femmes
+tab10_pg_f = dwfbi_violence_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab10_vars),
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+ # Version FINALE 
+tab10_pg_f = tab10_pg_f %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Champ : Répondantes bisexuelles et hétérosexuelles en couple dans les 12 mois de l'enquête Virage.Données pondérées\nLecture : 98,4% des femmes homosexuelles dans l'enquête Virage en population générale n'ont pas vécu de violence dans le couple dans les 12 mois précédent l'enquête, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab10_pg_f, path = "tab10_pg_f.docx")
+```
+
+```{r}
+#| label: tbl-violence-type-vie
+#| tbl-cap: "Violence dans le couple (actuel ou ex) avant les 12 derniers mois selon la nature des violence."
+
+# Base 
+pgnfbi_violence_vie = pgnf_violence_vie %>% 
+  filter(idsexu %in% c("Bi", "Hétéro")) %>% 
+  droplevels()
+
+# pondération 
+dwfbi_violence_vie = svydesign(id = ~1, weights = pgnfbi_violence_vie$poids_cal, data = pgnfbi_violence_vie)
+
+# variables
+tab11_vars = c("violence_vie_phys", "violence_vie_psy", "violence_vie_sex")
+
+# Tableau PG pondéré -- Femmes
+tab11_pg_f = dwfbi_violence_vie %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab11_vars),
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+ # Version FINALE 
+tab11_pg_f = tab11_pg_f %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Champ : Répondantes bisexuelles et hétérosexuelles en couple dans les 12 mois de l'enquête Virage.Données pondérées\nLecture : 98,4% des femmes homosexuelles dans l'enquête Virage en population générale n'ont pas vécu de violence dans le couple dans les 12 mois précédent l'enquête, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab11_pg_f, path = "tab11_pg_f.docx")
+
+```
+
+```{r}
+pgnfbi_violence_vie %>% 
+  filter(violence_vie_psy == "Oui", violence_couple_psy == "Oui") %>%
+  nrow()
+```
+## régression violence psychologique 
+```{r}
+#| label: tbl-regression-violence-psy
+#| tbl-cap: "Prévalence de violences psychologiques des enquêtées (régression logistique)."
+
+# Base 
+pgnfbi_violence_couple = pgnf_violence_couple %>% 
+  filter(idsexu %in% c("Bi", "Hétéro")) %>% 
+  droplevels()
+
+pgfbi_reg_violence_couple = pgnfbi_violence_couple %>%
+  mutate(violence_couple_psy = fct_relevel(violence_couple_psy, "Non"),
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi"),
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         taille_agglo = fct_drop(as.factor(na_if(taille_agglo, "NVPD/NSP"))),
+         revenu = fct_drop(as.factor(na_if(revenu, "NVPD/NSP"))),
+         enf_ego = fct_relevel(enf_ego, "Non"), 
+         statut_act2 = fct_relevel(statut_act2, "Inactif·ve")
+         ) 
+
+dwfbi_reg_violence_couple = svydesign(id = ~1, weights = pgfbi_reg_violence_couple$poids_cal, data = pgfbi_reg_violence_couple)
+
+# reg 
+regf_violence_brut = svyglm(
+  violence_couple_psy ~ idsexu,
+  family = binomial(),
+  design = dwfbi_reg_violence_couple
+)
+
+regf_violence_1 = svyglm(
+  violence_couple_psy ~ idsexu + age + statut_act2 + diplome + revenu + taille_agglo + mariage + enf_ego,
+  family = binomial(),
+  design = dwfbi_reg_violence_couple
+)
+
+tbl_violence_brut = tbl_regression(
+  regf_violence_brut,
+  include = c(idsexu),
+  label = idsexu ~ "Identification sexuelle", 
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Violences psychologiques OR**") %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : identification sexuelle, âge, diplôme, revenu, territoire, statut marital, statut parental, statut d'activité.\nChamp : Ensemble des répondantes en couple dans les 12 mois précédent l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+print(tbl_violence_brut)
+
+tbl_violence_1 = tbl_regression(
+  regf_violence_1,
+  include = c(idsexu, age, statut_act2, diplome, revenu, taille_agglo, mariage, enf_ego),
+  label = idsexu ~ "Identification sexuelle", 
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Violences psychologiques OR**") %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : identification sexuelle, âge, diplôme, revenu, territoire, statut marital, statut parental, statut d'activité.\nChamp : Ensemble des répondantes en couple dans les 12 mois précédent l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+print(tbl_violence_1)
+
+```
+
+# bisexuelles qui déclarent violences psy 12 derniers mois 
+
+```{r}
+pgnfbi_violence_couple_psy = pg %>% 
+  filter(ID %in% c("1000150662", "1000365490", "1001272613", "1001579882", "1001780504", "1001816036", "1002049048", "1002688201", "1003114403", "1003124205", "1003699861", "1003743268", "1003762930", "1004072385"))
+
+
+install.packages("writexl")
+library(writexl)
+
+write_xlsx(pgnfbi_violence_couple_psy, "pgnfbi_violence_couple_psy.xlsx")
+
+```
+
+## violence LGBT 
+
+```{r}
+#| label: tbl-violences-lgbt
+#| tbl-cap: "Déclaration des violences par type de violence."
+
+tab12_vars <- c("psy_oui", "phy_oui", "sex_oui")
+
+# Tableau LGBT -- Femmes
+tab12_lgbt_f = lgbtf_violence_conjugal %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab12_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT  -- Hommes
+tab12_lgbt_h = lgbth_violence_conjugal %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab12_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab12 = tbl_merge(
+  tbls = list(tab12_lgbt_f, tab12_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test exact de Fisher.", 
+      p.value_2 ~ "Test exact de Fisher.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab12 = tab12 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Champ : Ensemble des répondant-es de l'enquête Virage ; Répondant-es de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab12, path = "tab12.docx")
+
+lgbtfbi_violences_psy = lgbtf_violence_conjugal %>% 
+  filter(idsexu == "Bi") %>% 
+  filter(psy_oui == "Oui")
+
+lgbtfbi_violences_sex = lgbtf_violence_conjugal %>% 
+  filter(idsexu == "Bi") %>% 
+  filter(sex_oui == "Oui")
+```
+
+```{r}
+lgbtfbi_violence_couple_sex = lgbtf_violence_conjugal %>% 
+  filter(idsexu == "Bi") %>% 
+  filter(sex_oui == "Oui")
+
+lgbtfbi_violence_couple_sex = lgbt %>% 
+  filter(ID %in% c("1990000171", "1990000699", "1990001513", "1990002064", "1990002296", "1990003572", "1990003672", "1990003916", "1990005056", "1990006027", "1990006400", "1990006438", "1990007886", "1990008617", "1990009725", "1990011957", "1990012095")) 
+
+lgbtf_violence_conjugal %>%
+   filter(ID %in% c("1990000171", "1990000699", "1990001513", "1990002064", "1990002296", "1990003572", "1990003672", "1990003916", "1990005056", "1990006027", "1990006400", "1990006438", "1990007886", "1990008617", "1990009725", "1990011957", "1990012095")) %>% 
+  select(ID, idsexu, typecpl, age, comingoutconjoint) %>%
+  writexl::write_xlsx("anchors_sexuel.xlsx")
+
+lgbtfbi_non_comingout = lgbtnf_conjugal %>% 
+  filter(idsexu == "Bi") %>% 
+  filter(comingoutconjoint == "Non")
+
+lgbtfbi_non_comingout = lgbt %>% 
+  filter(ID %in% c("1990000383", "1990000535", "1990001405", "1990003137", "1990003956", "1990005896", "1990011703", "1990012167"))
+
+lgbtf_violence_conjugal %>%
+   filter(ID %in% c("1990000383", "1990000535", "1990001405", "1990003137", "1990003956", "1990005896", "1990011703", "1990012167")) %>% 
+  select(ID, idsexu, typecpl, age, comingoutconjoint) %>%
+  writexl::write_xlsx("anchors_co.xlsx")
+
+
+install.packages("writexl")
+library(writexl)
+
+write_xlsx(lgbtfbi_violence_couple_sex, "lgbtfbi_violence_couple_sex.xlsx")
+write_xlsx(lgbtfbi_non_comingout, "lgbtfbi_non_comingout.xlsx")
+
+```
+
+
+```{r}
+#| label: fig-violences-psy-lgbt
+#| fig-cap: "Faits de violences psychologiques déclarés."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+
+items_psy_labels <- c(
+  C2   = "Reproche de parler à d'autres hommes/femmes",
+  C3   = "Empêchement de voir amis/famille",
+  C4   = "Exigence de savoir où/avec qui",
+  C5   = "Confiscation papiers/clés/téléphone",
+  C6   = "Lecture courrier/messages sans accord",
+  C7   = "Dévalorisation des activités/du comportement",
+  C8   = "Remarques désagréables sur physique",
+  C9   = "Mépris des opinions",
+  C10  = "Refus de discuter",
+  C11  = "Insultes / injures",
+  C12  = "Cris, coups sur meubles, ambiance tendue",
+  C14a = "Privation d'argent : besoins du foyer négligés",
+  C14b = "Privation d'argent : besoins propres négligés",
+  C15  = "Contrainte à payer toutes les dépenses",
+  C16  = "Prise de salaire/économies ou dettes imposées"
+)
+
+items_psy <- names(items_psy_labels)
+
+recode_item_virage <- function(x) {
+  case_when(
+    x == "00" ~ 0L,
+    x %in% c("01","02","03","04","05") ~ 1L,
+    x %in% c("77","88","99") ~ NA_integer_,
+    TRUE ~ NA_integer_
+  )
+}
+
+lgbtf_violence_conjugal <- lgbtf_violence_conjugal %>%
+  mutate(across(all_of(items_psy), recode_item_virage, .names = "{.col}_bin"))
+
+# --- Base longue : % Oui par item et groupe ---
+base_lollipop_psy <- lgbtf_violence_conjugal %>%
+  filter(idsexu %in% c("Bi", "Homo")) %>%
+  select(idsexu, all_of(paste0(items_psy, "_bin"))) %>%
+  pivot_longer(-idsexu, names_to = "item", values_to = "val") %>%
+  mutate(item = str_remove(item, "_bin")) %>%
+  filter(!is.na(val)) %>%
+  group_by(idsexu, item) %>%
+  summarise(pct = mean(val) * 100, n = n(), .groups = "drop") %>%
+  mutate(item_label = recode(item, !!!items_psy_labels))   # reste en character ici
+
+# --- Ordre des items par écart Bi - Homo ---
+ecarts <- base_lollipop_psy %>%
+  select(idsexu, item_label, pct) %>%
+  pivot_wider(names_from = idsexu, values_from = pct) %>%
+  mutate(ecart = Bi - Homo) %>%
+  arrange(desc(ecart))
+
+niveaux_items <- rev(ecarts$item_label)   # <-- ordre mémorisé une bonne fois pour toutes
+
+# --- Test de Fisher par item ---
+test_items <- lgbtf_violence_conjugal %>%
+  filter(idsexu %in% c("Bi", "Homo")) %>%
+  select(idsexu, all_of(paste0(items_psy, "_bin"))) %>%
+  pivot_longer(-idsexu, names_to = "item", values_to = "val") %>%
+  mutate(item = str_remove(item, "_bin")) %>%
+  filter(!is.na(val)) %>%
+  group_by(item) %>%
+  summarise(p_value = fisher.test(table(idsexu, val))$p.value, .groups = "drop") %>%
+  mutate(
+    item_label = recode(item, !!!items_psy_labels),
+    signif = case_when(
+      p_value < 0.01 ~ "**",
+      p_value < 0.05 ~ "*",
+      TRUE ~ ""
+    )
+  )
+
+# --- Fusion (les deux colonnes item_label sont character, pas de perte) ---
+base_lollipop_psy <- base_lollipop_psy %>%
+  left_join(test_items %>% select(item_label, signif), by = "item_label") %>%
+  mutate(
+    item_label = factor(item_label, levels = niveaux_items),   # <-- on refixe le facteur ICI, après la fusion
+    y_num = as.numeric(item_label),
+    y_dodge = if_else(idsexu == "Bi", y_num + 0.15, y_num - 0.15)
+  )
+
+label_pos <- base_lollipop_psy %>%
+  group_by(item_label, y_num) %>%
+  summarise(pct_max = max(pct), signif = first(signif), .groups = "drop")
+
+# --- Graphique ---
+ggplot(base_lollipop_psy) +
+  geom_segment(aes(x = 0, xend = pct, y = y_dodge, yend = y_dodge, color = idsexu),
+               linewidth = 0.8) +
+  geom_point(aes(x = pct, y = y_dodge, color = idsexu), size = 3) +
+  geom_text(data = label_pos, aes(x = pct_max + 3, y = y_num, label = signif),
+            size = 4, fontface = "bold", color = "black") +
+  scale_y_continuous(
+    breaks = seq_along(levels(base_lollipop_psy$item_label)),
+    labels = levels(base_lollipop_psy$item_label)
+  ) +
+  scale_color_manual(values = c("Bi" = "#9B4F96", "Homo" = "#FF9B55")) +
+  labs(
+    x = "% ayant déclaré l'acte au cours des 12 derniers mois",
+    y = NULL,
+    color = "Identification"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+    panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+    axis.text   = element_text(family = "serif", size = 12, color = "black"),
+    axis.title  = element_blank(),
+    legend.position = "bottom",
+    legend.text = element_text(family = "serif", size = 12)
+  )
+```
+
+```{r}
+#| label: tbl-violences-psy-typecpl
+#| tbl-cap: "Comparaison des violences par type de couple."
+
+tab13_vars <- c("C2_bin", "C3_bin", "C4_bin", "C5_bin", "C6_bin", "C7_bin", "C8_bin", "C9_bin", "C10_bin", "C11_bin", "C12_bin", "C14a_bin", "C14b_bin", "C15_bin", "C16_bin")
+
+# Tableau LGBT -- Femmes
+tab13 = lgbtf_violence_conjugal %>%
+  tbl_summary(
+    by = typecplbi,
+    include = all_of(tab13_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+ # Version FINALE 
+tab13 = tab13 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Champ : Ensemble des répondant-es de l'enquête Virage ; Répondant-es de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab13, path = "tab13.docx")
+
+```
+
+```{r}
+
+dwf_violence_couple = svydesign(id = ~1, weights = pgnf_violence_couple$poids_cal, data = pgnf_violence_couple)
+
+tab14_vars <- c("mepris", "contrainte_depense")
+
+# Tableau LGBT -- Femmes
+tab14 = dwf_violence_couple %>%
+  tbl_svysummary(
+    by = typecplbi,
+    include = all_of(tab14_vars),
+    statistic = all_categorical() ~ "{p}\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+ # Version FINALE 
+tab14 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Champ : Ensemble des répondant-es de l'enquête Virage ; Répondant-es de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)
+```
+
