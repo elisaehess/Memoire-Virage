@@ -3,14 +3,11 @@
 .RData
 .Ruserdata
 .Rproj.user/
-
 # --- DONNÉES SENSIBLES ---
-# Exclure tout le dossier de données 
+# Exclure tout le dossier de données
 Data/
 # Exclure le dossier archive
 OLD/
-
-
 # Exclure des formats de fichiers spécifiques s'ils traînent à la racine
 *.csv
 *.xlsx
@@ -23,3 +20,4 @@ OLD/
 *.rdx
 *.rdb2
 *_files/
+.DS_Store
