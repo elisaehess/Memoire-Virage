@@ -6,14 +6,9 @@
 #### Objectif du script ----
 
 # Préparer les données pour l'analyse :
-# - Sous-population principale (filtre sur ident_sexu, Homo/Bi/Hétéro)
+# - Sous-population principale (filtre ident_sexu, Homo/Bi/Hétéro retire NSP/NVPD)
 # - Sous-population par genre (femmes / hommes)
-# - Variables sociodémo recodées (pour tableau Trachman & Lejbowicz)
-# - Variables d'attirance/pratique/identification (pour tableau Bajos & Beltzer)
-# - Variables de situation conjugale (pour tableau couple) :
-#     * Sur l'ensemble (pgn) : etatmat, couple12mois, statutcouple, nb_enf_ego
-#     * Sur les pers. en couple > 4 mois dans les 12 derniers mois (pgn_conjugal) :
-#       cohabitation, nb_enf_couple
+# - Recodage variables  
 
 #### Import des librairies ----
 
@@ -24,41 +19,44 @@ library(questionr) # fonctions utiles
 #### Base de travail commune (tous les recodages, aucun filtre) ----
 
 # pg_base contient l'ensemble des observations (y compris NSP/NVPD à ident_sexu)
-# et tous les recodages. On en dérive ensuite pgn (filtrée) pour le tableau
-# Trachman, et pg_aip (non filtrée) pour les tableaux id-attir-prat et Bajos.
+# et tous les recodages. 
 
 pg_base = pg %>%
   select(
     ID, 
-    poids_cal,
-    Q1,
-    ident_sexu,
-    attirance_sexu, # ajouté pour tableau Bajos
-    pratique_sexu, # ajouté pour tableau Bajos
-    SEX10, # recodage présumé·es hétéro 
-    SEX2H, # recodage présumé·es hétéros
-    SEX2F, # recodage présumé·es hétéros
-    SEX8_age, # recodage présumé·es hétéros
-    SEX8a, # recodage présumé·es hétéros
-    SEX9, # recodage présumé·es hétéros
-    SEX9a, # recodage présumé·es hétéros
+    poids_cal, # poids pondération 
+    Q1, # genre
+    ident_sexu, # identification 
+    attirance_sexu, # attirance
+    pratique_sexu, # pratique
+    
+    # Variables recodage présumé·es hétéro 
+    SEX10, 
+    SEX2H, 
+    SEX2F, 
+    SEX8_age, 
+    SEX8a, 
+    SEX9, 
+    SEX9a, 
+    
+    # Variables socio-démo
     Q19e_gragebis, #âge 
-    Q19E_age, 
+    Q19E_age, #âge
     Q29e_5gr, # niveau diplôme
     Q29E, #statut activité
     Q28E_cpt, # nombre périodes d'inactivité
     CS_E_NIV1, # csp 
-    CS_E_NIV3,
+    CS_E_NIV3, #csp
     REV2, # revenu individuel 
     REV4, # revenu subjectif
     Q25E, # statut activité
     Q3, #taille agglo 
-    TERRITOIRE_3MOD, 
+    TERRITOIRE_3MOD, # territoire
     Q2, # département
     Q4, # type logement
     Mig_e, #statut migratoire
     
-    # ↓ Variables brutes pour creuser célibat 
+    # Variables brutes pour creuser célibat 
     Q6, # relation de couple actuellement 
     Q13, # statut légal de la dernière relation 
     Q13a, # état matrimonial atteint
@@ -69,12 +67,12 @@ pg_base = pg %>%
     Q15, # durée de la dernière relation 
     Q16, # durée depuis la fin de la dernière relation (mois)
     
-    # ↓ Variables sur le/la (ex) partenaire 
+    # Variables sur le/la (ex) partenaire 
     Q19C, # âge actuel dernier partenaire 
     Q19C1, # écart âge 
     Migbis_C, # statut migratoire (ex)partenaire 
     Q25C, # en emploi ou au chômage (ex)partenaire 
-    Q29C, # diplôme (ex)partenaire 
+    Q29c_5gr, # diplôme (ex)partenaire 
     CS_C_Niv3, # CSP (ex)partenaire
     CS_C_Niv1, 
     Q29c_9gr, # diplôme (ex)partenaire
@@ -89,72 +87,93 @@ pg_base = pg %>%
     ENF6_01, # logement 1er enfant
     ENF6_02, # logement 2e enfant 
     
-    # ↓ Variables brutes pour reconstruire FSEXCJT et TYPECPL
-    FCPL, 
-    Q12, 
-    Q36, 
+    # Variables brutes pour reconstruire FSEXCJT et TYPECPL
+    FCPL, # couple > 4 mois au cours des 12 derniers mois
+    Q12, # type de relation de couple
+    Q36, # type de relation de couple (ex)
     Q17, # sexe de l'ex conjoint
-    Etatmat,
-    Situmat,
-    FCPL,
+    Etatmat, # statut légal de la relation de couple
+    Situmat, # statut de couple au moment de l'enquête 
     FCOHAB, # cohabitation 
     Enf1,   # nb d'enfants d'ego 
     ENF2,   # nb d'enfants du couple
-    Diffage_cjt, 
-    Dur_relconj,
-    Typmen_5mod, 
-    Typmen_9mod, 
+    Diffage_cjt, # écart d'âge conjugal
+    Dur_relconj, # durée de la relation de couple
+    Typmen_5mod, # type de ménage 5 modalités
+    Typmen_9mod, # type de ménage 9 modalités
     
-    # ↓ Styles de conjugalité 
+    # Styles de conjugalité 
     CF1a, # tout faire ensemble
     CF1b, # compromis 
-    SOC1a, 
-    SOC1b, 
-    SOC1c, 
-    SOC1d, 
-    SOC2a, 
-    SOC2b, 
-    SOC2c, 
-    SOC2d, 
+    SOC1a, # confidence conjoint
+    SOC1b, # confidence famille
+    SOC1c, # confidence amis 
+    SOC2a, # contacts famille
+    SOC2b, # contacts amis 
+    SOC2c, # activités, loisirs
+    SOC2d, # assos 
     CF2, # tâches ménagères
     CF3, # s'occuper des enfants
     
-    # ↓ Satisfaction relation  
-    C1,
-    C1a,
-    C1a1,
-    SEX14,
-    S2a_02, 
-    LGBT1e, 
+    # Satisfaction relation  
+    C1, # satisfaction relation
+    C1a, # Intention rupture
+    C1a1, # Suite intention rupture 
+    SEX14, # Amoureux·se
+    S2a_02, # Depression 
+    LGBT1e, # Coming out conjoint
     
-    # ↓ Sujets de conflits 
-    CF5a, 
-    CF5b, 
-    CF5d, 
-    CF5e, 
-    CF5f, 
-    CF5g, 
-    CF5h, 
-    CF5i, 
-    CF5j, 
-    CF5k, 
-    CF5l,
+    # Sujets de conflits 
+    CF5a, # conflits sur les tâches ménagères
+    CF5b, # conflits sur les enfants
+    CF5d, # conflits sur l'argent
+    CF5e, # conflits sur les opinions, politique, religion 
+    CF5f, # conflits sur les vacances
+    CF5g, # conflits sur la famille
+    CF5h, # conflits sur la famille conjoint
+    CF5i, # conflits sur les amis 
+    CF5j, # conflits sur le travail 
+    CF5k, # conflits sur le travail conjoint
+    CF5l, # conflits sur la sexualité 
     
-    # ↓ Situation avec parents 
-    EA9a, 
-    EA9b, 
-    EA9c, 
-    EA9d, 
-    EA9e, 
-    EA9f, 
-    EA9g
+    # Situation avec parents dans l'enfance
+    EA9a, # Privations
+    EA9b, # Conflit père
+    EA9c, # Conflit mère 
+    EA9d, # Fugue
+    EA9e, # Violence entre parents
+    EA9f, # Aide éducative à la maison 
+    EA9g, # Foyer 
+    
+    # Violences 
+    
+    # Couple 12 derniers mois 
+    C12m_cible, # filtre
+    C_physc12m,  # physique
+    C_psysc12m,  # psychologique
+    C_sexsc12m, # sexuelle
+    C_totsc12m, # totale
+    
+    # Couple ou ex avant 12 derniers mois 
+    Cve_cible, # filtre
+    C_physcve, # physique
+    C_psyscve, # psychologique
+    C_sexscve, # sexuelle
+    C_totscve, # totale
+    
+    # Ex 12 derniers mois 
+    E12m_cible, # filtre
+    E_totsc12m, # totale
+    
+    C9, # mepris 
+    C15 # violence eco 
   ) %>%
   mutate(
     genre = fct_drop(as_factor(Q1)) %>%
       fct_relevel("Une femme") %>% 
       set_variable_labels("Genre"),
     
-    # ↓ Identification avec NSP/NVPD conservés en modalité distincte
+    # Identification avec NSP/NVPD conservés en modalité distincte
     idsexu = fct_recode(
       as_factor(ident_sexu),
       "NSP/NVPD" = "NSP",
@@ -163,7 +182,7 @@ pg_base = pg %>%
       fct_relevel("Homo", "Bi", "Hétéro", "NSP/NVPD") %>% 
       set_variable_labels("Identification sexuelle"), 
     
-    # ↓ Nouvelle variable idsexu présumé·es hétéros
+    # Nouvelle variable idsexu présumé·es hétéros
     idsexu2 = case_when(
       SEX10 == "Homosexuel-le" ~ "Homo", 
       SEX10 == "Bisexuel-le" ~ "Bi",
@@ -178,7 +197,7 @@ pg_base = pg %>%
     ) |> 
       fct_relevel("Homo", "Bi", "Hétéro", "Présumé·e hétéro", "NSP/NVPD"),
     
-    # ↓ Nouvelle variable croisée genre et identification sexuelle 
+    # Nouvelle variable croisée genre et identification sexuelle 
     genre_idsexu = case_when(
       genre == "Un homme" & idsexu == "Hétéro" ~ "Hétéro", 
       genre == "Un homme" & idsexu == "Bi" ~ "Bi", 
@@ -189,7 +208,7 @@ pg_base = pg %>%
     ) %>% 
       fct_relevel ("Hétéro", "Hétéra", "Bi", "Bie", "Gay", "Lesbienne"), 
     
-    # ↓ Attirance recodée
+    # Attirance recodée
     attirance = fct_recode(
       as_factor(attirance_sexu),
       "Hétéro" = "Uniquement sexe opposé",
@@ -203,7 +222,7 @@ pg_base = pg %>%
     ) %>%
       fct_relevel("Homo", "Bi", "Hétéro", "Pas d'attirance/NSP/NVPD"),
     
-    # ↓ Pratique recodée
+    # Pratique recodée
     pratique = fct_recode(
       as_factor(pratique_sexu),
       "Pas de rapport/NSP/NVPD" = "Pas de rapport sexue",
@@ -212,19 +231,11 @@ pg_base = pg %>%
     ) %>%
       fct_relevel("Homo", "Bi", "Hétéro", "Pas de rapport/NSP/NVPD"),
     
-    # ↓ Indicateurs binaires pour le tableau Bajos (construits sur l'ensemble)
-    attire_ms = as.integer(attirance %in% c("Homo", "Bi")),
-    pratique_vie = as.integer(pratique %in% c("Homo", "Bi")),
-    pratique_vie_excl = as.integer(pratique == "Homo"),
-    id_homo = as.integer(idsexu == "Homo"),
-    id_bi = as.integer(idsexu == "Bi"),
-    attire_jamais_prat = as.integer(attire_ms == 1 & pratique_vie == 0), 
-    
-    # ↓ Recodage âge 
+    # Recodage âge 
     age = as_factor(Q19e_gragebis) %>% 
       set_variable_labels("Groupe d'âge"),
     
-    # ↓ Recodage diplôme 
+    # Recodage diplôme 
     diplome = fct_recode(
       as_factor(Q29e_5gr),
       "Lycée ou inférieur" = "Aucun diplôme",
@@ -241,9 +252,35 @@ pg_base = pg %>%
         "Supérieur à Bac+3",
         "NVPD/NSP"
       ) %>% 
-      set_variable_labels("Diplôme"), 
+      set_variable_labels("Diplôme"),
     
-    # ↓ Recodages classe 
+    diplome_conjoint = fct_recode(
+      as_factor(Q29c_5gr),
+      "Lycée ou inférieur" = "Aucun diplôme",
+      "Lycée ou inférieur" = "BEPC/BEP/CAP",
+      "Bac / Bac+3" = "Baccalauréat",
+      "Bac / Bac+3" = "Dipl. du supérieur 1er cycle",
+      "Supérieur à Bac+3" = "Dipl. du supérieur 2e et 3e cycle",
+      "NVPD/NSP" = "Ne souhaite pas répondre",
+      "NVPD/NSP" = "Ne sais pas"
+    ) %>%
+      fct_relevel(
+        "Lycée ou inférieur",
+        "Bac / Bac+3",
+        "Supérieur à Bac+3",
+        "NVPD/NSP"
+      ) %>% 
+      set_variable_labels("Diplôme"),
+    
+    diplome_compare = case_when(
+      diplome == "Lycée ou inférieur" & diplome_conjoint == "Lycée ou inférieur" |
+      diplome == "Bac / Bac+3" & diplome_conjoint == "Bac / Bac+3" |
+      diplome == "Supérieur à Bac+3" & diplome_conjoint == "Supérieur à Bac+3" |
+      diplome == "NVPD/NSP" & diplome_conjoint == "NVPD/NSP" ~ "Même niveau de diplôme", 
+      TRUE ~ "Niveau de diplôme différent"
+    ), 
+    
+    # Recodages classe 
     csp = fct_recode(
       as_factor(CS_E_NIV1),
       "Agriculteur·rice exploitant·e" = "Agriculteurs exploitants",
@@ -356,7 +393,7 @@ pg_base = pg %>%
     ) %>% 
       set_variable_labels("Situation financière"), 
     
-    # ↓ territoire 
+    # territoire 
     taille_agglo = fct_recode(
       as_factor(Q3),
       "200 000 et plus" = "Paris ou la petite couronne (Hauts-de-Seine (92), Seine-Saint-Denis (93), Val-de-Marne (94))",  
@@ -377,7 +414,7 @@ pg_base = pg %>%
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP"), 
     
-    # ↓ statut migratoire 
+    # statut migratoire 
     mig = fct_recode(
       as_factor(Mig_e),
       "Immigré·e, descendant·e ou né·e dans un DOM" = "Né-e dans un DOM",
@@ -386,13 +423,15 @@ pg_base = pg %>%
       "Immigré·e, descendant·e ou né·e dans un DOM" = "Descendant-e de 2 immigré-e-s", 
       "Indeterminé" = "Inclassable"
     ),
-    # ↓ État matrimonial légal (sur l'ensemble)
+    
+    # État matrimonial légal (sur l'ensemble)
     etatmat = fct_recode(
       as_factor(Etatmat),
       "NVPD/NSP" = "NVPD",
       "NVPD/NSP" = "NSP"
     ),
-    # ↓ Relation de couple > 4 mois au cours des 12 derniers mois (sur l'ensemble)
+    
+    # Relation de couple > 4 mois au cours des 12 derniers mois (sur l'ensemble)
     couple12mois = fct_recode(
       as_factor(FCPL),
       "Oui" = "A une seule relation de couple au moment de l’enquête, depuis au moins 4 mois",
@@ -405,7 +444,7 @@ pg_base = pg %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("En couple au cours des 12 derniers mois (> 4 mois)"), 
     
-    # ↓ Statut du couple au moment de l'enquête (sur l'ensemble). Pas construit à partir de FCPL, 
+    # Statut du couple au moment de l'enquête (sur l'ensemble). Pas construit à partir de FCPL, 
     # mais de Q6, Q7, Q9, Q13 
     statutcouple = fct_recode(
       as_factor(Situmat),
@@ -413,7 +452,7 @@ pg_base = pg %>%
       "NVPD/NSP" = "NSP"
     ),
     
-    # ↓ Statut couple au moment de l'enquête : oui / non (ensemble)
+    # Statut couple au moment de l'enquête : oui / non (ensemble)
     couple_enq = fct_recode(
       as_factor(Situmat),
       "Oui" = "Marié.e", 
@@ -426,7 +465,7 @@ pg_base = pg %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("En couple au moment de l'enquête"), 
     
-    # ↓ SEXCONJOINT reconstruite (sexe conjoint-e)
+    # SEXCONJOINT reconstruite (sexe conjoint-e)
     Sexcjt = case_when(
       Q1 == "01" & FCPL %in% c("05", "06") ~ "Pas en couple",
       
@@ -463,7 +502,7 @@ pg_base = pg %>%
       Q1 == "02" & FCPL == "04" & Q17 %in% c("88", "99") ~ "NSP/NVPD"
     ),
     
-    # ↓ TYPECPL reconstruite (en couple homo ou hétéro, selon sexe ego)
+    # TYPECPL reconstruite (en couple homo ou hétéro, selon sexe ego)
     typecpl = case_when(
       Q1 == "01" & Sexcjt == "Un homme" ~ "En couple de même sexe", 
       Q1 == "01" & Sexcjt == "Une femme" ~ "En couple de sexe différent", 
@@ -480,7 +519,20 @@ pg_base = pg %>%
                         "NSP/NVPD")) %>%
       set_variable_labels("Type de couple"),
     
-    # ↓ Célibat et dernière relation 
+    # TYPECPL bi
+    typecplbi = case_when(
+      idsexu == "Bi" & typecpl == "En couple de même sexe" ~ "Bi en couple de même sexe",
+      idsexu == "Bi" & typecpl == "En couple de sexe différent" ~ "Bi en couple de sexe différent",
+      idsexu == "Bi" & typecpl == "Pas en couple" ~ "Bi célibataire", 
+      idsexu == "Homo" & typecpl == "En couple de même sexe" ~ "Homo en couple", 
+      idsexu == "Homo" & typecpl == "Pas en couple" ~ "Homo célibataire", 
+      idsexu == "Hétéro" & typecpl == "En couple de sexe différent" ~ "Hétéro en couple",
+      idsexu == "Hétéro" & typecpl == "Pas en couple" ~ "Hétéro célibataire",
+      TRUE ~ NA_character_ 
+    ) %>% 
+      set_variable_labels("Type de couple"),
+    
+    # Célibat et dernière relation 
     couple_celib = fct_recode(
       as_factor(Q6), 
       "Célibataire après rupture" = "Non aucune, mais vous avez déjà eu une relation de couple",
@@ -502,7 +554,7 @@ pg_base = pg %>%
     sexe_dernier_conjoint = as_factor(Q17),
     nb_enfants_ego = as.numeric(Enf1), 
     
-    # ↓ Cohabitation (utile sur sous-pop en couple, mais on recode sur l'ensemble
+    #   Cohabitation (utile sur sous-pop en couple, mais on recode sur l'ensemble
     #   pour conserver la cohérence) — la modalité "Pas en couple" servira
     #   uniquement si on l'analyse sur l'ensemble ; vide une fois filtré sur
     #   pgn_conjugal.
@@ -518,7 +570,7 @@ pg_base = pg %>%
       fct_relevel("En couple cohabitant", "En couple non cohabitant", "Pas en couple") %>% 
       set_variable_labels("Cohabitation"),
     
-    # ↓ Nombre d'enfants d'ego (sur l'ensemble)
+    # Nombre d'enfants d'ego (sur l'ensemble)
     enf_ego = fct_recode(
       as_factor(Enf1), 
       NULL = "", 
@@ -539,7 +591,7 @@ pg_base = pg %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("A des enfants"), 
     
-    # ↓ Nombre d'enfants du couple parmi vos enfants 
+    # Nombre d'enfants du couple parmi vos enfants 
     # (filtré sur pers. en couple à l'enquête et avec au moins 1 enfant)
     enf_avc_cjt = fct_recode(
       as_factor(ENF2),
@@ -562,7 +614,7 @@ pg_base = pg %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("A un/des enfant(s) avec (ex) conjoint·e"),
     
-    # ↓ Enfant conjoint avec une autre personne
+    # Enfant conjoint avec une autre personne
     enf_cjt_autre = fct_recode(
       as_factor(Enf3), 
       "Non" = "0", 
@@ -600,8 +652,7 @@ pg_base = pg %>%
       fct_relevel("Sans enfant", "Enfant(s) dans le couple", "Enfant(s) d'une précédente union") %>% 
       set_variable_labels("Situation parentale"),
     
-    # ↓ Durée de la relation actuelle (en années, catégorisée)
-    # DUR_RELCONJ en mois ; 888=NVPD, 999=NSP → NA
+    # Durée de la relation actuelle (en années, catégorisée)
     dur_rel_mois = if_else(
       as.numeric(Dur_relconj) %in% c(888, 999),
       NA_real_,
@@ -619,7 +670,7 @@ pg_base = pg %>%
                         "10-19 ans", "20 ans ou plus")) %>% 
       set_variable_labels("Durée relation (ex) conjoint·e"),
     
-    # ↓ Écart d'âge avec le/la conjoint·e (5 catégories ego-centriques)
+    # Écart d'âge avec le/la conjoint·e (5 catégories)
     # DIFFAGE_CJT : valeur numérique en années (codes 888=NVPD, 999=NSP → NA).
     # Convention INED : 
     #   - Si Q1=01 (homme) : DIFFAGE = age_ego - age_partner
@@ -650,7 +701,7 @@ pg_base = pg %>%
                         "Conjoint·e plus jeune (10+ ans)")) %>%
       set_variable_labels("Ecart d'âge (ex) conjoint·e"),
 
-    # ↓ CSP du/de la conjoint·e. Champ : personnes en couple FCPL=01..04.
+    # CSP du/de la conjoint·e. Champ : personnes en couple FCPL=01..04.
     csp_conjoint = fct_recode(
       as_factor(CS_C_Niv1),
       "Agriculteur·rice exploitant·e" = "Agriculteurs exploitants",
@@ -665,8 +716,19 @@ pg_base = pg %>%
     ) %>% 
       set_variable_labels("Catégorie socioprofessionnelle (ex) conjoint·e"),
     
-    # ↓ Revenu du ménage (REV3), en tranches. Champ : ménage cohabitant
-    #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre du ménage).
+    # CSP comparé
+    csp_compare = case_when(
+      csp == "Agriculteur·rice exploitant·e" & csp_conjoint == "Agriculteur·rice exploitant·e" | 
+      csp == "Artisan·e, commerçant·e, chef d'entreprise" & csp_conjoint == "Artisan·e, commerçant·e, chef d'entreprise" | 
+      csp == "Cadre, profession intellect. sup." & csp_conjoint == "Cadre, profession intellect. sup." |
+      csp == "Profession intermédiaire" & csp_conjoint == "Profession intermédiaire" |
+      csp == "Employé·e" & csp_conjoint == "Employé·e" |
+      csp == "Ouvrier·e" & csp_conjoint == "Ouvrier·e" ~ "Même PCS", 
+      TRUE ~ "PCS différente"
+    ), 
+    
+    # Revenu du ménage (REV3), en tranches. Champ : ménage cohabitant
+    #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre dans ménage).
     revenu_menage = case_when(
       REV3 %in% c("00", "01", "02", "03") ~ "Moins de 1 800€",
       REV3 %in% c("04", "05")       ~ "De 1 800 à moins de 3 000€",
@@ -680,7 +742,7 @@ pg_base = pg %>%
                         "Pas de budget commun/NVPD/NSP")) %>%
       set_variable_labels("Revenu du ménage"),
     
-    # ↓ Revenu d'Ego comparé à celui du/de la conjoint·e (REV4bis).
+    # Revenu d'Ego comparé à celui du/de la conjoint·e (REV4bis).
     #   Champ : personnes en couple FCPL=01..04.
     revenu_compare = case_when(
       REV4bis %in% c("01", "02") ~ "Revenu supérieur à celui du/de la conjoint·e",
@@ -696,7 +758,7 @@ pg_base = pg %>%
                         "Conjoint·e sans revenu", "NVPD/NSP")) %>%
       set_variable_labels("Revenu comparé à celui (ex) conjoint·e"),
     
-    # ↓ Patrimoine (biens immobiliers + épargne du couple) d'Ego comparé à
+    # Patrimoine (biens immobiliers + épargne du couple) d'Ego comparé à
     #   celui du/de la conjoint·e (REV5). Champ : couples cohabitants
     #   FCOHAB=01..04.
     patrimoine_compare = case_when(
@@ -715,7 +777,7 @@ pg_base = pg %>%
                         "NVPD/NSP")) %>%
       set_variable_labels("Patrimoine comparé à celui (ex) conjoint·e"),
     
-    # ↓ Styles de conjugalité
+    # Styles de conjugalité
     fusion = fct_recode( # non filtrée
       as_factor(CF1a), 
       "D'accord" = "Tout à fait d'accord", 
@@ -812,7 +874,7 @@ pg_base = pg %>%
       NULL = "NSP"
     ) %>% set_variable_labels("Répartition tâches enfants foyer"),
     
-    # ↓ Satisfaction conjugale 
+    # Satisfaction conjugale 
     satisfaction = fct_recode(
       as_factor(C1), # filtrée FCPL = 01, 02
       NULL = "", 
@@ -874,7 +936,7 @@ pg_base = pg %>%
     ) %>% 
       set_variable_labels("Le/la partenaire a connaissance de votre bisexualité"), 
     
-    # ↓ Sujets de conflits
+    # Sujets de conflits
     conflit_taches = fct_recode(
       as_factor(CF5a), # filtrée FCOHAB 01, 02, 03, 04
       NULL = "",
@@ -986,7 +1048,7 @@ pg_base = pg %>%
     ) %>% 
       set_variable_labels("Sexualité de couple"), 
     
-    # ↓ Situation avec parents 
+    # Situation avec parents 
     privation = fct_recode(
       as_factor(EA9a), 
       NULL = "Non concerné-e",
@@ -1036,11 +1098,133 @@ pg_base = pg %>%
       NULL = "NSP"
     ) %>% 
       set_variable_labels("Placement en foyer ou famille d'accueil"),
+    
+    # Violences couple 12 mois 
+    violence_couple = fct_recode(
+      as_factor(C_totsc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence dans le couple au cours des 12 derniers mois"), 
+    violence_couple_phys = fct_recode(
+      as_factor(C_physc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence physique dans le couple au cours des 12 derniers mois"), 
+    violence_couple_psy = fct_recode(
+      as_factor(C_psysc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence psychique dans le couple au cours des 12 derniers mois"), 
+    violence_couple_sex = fct_recode(
+      as_factor(C_sexsc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence sexuelle dans le couple au cours des 12 derniers mois"), 
+    violence_couple_vie = fct_recode(
+      as_factor(C_totscve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_vie_phys = fct_recode(
+      as_factor(C_physcve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence physique dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_vie_psy = fct_recode(
+      as_factor(C_psyscve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence psycique dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_vie_sex = fct_recode(
+      as_factor(C_sexscve), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence sexuelle dans le couple (conjoint-e actuel-le ou ex) avant les 12 derniers mois"), 
+    violence_ex = fct_recode(
+      as_factor(E_totsc12m), 
+      NULL = "Niv?", 
+      NULL = "", 
+      "Non" = "Niv0", 
+      "Oui" = "Niv1", 
+      "Oui" = "Niv2", 
+      "Oui" = "Niv3"
+    ) %>% 
+      fct_relevel("Oui") %>% 
+      set_variable_labels("Violence de la part d'un-e ex-conjoint-e dans les 12 derniers mois"), 
+    mepris = fct_recode(
+      as_factor(C9), 
+      NULL = "", 
+      NULL = "NVPD", 
+      NULL = "NSP", 
+      "Non" = "Non", 
+      "Oui" = "Une fois", 
+      "Oui" = "Quelques fois (2 à 5 fois)", 
+      "Oui" = "Souvent (6 fois ou plus)", 
+      "Oui" = "Presque toutes les semaines", 
+      "Oui" = "Tous les jours ou presque"
+    ), 
+    contrainte_depense = fct_recode(
+      as_factor(C15), 
+      NULL = "", 
+      NULL = "NVPD", 
+      NULL = "NSP", 
+      "Non" = "Non", 
+      "Oui" = "Une fois", 
+      "Oui" = "Quelques fois (2 à 5 fois)", 
+      "Oui" = "Souvent (6 fois ou plus)", 
+      "Oui" = "Presque toutes les semaines", 
+      "Oui" = "Tous les jours ou presque"
+    ),
   )
 
-#### Sous-pop principale filtrée sur l'identification (Trachman & Lejbowicz) ----
+#### Sous-pop principale filtrée sur l'identification ----
 
-# pgn est utilisée pour le tableau 2a Trachman et le tableau 3a (mémoire) :
 # on exclut les NSP/NVPD ident (46 observations) et on supprime le niveau
 # "NSP/NVPD" devenu vide.
 
@@ -1067,29 +1251,14 @@ pgnhbi = pgnh %>%
 #### Sous-pop homme bi célibataire ----
 
 pgnhbi_celibat = pgnhbi %>% 
-  filter(Q6 %in% c("03", "04")) %>% 
-  arrange(couple_celib, desc(duree_depuis_rupture))
-
-pgnhbi_celibat
-
-#### Sous-pop sans filtre sur l'identification (Bajos et id-attir-prat) ----
-
-# pg_aip est l'alias de pg_base, conservé pour la lisibilité des chunks qui
-# l'appellent. Toutes les observations sont conservées, y compris celles dont
-# l'identification est NSP/NVPD, ce qui évite les biais sur attirance/pratique.
-
-# pg_aip = pg_base
-# 
-# pg_aip_f = pg_aip %>% filter(genre == "Une femme")
-# pg_aip_h = pg_aip %>% filter(genre == "Un homme")
+  filter(Q6 %in% c("03", "04")) 
 
 #### Sous-pop en couple > 4 mois 12 DERNIERS MOIS ----
 
 # pgn_conjugal = pgn filtrée sur FCPL %in% c("01","02", "03", "04")
 # en couple >4 dans 12 MOIS C'est la base appropriée pour les variables filtrées
 # (cohabitation, nb_enf_couple) qui ne sont posées qu'aux personnes dans ce cas.
-# /!\ Distincte de pgn_couple : pgn_couple est plus restrictive ; on l'a gardée
-# intacte pour les analyses existantes sur la satisfaction relationnelle.
+# Distincte de pgn_couple : pgn_couple est plus restrictive 
 
 pgn_conjugal = pgn %>%
   filter(FCPL %in% c("01", "02", "03", "04")) %>%
@@ -1112,8 +1281,6 @@ pgnh_conjugal = pgn_conjugal %>% # sous-pop hommes en couple > 4 mois
 # pgn_couple = pgn filtrée sur FCPL %in% c("01", "02") + 
 # filtre NA satisfaction/amoureux/rupture. C'est la base appropriée pour les
 # questions posées aux personnes en couple AU MOMENT de l'enquête. 
-# /!\ On la conserve telle quelle pour ne pas casser les analyses existantes
-#     sur la satisfaction. 
 
 pgn_couple = pgn %>%
   filter(FCPL %in% c("01", "02"))
@@ -1124,29 +1291,31 @@ pgnf_couple = pgn_couple %>% # Création de la sous-population femmes
 pgnh_couple = pgn_couple %>% # Création de la sous-population hommes
   filter(genre == "Un homme")
 
-#### Sauvegarde des nouvelles bases ----
+#### Sous-pop violences ----
 
-# save(pgn, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgn.Rdata")
-# 
-# save(pgnf, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnf.Rdata")
-# 
-# save(pgnh, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnh.Rdata")
-# 
-# save(pg_aip, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pg_aip.Rdata")
-# 
-# save(pg_aip_f, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pg_aip_f.Rdata")
-# 
-# save(pg_aip_h, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pg_aip_h.Rdata")
-# 
-# save(pgn_couple, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgn_couple.Rdata")
-# 
-# save(pgnf_couple, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnf_couple.Rdata")
-# 
-# save(pgnh_couple, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnh_couple.Rdata")
-# 
-# save(pgn_conjugal, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgn_conjugal.Rdata")
-# 
-save(pgnf_conjugal, file = "NOUVELLES BASES/pgnf_conjugal.Rdata")
-# 
-# save(pgnh_conjugal, file = "~/Documents/MASTER EHESS/VIRAGE/2. Test claude/NOUVELLES BASES/pgnh_conjugal.Rdata")
-# 
+pgn_violence_couple = pgn %>% 
+  filter(C12m_cible == 01)
+
+pgnf_violence_couple = pgn_violence_couple %>% 
+  filter(genre == "Une femme")
+
+pgnh_violence_couple = pgn_violence_couple %>% 
+  filter(genre == "Un homme")
+
+pgn_violence_vie = pgn %>% 
+  filter(Cve_cible == 01)
+
+pgnf_violence_vie = pgn_violence_vie %>% 
+  filter(genre == "Une femme")
+
+pgnh_violence_vie = pgn_violence_vie %>% 
+  filter(genre == "Un homme")
+
+pgn_violence_ex = pgn %>% 
+  filter(E12m_cible == 01)
+
+pgnf_violence_ex = pgn_violence_ex %>% 
+  filter(genre == "Une femme")
+
+pgnh_violence_ex = pgn_violence_ex %>% 
+  filter(genre == "Un homme")

@@ -12,7 +12,7 @@
 ## Import des librairies
 library(haven) # importer des données SAS
 
-## Chemin vers le dossier contenant les bases (<!> à adapter <!>)
+## Chemin vers le dossier contenant les bases 
 
 path = "Data/"
 

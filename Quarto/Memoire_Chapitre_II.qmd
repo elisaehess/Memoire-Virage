@@ -1,0 +1,1652 @@
+---
+title: "Mémoire – Partie II"
+subtitle: "La qualité des relations, les conflits et styles de conjugalités bisexuelles"
+author: "Elisa Lemoine"
+date: today
+date-format: long
+lang: fr
+format:
+  docx:
+    toc: true
+    toc_depth: 5
+    fig-cap-location: "top"
+execute:
+  echo: false   # le code n'apparaît pas dans le rendu, seuls les tableaux
+  warning: false
+  message: false
+  cache: false 
+editor: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+```{r setup}
+#| include: false
+
+# Librairies ---------------------------------------------------------------
+library(tidyverse)   # manipulation (plsrs packages)
+library(labelled)    # variables labellisées
+library(haven)       # import SAS
+library(questionr)   # quelques fonctions utiles
+library(survey)      # données pondérées
+library(srvyr)       # fournit select et filter aux données pondérées 
+library(gtsummary)   # tableaux de synthèse
+library(flextable)   # export Word des tableaux
+library(ggplot2)     # graphiques 
+library(GGally)      # graphiques (extension de ggplot2)
+library(broom)       # faire des tibble (pour le forest plot)
+library(extrafont)   # charger polices d'écriture 
+loadfonts(device = "win")
+
+# Préférences gtsummary
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+options(scipen = 999)
+
+# Import + préparation : on appelle les scripts existants -----------------
+source("01_PG_Import.R", encoding = "UTF-8")
+source("02_PG_Preparation.R", encoding = "UTF-8")
+source("03_LGBT_Import.R", encoding = "UTF-8")
+source("04_LGBT_Preparation.R", encoding = "UTF-8")
+
+# Plans de pondération (PG uniquement) -----
+dw = svydesign(id = ~1, weights = pgn$poids_cal, data = pgn)
+dwf = svydesign(id = ~1, weights = pgnf$poids_cal, data = pgnf)
+dwh = svydesign(id = ~1, weights = pgnh$poids_cal, data = pgnh)
+
+```
+
+# Les styles de conjugalité bisexuels 
+
+## Les conceptions du couple : autonomie, fusion et compromis
+
+```{r}
+#| label: tbl-conceptions-conjugalite
+#| tbl-cap: "Conceptions de la conjugalité selon l'identification sexuelle et le genre."
+
+# Liste commune des variables à inclure
+tab4_vars = c("fusion", "compromis")
+
+# Tableau PG pondéré -- Femmes
+tab4_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab4_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab4_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab4_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT -- Femmes
+tab4_lgbt_f = lgbtnf %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab4_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT  -- Hommes
+tab4_lgbt_h = lgbtnh %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab4_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_overall(last = TRUE) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab4 = tbl_merge(
+  tbls = list(tab4_pg_f, tab4_pg_h, tab4_lgbt_f, tab4_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab4 = tab4 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Intervalle de confiance à 95 %)."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Ensemble des répondant-es de l'enquête Virage ; Répondant-es de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 53,5% des femmes homosexuelles dans l'enquête Virage en population générale sont d'accord avec la première affirmation, avec un intervalle de confiance à 95% de [41% - 66%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab4, path = "tab4.docx")
+
+```
+
+
+```{r}
+#| label: fig-fusion-compromis-lgbt
+#| fig-cap: "Adhésion aux normes de fusion et de compromis conjugal, selon le genre et l'identification sexuelle. Virage LGBT."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+# p-valeur
+
+pval_fusion = lgbtn %>% 
+  filter(is.na(fusion) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, fusion))$p.value)
+
+pval_fusion
+
+pval_compromis = lgbtn %>% 
+  filter(is.na(compromis) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, compromis))$p.value)
+
+pval_compromis
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph3 = function(var, label){
+  lgbtn %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+    group_by(genre, typecplbi, modalite) %>% 
+    summarise(eff = n()) %>% 
+    group_by(genre, typecplbi) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "D'accord") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph3 = base_graph3("fusion", "Il faut tout faire\nensemble") %>% 
+  bind_rows(base_graph3("compromis", "Il faut faire des compromis\npour ne pas contrarier l'autre"))
+
+ordre_typecplbi = c("Homo célibataire", "Homo en couple",
+                     "Bi célibataire", "Bi en couple de même sexe", "Bi en couple de sexe différent")
+
+base_graph3 = base_graph3 %>% 
+  mutate(typecplbi = factor(typecplbi, levels = rev(ordre_typecplbi)))
+
+# Créer graphique
+graphique3 = ggplot(base_graph3, aes(x = typecplbi, y = pct)) +
+  geom_segment(aes(xend = typecplbi, yend = 0),
+               color = "#9B4F96", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "#9B4F96", size = 2.5) +
+  coord_flip() + 
+  facet_grid(rows = vars(genre), cols = vars(variable)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
+  theme_minimal(base_size = 13) + 
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "bold.italic", family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")
+        )
+graphique3
+```
+
+### Regressions logistiques
+
+```{r}
+#| label: tbl-regression-fusion
+#| tbl-cap: "Probabilité chez les femmes d'adhérer à l'idée qu'il faut tout faire ensemble en couple selon l'identification sexuelle (régression logistique)."
+
+# Reg femmes 
+pgf_reg_fusion = pgnf %>%
+  mutate(fusion = fct_relevel(fusion, "Pas d'accord"),
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"),
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         enf_ego = fct_relevel(enf_ego, "Non"), 
+         statut_act2 = fct_relevel(statut_act2, "Inactif·ve")
+         ) 
+
+dwf_reg_fusion = svydesign(id = ~1, weights = pgf_reg_fusion$poids_cal, data = pgf_reg_fusion)
+
+regf_fusion = svyglm(
+  fusion ~ idsexu + age + diplome + mariage + enf_ego + statut_act2,
+  family = binomial(),
+  design = dwf_reg_fusion
+)
+
+tbl_fusion = tbl_regression(
+  regf_fusion,
+  include = c(idsexu),
+  label = idsexu ~ "Identification sexuelle", 
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Fusion OR**") %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : âge, diplôme, statut marital, statut parental, statut d'activité.\nChamp : Ensemble des répondantes à l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+print(tbl_fusion)
+save_as_docx(tbl_fusion, path = "tbl_fusion.docx")
+
+# Reg femmes - LGBT 
+lgbtf_reg_fusion = lgbtnf %>%
+  mutate(fusion = fct_relevel(fusion, "Pas d'accord"),
+         typecplbi = fct_relevel(typecplbi, "Homo en couple", "Homo célibataire", "Bi en couple de même sexe", "Bi en couple de sexe différent", "Bi célibataire"), 
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         enf_ego = fct_relevel(enf_ego, "Non"), 
+         statut_act2 = fct_relevel(statut_act2, "Inactif·ve")
+         ) 
+
+reglgbtf_fusion = glm(
+  fusion ~ typecplbi + age + diplome + mariage + enf_ego + statut_act2,
+  family = binomial(),
+  lgbtf_reg_fusion
+)
+
+tbl_fusion_lgbt = tbl_regression(
+  reglgbtf_fusion,
+  include = c(typecplbi),
+  label = typecplbi ~ "Type de couple", 
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Fusion OR**") %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : âge, diplôme, statut marital, statut parental, statut d'activité.\nChamp : Ensemble des répondantes âgées de 20 à 69 ans à l'enquête Virage LGBT.\nLecture : Les femmes homosexuelles célibataires ont moins de chance d'adhérer à l'idée qu'en couple il faut tout faire ensemble que les femmes homosexuelles en couple, à variables de contrôle équivalentes.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+print(tbl_fusion_lgbt)
+save_as_docx(tbl_fusion_lgbt, path = "tbl_fusion_lgbt.docx")
+```
+
+## La confidence conjugale : articulation entre rapports de genre et de sexualité
+
+### Une confidence conjugale plus sélective, surtout dans les couples de sexe différent
+
+```{r}
+#| label: tbl-confidence-conjoint
+#| tbl-cap: "Se confier au partenaire lors d'un problème personel. Personnes en couple au moment de l'enquête. "
+
+# Plans de pondération 
+dwf_couple = svydesign(id = ~1, weights = pgnf_couple$poids_cal, data = pgnf_couple)
+dwh_couple = svydesign(id = ~1, weights = pgnh_couple$poids_cal, data = pgnh_couple)
+
+# Tableau PG pondéré -- Femmes
+tab5_pg_f = dwf_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = confidence_cjt,
+    statistic = all_categorical() ~ "{p}%\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab5_pg_h = dwh_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = confidence_cjt,
+    statistic = all_categorical() ~ "{p}%\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0),
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT -- Femmes
+tab5_lgbt_f = lgbtnf_couple %>%
+  tbl_summary(
+    by = idsexu,
+    include = confidence_cjt,
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0),
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT  -- Hommes
+tab5_lgbt_h = lgbtnh_couple %>%
+  tbl_summary(
+    by = idsexu,
+    include = confidence_cjt,
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0),
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n(n = {n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab5 = tbl_merge(
+  tbls = list(tab5_pg_f, tab5_pg_h, tab5_lgbt_f, tab5_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab5 = tab5 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (effectifs non pondérés) [Intervalle de confiance à 95 %]."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Répondant-es en couple au moment de l'enquête Virage ; Répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 83,9% des femmes homosexuelles en couple dans l'enquête Virage en population générale se confient à leur partenaire lors d'un problème personnel, avec un intervalle de confiance à 95% de [71% - 92%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+save_as_docx(tab5, path = "tab5.docx")
+```
+
+```{r}
+#| label: fig-confidence-conjoint-lgbt
+#| fig-cap: "Se confier au partenaire lors d'un problème personnel selon le type de couple."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+# p-valeur
+
+pval_confidence_cjt = lgbtn_couple %>% 
+  filter(is.na(confidence_cjt) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, confidence_cjt))$p.value)
+
+pval_confidence_cjt
+
+# Créer fonction graph 
+base_graph2 = function(var, label){
+  lgbtn_couple %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+    group_by(genre, typecplbi, modalite) %>% 
+    summarise(eff = n()) %>% 
+    group_by(genre, typecplbi) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "Oui") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph2 = base_graph2("confidence_cjt", "Se confier au partenaire\nlors d'un problème personnel")
+
+ordre_typecplbi = c("Homo célibataire", "Homo en couple",
+                     "Bi célibataire", "Bi en couple de même sexe", "Bi en couple de sexe différent")
+
+base_graph2 = base_graph2 %>% 
+  mutate(typecplbi = factor(typecplbi, levels = rev(ordre_typecplbi)))
+
+# Créer graphique
+graphique2 = ggplot(base_graph2, aes(x = typecplbi, y = pct)) +
+  geom_segment(aes(xend = typecplbi, yend = 0),
+               color = "#9B4F96", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "#9B4F96", size = 2) +
+  coord_flip() + 
+  facet_grid(rows = vars(genre), cols = vars(variable)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "bold.italic", family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")
+        )
+graphique2
+```
+
+## Le genre du travail domestique dans les conjugalités bisexuelles
+
+```{r}
+#| label: tbl-sexuation-roles-domestique
+#| tbl-cap: "Sexuation des rôles domestiques selon l'identification sexuelle et le genre. Personnes en couple cohabitant dans l'année."
+
+# Nouvelles bases 
+pgnf_cohab = pgnf_conjugal %>% 
+  filter(FCOHAB %in% c("01", "02", "03", "04"))
+
+pgnh_cohab = pgnh_conjugal %>% 
+  filter(FCOHAB %in% c("01", "02", "03", "04"))
+
+lgbtnf_cohab = lgbtnf_conjugal %>% 
+  filter(FCOHAB %in% c("01", "02", "03", "04"))
+
+lgbtnh_cohab = lgbtnh_conjugal %>% 
+  filter(FCOHAB %in% c("01", "02", "03", "04"))
+
+# Plans de pondération 
+dwf_cohab = svydesign(id = ~1, weights = pgnf_cohab$poids_cal, data = pgnf_cohab)
+dwh_cohab = svydesign(id = ~1, weights = pgnh_cohab$poids_cal, data = pgnh_cohab)
+
+# Liste commune des variables à inclure
+tab6_vars = c("taches_men", "taches_enf")
+
+# Tableau PG pondéré -- Femmes
+tab6_pg_f = dwf_cohab %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab6_vars),
+    statistic = all_categorical() ~ "{p}%\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**") 
+
+# Tableau PG pondéré -- Hommes
+tab6_pg_h = dwh_cohab %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab6_vars),
+    statistic = all_categorical() ~ "{p}%\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**") 
+
+# Tableau LGBT -- Femmes
+tab6_lgbt_f = lgbtnf_cohab %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab6_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT  -- Hommes
+tab6_lgbt_h = lgbtnh_cohab %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab6_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab6 = tbl_merge(
+  tbls = list(tab6_pg_f, tab6_pg_h, tab6_lgbt_f, tab6_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_3 ~ "Test exact de Fisher.",
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab6 = tab6 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Effectifs non pondérés) [Intervalle de confiance à 95 %]."),
+    ref_symbols = "4", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Répondant-es en couple cohabitant dans l'année de l'enquête Virage ; Répondant-es en couple cohabitant dans l'année de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés\nLecture : 12,6% des hommes homosexuels en couple cohabitant dans l'enquête Virage en population générale déclarent avoir pris en charge l'essentiel des tâches ménagères, avec un intervalle de confiance à 95% de [5% - 28%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+save_as_docx(tab6, path = "tab6.docx")
+```
+
+```{r}
+#| label: tbl-sexuation-roles-domestique-typecpl
+#| tbl-cap: "Sexuation des rôles domestiques selon le type de couple. Personnes en couple cohabitant dans l'année."
+
+# Liste commune des variables à inclure
+tab7_vars = c("taches_men", "taches_enf")
+
+lgbtnf_cohab = lgbtnf %>% 
+  filter(!cohabitation == "En couple non cohabitant") %>% 
+  filter(!typecplbi %in% c("Bi célibataire", "Homo célibataire")) %>% 
+  mutate(typecplbi = fct_relevel(typecplbi, "Homo en couple", "Bi en couple de même sexe", "Bi en couple de sexe différent"))
+
+lgbtnh_cohab = lgbtnh %>% 
+  filter(!cohabitation == "En couple non cohabitant") %>% 
+  filter(!typecplbi %in% c("Bi célibataire", "Homo célibataire")) %>% 
+  mutate(typecplbi = fct_relevel(typecplbi, "Homo en couple", "Bi en couple de même sexe", "Bi en couple de sexe différent"))
+         
+# Tableau LGBT -- Femmes
+tab7_lgbt_f = lgbtnf_cohab %>%
+  tbl_summary(
+    by = typecplbi,
+    include = all_of(tab7_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**") 
+
+# Tableau LGBT -- Hommes
+tab7_lgbt_h = lgbtnh_cohab %>%
+  tbl_summary(
+    by = typecplbi,
+    include = all_of(tab7_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**") 
+
+# Fusion des tableaux 
+tab7 = tbl_merge(
+  tbls = list(tab7_lgbt_f, tab7_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test exact de Fisher.", 
+      p.value_2 ~ "Test exact de Fisher.",
+      all_stat_cols() ~ "Effectifs entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab7 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Champ : Répondant-es en couple cohabitant dans l'année de l'enquête Virage LGBT âgé-es de 20 à 69 ans. Virage LGBT : effectifs et pourcentages non pondérés.\nLecture : 12% des femmes homosexuelles en couple cohabitant dans l'enquête Virage LGBT ont pris en charge l'essentiel des tâches ménagères.\nSource :  Enquête Virage LGBT, Ined, 2015-2016.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+save_as_docx(tab7, path = "tab7.docx")
+```
+
+## Les expériences familiales dans l’enfance: des modèles conjugaux plus conflictuels ?
+
+```{r}
+#| label: tbl-situation-parents
+#| tbl-cap: "Situation parentale selon l'identification sexuelle et le genre."
+
+# Liste commune des variables à inclure
+tab7b_vars = c("privation", "conflit_pere", "conflit_mere",  "fugue", "conflit_parents", "aide_educ")
+
+# Tableau PG pondéré -- Femmes
+tab7b_pg_f = dwf %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab7b_pg_h = dwh %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%  
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab7b_lgbt_f = lgbtnf %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab7b_lgbt_h = lgbtnh %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab7b_vars),
+    statistic = all_categorical() ~ "{p}",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab7b = tbl_merge(
+  tbls = list(tab7b_pg_f, tab7b_pg_h, tab7b_lgbt_f, tab7b_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.", 
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab7b = tab7b %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés [Intervalle de confiance à 95 %]."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Ensemble des répondant-es de l'enquête Virage ; Répondant-es de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 94,1% des femmes homosexuelles dans l'enquête Virage en population générale n'ont pas subi de privations matérielles ou négligences graves dans l'enfance, avec un intervalle de confiance à 95% de [87% - 97%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+save_as_docx(tab7b, path = "tab7b.docx")
+
+```
+
+# Sentiments conjugaux, satisfaction et santé mentale
+
+## Des sentiments conjugaux plus fragiles chez les bisexuel·les
+```{r}
+#| label: tbl-satisfaction-couple
+#| tbl-cap: "Satisfaction du couple actuel selon l'identification sexuelle et le genre. Virage PG (pondéré)."
+
+# Plans de pondération 
+dwf_couple = svydesign(id = ~1, weights = pgnf_couple$poids_cal, data = pgnf_couple)
+dwh_couple = svydesign(id = ~1, weights = pgnh_couple$poids_cal, data = pgnh_couple)
+
+# Liste commune des variables à inclure
+tab8_vars = c("satisfaction", "amoureux", "rupture", "depression")
+
+# Tableau PG pondéré -- Femmes
+tab8_pg_f = dwf_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab8_vars),
+    statistic = all_categorical() ~ "{p}%\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>%
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab8_pg_h = dwh_couple %>%
+  tbl_svysummary(
+    by = idsexu,
+    include = all_of(tab8_vars),
+    statistic = all_categorical() ~ "{p}%\n({n_unweighted})",
+    digits = all_categorical() ~ list(1, 0), 
+    missing = "no"
+  ) %>%
+  add_ci(statistic = all_categorical() ~ "{conf.low}-{conf.high}", 
+         pattern = "{stat}\n[{ci}]") %>% 
+  add_p(test = all_categorical() ~ "svy.adj.chisq.test") %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+ # Tableau LGBT non pondéré -- Femmes
+tab8_lgbt_f = lgbtnf_couple %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab8_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0),
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab8_lgbt_h = lgbtnh_couple %>%
+  tbl_summary(
+    by = idsexu,
+    include = all_of(tab8_vars),
+    statistic = all_categorical() ~ "{p}%\n({n})",
+    digits = all_categorical() ~ list(1, 0),
+    missing = "no"
+  ) %>%
+  add_p(
+  test = all_categorical() ~ "fisher.test",
+  test.args = all_categorical() ~ list(simulate.p.value = TRUE, B = 10000)
+) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab8 = tbl_merge(
+  tbls = list(tab8_pg_f, tab8_pg_h, tab8_lgbt_f, tab8_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      p.value_1 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_2 ~ "Test du Chi-deux ajusté de Rao & Scott pour données pondérées.",
+      p.value_3 ~ "Test exact de Fisher.", 
+      p.value_4 ~ "Test exact de Fisher.", 
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab8 = tab8 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés (Effectifs non pondérés) [Intervalle de confiance à 95 %]."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Répondant-es en couple au moment de l'enquête Virage ; Répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans. Pour Virage PG : pourcentages pondérés. Pour Virage LGBT : pourcentages et effectifs non pondérés.\nLecture : 98,1% des femmes homosexuelles en couple dans l'enquête Virage en population générale sont satisfaites de leur relation actuelle, avec un intervalle de confiance à 95% de [92% - 100%].\nSources : Enquête Virage PG, Ined, 2015 ; enquête Virage LGBT, Ined, 2015-2016") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab8, path = "tab8.docx")
+```
+
+## Des écarts qui ne se réduisent ni à la configuration genrée du couple ni à la structure sociale
+
+```{r}
+#| label: fig-satisfaction-lgbt
+#| fig-cap: "Satisfaction relationnelle selon le type de couple."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+#p valeur 
+pval_satisfaction = lgbtn_couple %>% 
+  filter(is.na(satisfaction) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, satisfaction))$p.value)
+
+pval_satisfaction
+
+pval_amoureux = lgbtn_couple %>% 
+  filter(is.na(amoureux) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, amoureux))$p.value)
+
+pval_amoureux
+
+pval_rupture = lgbtn_couple %>% 
+  filter(is.na(rupture) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, rupture))$p.value)
+
+pval_rupture
+
+pval_depression = lgbtn_couple %>% 
+  filter(is.na(depression) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+  group_by(genre) %>% 
+  summarise(p = chisq.test(table(typecplbi, depression))$p.value)
+
+pval_depression
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph5 = function(var, label){
+  lgbtn_couple %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(typecplbi) == F, is.na(genre) == F) %>% 
+    group_by(genre, typecplbi, modalite) %>% 
+    summarise(eff = n()) %>% 
+    group_by(genre, typecplbi) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "Oui") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph5 = base_graph5("satisfaction", "Satisfaction\nconjugale") %>% 
+  bind_rows(base_graph5("amoureux", "Sentiment\namoureux")) %>% 
+  bind_rows(base_graph5("rupture", "Projet séparation\n(12 derniers mois)")) %>% 
+  bind_rows(base_graph5("depression", "Dépression ou anxiété\nau moment de l'enquête"))
+
+# Créer graphique
+graphique5 = ggplot(base_graph5, aes(x = typecplbi, y = pct)) +
+  geom_segment(aes(xend = typecplbi, yend = 0),
+               color = "#9B4F96", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "#9B4F96", size = 2) +
+  coord_flip() + 
+ facet_grid(rows = vars(genre), cols = vars(variable)) +  
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "bold.italic", family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")
+        )
+graphique5
+
+```
+
+### Régressions logistiques 
+
+```{r}
+#| label: tbl-regression-evaluation
+#| tbl-cap: "Régression logistique des indicateurs d'évaluation conjugale et psychologique sur l'identification sexuelle et diverses variables de structuration sociale."
+
+# Base reg  
+pg_reg_evaluation = pgn_couple %>%
+  mutate(satisfaction = fct_relevel(satisfaction, "Non"),
+         amoureux = fct_relevel(amoureux, "Non"),
+         rupture = fct_relevel(rupture, "Non"),
+         depression = fct_relevel(depression, "Non"),
+         idsexu = fct_relevel(idsexu, "Hétéro", "Bi", "Homo"),
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         revenu_menage = fct_relevel(revenu_menage, "4 000€ et plus"),
+         revenu_menage = fct_drop(as.factor(na_if(revenu_menage, "Pas de budget commun/NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         cohabitation = fct_relevel(cohabitation, "En couple non cohabitant"),
+         enf_couple = fct_relevel(enf_couple, "Enfant(s) dans le couple"), 
+         statut_act_compare = fct_relevel(statut_act_compare, "Couple actif")
+         ) 
+
+pgf_reg_evaluation = pg_reg_evaluation %>% 
+  filter(genre == "Une femme")
+
+pgh_reg_evaluation = pg_reg_evaluation %>% 
+  filter(genre == "Un homme")
+
+# Pondération  
+dwf_reg_evaluation = svydesign(id = ~1, weights = pgf_reg_evaluation$poids_cal, data = pgf_reg_evaluation)
+
+dwh_reg_evaluation = svydesign(id = ~1, weights = pgh_reg_evaluation$poids_cal, data = pgh_reg_evaluation)
+
+# Regressions  
+regf_satisfaction = svyglm(
+  satisfaction ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_satisfaction = svyglm(
+  satisfaction ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+regf_amoureux = svyglm(
+  amoureux ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_amoureux = svyglm(
+  amoureux ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+regf_rupture = svyglm(
+  rupture ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_rupture = svyglm(
+  rupture ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+regf_depression = svyglm(
+  depression ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwf_reg_evaluation
+)
+
+regh_depression = svyglm(
+  depression ~ idsexu + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  design = dwh_reg_evaluation
+)
+
+# Sous-tableaux  
+
+tbl_satisfaction_f = tbl_regression(
+  regf_satisfaction,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nFemme**") 
+
+tbl_satisfaction_h = tbl_regression(
+  regh_satisfaction,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nHomme**")
+
+tab_satisfaction = tbl_merge(
+  tbls = list(tbl_satisfaction_f, tbl_satisfaction_h), 
+  tab_spanner = FALSE
+)
+
+tbl_amoureux_f = tbl_regression(
+  regf_amoureux,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nFemme**") 
+
+tbl_amoureux_h = tbl_regression(
+  regh_amoureux,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nHomme**")
+
+tab_amoureux = tbl_merge(
+  tbls = list(tbl_amoureux_f, tbl_amoureux_h), 
+  tab_spanner = FALSE
+)
+
+tbl_rupture_f = tbl_regression(
+  regf_rupture,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nFemme**") 
+
+tbl_rupture_h = tbl_regression(
+  regh_rupture,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nHomme**")
+
+tab_rupture = tbl_merge(
+  tbls = list(tbl_rupture_f, tbl_rupture_h), 
+  tab_spanner = FALSE
+)
+
+tbl_depression_f = tbl_regression(
+  regf_depression,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nFemme**") 
+
+tbl_depression_h = tbl_regression(
+  regh_depression,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nHomme**")
+
+tab_depression = tbl_merge(
+  tbls = list(tbl_depression_f, tbl_depression_h), 
+  tab_spanner = FALSE
+)
+
+# Tableau final 
+
+tab_evaluation = tbl_merge(
+  tbls = list(tab_satisfaction, tab_amoureux, tab_rupture, tab_depression), 
+  tab_spanner = FALSE
+)
+
+tab_evaluation %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : identification sexuelle, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage PG. Données pondérées.\nLecture : Les femmes bisexuelles en couple ont moins de chance d'être satisfaites de leur relation que les femmes hétérosexuelles, à variables de contrôle équivalentes.\nSource : Enquête Virage PG, Ined, 2015.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+save_as_docx(tab_evaluation, path = "tab_evaluation.docx")  
+
+```
+
+
+```{r}
+#| label: tbl-regression-evaluation-lgbt
+#| tbl-cap: "Régression logistique des indicateurs d'évaluation conjugale et psychologique sur le type de couple et diverses variables de structuration sociale."
+
+# Base reg  
+lgbt_reg_evaluation = lgbtn_couple %>%
+  mutate(satisfaction = fct_relevel(satisfaction, "Non"),
+         amoureux = fct_relevel(amoureux, "Non"),
+         rupture = fct_relevel(rupture, "Non"),
+         depression = fct_relevel(depression, "Non"),
+         typecplbi = fct_relevel(typecplbi, "Homo en couple"),
+         age = fct_relevel(age, "30-39"),
+         diplome = fct_drop(as.factor(na_if(diplome, "NVPD/NSP"))),
+         revenu_menage = fct_relevel(revenu_menage, "4 000€ et plus"),
+         revenu_menage = fct_drop(as.factor(na_if(revenu_menage, "Pas de budget commun/NVPD/NSP"))),
+         mariage = fct_recode(
+           as_factor(statutcouple), 
+           "Mariée" = "Marié.e", 
+           "Pas mariée" = "Pacsé.e", 
+           "Pas mariée" = "Union libre", 
+           "Pas mariée" = "Pas en couple",
+           "Pas mariée" = "NVPD/NSP") %>% 
+           fct_relevel("Pas mariée"), 
+         cohabitation = fct_relevel(cohabitation, "En couple non cohabitant"),
+         enf_couple = fct_relevel(enf_couple, "Enfant(s) dans le couple"), 
+         statut_act_compare = fct_relevel(statut_act_compare, "Couple actif")
+         ) 
+
+lgbtf_reg_evaluation = lgbt_reg_evaluation %>% 
+  filter(genre == "Une femme")
+
+lgbth_reg_evaluation = lgbt_reg_evaluation %>% 
+  filter(genre == "Un homme")
+
+# Regressions  
+regf_satisfaction_lgbt = glm(
+  satisfaction ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_satisfaction_lgbt = glm(
+  satisfaction ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+regf_amoureux_lgbt = glm(
+  amoureux ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_amoureux_lgbt = glm(
+  amoureux ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+regf_rupture_lgbt = glm(
+  rupture ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_rupture_lgbt = glm(
+  rupture ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+regf_depression_lgbt = glm(
+  depression ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbtf_reg_evaluation
+)
+
+regh_depression_lgbt = glm(
+  depression ~ typecplbi + age + diplome + revenu_menage + mariage + cohabitation + enf_couple + statut_act_compare,
+  family = binomial(),
+  data = lgbth_reg_evaluation
+)
+
+# Sous-tableaux  
+
+tbl_satisfaction_f_lgbt = tbl_regression(
+  regf_satisfaction_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nFemme**") 
+
+tbl_satisfaction_h_lgbt = tbl_regression(
+  regh_satisfaction_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Satisfaction conjugale\nHomme**")
+
+tab_satisfaction_lgbt = tbl_merge(
+  tbls = list(tbl_satisfaction_f_lgbt, tbl_satisfaction_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+tbl_amoureux_f_lgbt = tbl_regression(
+  regf_amoureux_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nFemme**") 
+
+tbl_amoureux_h_lgbt = tbl_regression(
+  regh_amoureux_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Sentiment amoureux\nHomme**")
+
+tab_amoureux_lgbt = tbl_merge(
+  tbls = list(tbl_amoureux_f_lgbt, tbl_amoureux_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+tbl_rupture_f_lgbt = tbl_regression(
+  regf_rupture_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nFemme**") 
+
+tbl_rupture_h_lgbt = tbl_regression(
+  regh_rupture_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Projet de séparation\nHomme**")
+
+tab_rupture_lgbt = tbl_merge(
+  tbls = list(tbl_rupture_f_lgbt, tbl_rupture_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+tbl_depression_f_lgbt = tbl_regression(
+  regf_depression_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nFemme**") 
+
+tbl_depression_h_lgbt = tbl_regression(
+  regh_depression_lgbt,
+  exponentiate = TRUE
+) %>%
+  modify_header(estimate ~ "**Dépression/Anxiété\nHomme**")
+
+tab_depression_lgbt = tbl_merge(
+  tbls = list(tbl_depression_f_lgbt, tbl_depression_h_lgbt), 
+  tab_spanner = FALSE
+)
+
+# Tableau final 
+
+tab_evaluation_lgbt = tbl_merge(
+  tbls = list(tab_satisfaction_lgbt, tab_amoureux_lgbt, tab_rupture_lgbt, tab_depression_lgbt), 
+  tab_spanner = FALSE
+)
+
+tab_evaluation_lgbt %>% 
+  as_flex_table() %>% 
+  add_footer_lines("Variables de contrôle : type de couple, âge, diplôme, revenu ménage, cohabitation, statut marital, statut parental couple, statut d'activité couple.\nChamp : Ensemble des répondant-es en couple au moment de l'enquête Virage LGBT, âgé-es de 20 à 69 ans.\nLecture : Les femmes bisexuelles en couple de même sexe ont moins de chance d'être satisfaites de leur relation actuelle que les homosexuelles en couple, à variables de contrôle équivalentes.\nSource : Enquête Virage LGBT, Ined, 2015-2016.") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1) 
+
+save_as_docx(tab_evaluation_lgbt, path = "tab_evaluation_lgbt.docx")
+
+```
+
+## L’ignorance de la bisexualité dans le couple
+
+```{r}
+#| label: tbl-connaissance-bisexualite
+#| tbl-cap: "Connaissance de la bisexualité par le/la partenaire au moment de l'enquête."
+
+# bases
+pgnfbi_couple = pgnf_couple %>% 
+  filter(idsexu == "Bi") %>% 
+  droplevels()
+
+pgnhbi_couple = pgnh_couple %>% 
+  filter(idsexu == "Bi") %>% 
+  droplevels()
+
+lgbtnfbi_couple = lgbtnf_couple %>% 
+  filter(idsexu == "Bi") %>% 
+  droplevels() %>% 
+  drop_na(comingoutconjoint)
+
+lgbtnhbi_couple = lgbtnh_couple %>% 
+  filter(idsexu == "Bi") %>% 
+  droplevels() %>% 
+  drop_na(comingoutconjoint)
+
+# Plans de pondération 
+dwfbi_couple = svydesign(id = ~1, weights = pgnfbi_couple$poids_cal, data = pgnfbi_couple)
+dwhbi_couple = svydesign(id = ~1, weights = pgnhbi_couple$poids_cal, data = pgnhbi_couple)
+
+# Tableau PG pondéré -- Femmes
+tab10_pg_f = dwfbi_couple %>%
+  tbl_svysummary(
+    include = comingoutconjoint,
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>%  
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Femmes**")
+
+# Tableau PG pondéré -- Hommes
+tab10_pg_h = dwhbi_couple %>%
+  tbl_svysummary(
+    include = comingoutconjoint,
+    statistic = all_categorical() ~ "{p}({n_unweighted})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  add_ci(pattern = "{stat}\n[{ci}]") %>% 
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n_unweighted})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage PG — Hommes**")
+
+# Tableau LGBT non pondéré -- Femmes
+tab10_lgbt_f = lgbtnfbi_couple %>%
+  tbl_summary(
+    include = comingoutconjoint,
+    statistic = all_categorical() ~ "{p}({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Femmes**")
+
+# Tableau LGBT non pondéré -- Hommes
+tab10_lgbt_h = lgbtnhbi_couple %>%
+  tbl_summary(
+    include = comingoutconjoint,
+    statistic = all_categorical() ~ "{p}({n})",
+    digits = all_categorical() ~ 1,
+    missing = "no"
+  ) %>%
+  bold_labels() %>%
+  modify_header(all_stat_cols() ~ "**{level}**\n({n})") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Virage LGBT — Hommes**")
+
+# Fusion des tableaux 
+tab10 = tbl_merge(
+  tbls = list(tab10_pg_f, tab10_pg_h, tab10_lgbt_f, tab10_lgbt_h),
+  tab_spanner = FALSE   # on garde les bandeaux des sous-tableaux
+) %>%
+  modify_footnote( # notes bas de tableau 
+      all_stat_cols() ~ "Effectifs non-pondérés entre parenthèses."
+    ) 
+
+ # Version FINALE 
+tab10 %>%
+  # modify_column_hide(columns = starts_with("ci_")) %>% 
+  as_flex_table() %>% 
+  footnote( # note de bas de tableau 
+    i = 2, 
+    j = 2, 
+    value = as_paragraph("Pourcentages pondérés."),
+    ref_symbols = "3", 
+    part = "body"
+  ) %>% 
+  add_footer_lines("Champ : Personnes bies en couple au moment de l'enquête, 20-69 ans, France métropolitaine, ménages ordinaires.\nLecture : 5 femmes bisexuelles sur 70 dans l'enquête Virage en population générale sont en couple avec quelqu'un qui n'a pas connaissance de leur bisexualité, avec un intervalle de confiance à 95% de [3,8% - 31%].") %>%
+  fontsize(size = 7, part = "all") %>%
+  set_table_properties(layout = "autofit", width = 1)  
+
+```
+
+
+```{r}
+#| label: fig-connaissance-bisexualite-lgbt
+#| fig-cap: "Connaissance de la bisexualité par le partenaire au moment de l'enquête, selon le type de couple."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+# p-valeur
+pval_comingoutconjoint = lgbtnhbi_couple %>% 
+  filter(is.na(comingoutconjoint) == F, is.na(typecplbi) == F) %>% 
+  summarise(p = chisq.test(table(typecplbi, comingoutconjoint))$p.value)
+
+pval_comingoutconjoint
+
+# Créer fonction graph (% d'accord par genre_idsexu)
+base_graph4 = function(var, label){
+  lgbtnhbi_couple %>% 
+    mutate(modalite = get(var)) %>% 
+    filter(is.na(modalite) == F, is.na(typecplbi) == F) %>% 
+    group_by(typecplbi, modalite) %>% 
+    summarise(eff = n()) %>% 
+    group_by(typecplbi) %>% 
+    mutate(pct = eff * 100 / sum(eff)) %>% 
+    filter(modalite == "Non") %>% 
+    mutate(variable = label)
+}
+
+# Créer base données graph
+base_graph4 = base_graph4("comingoutconjoint", "Partenaire n'a pas connaissance\nde la bisexualité") 
+
+# Créer graphique
+graphique4 = ggplot(base_graph4, aes(x = typecplbi, y = pct)) +
+  geom_segment(aes(xend = typecplbi, yend = 0),
+               color = "#9B4F96", linewidth = 0.75, 
+               alpha = 0.75, linetype = "dotted") +
+  geom_point(color = "#9B4F96", size = 2) +
+  coord_flip() + 
+ facet_grid(cols = vars(variable)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 20)) + 
+  theme_minimal() + 
+  theme(panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+        panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+        axis.text = element_text(family = "serif", size = 12, color = "black"),
+        axis.title = element_blank(),
+        strip.text = element_text(face = "bold.italic", family = "serif", size = 13, color = "#9B4F96"), 
+        panel.spacing = unit(1.2, "lines")
+        )
+graphique4
+
+```
+
+# Conflits conjugaux : fréquence, sujets et configuration de genre
+
+## Une surdéclaration des conflits chez les bisexuelles
+
+```{r}
+#| label: fig-sujets-conflits-pg
+#| fig-cap: "Sujets de conflits selon l'identification sexuelle et le genre. Virage PG (pondéré)."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+base_conflits_pg = base_conflits(pgn_conjugal, poids = "poids_cal")
+
+# graph
+
+ordre_genre_idsexu = c("Hétéro", "Bi", "Gay", "Hétéra", "Bie", "Lesbienne")
+
+base_conflits_pg = base_conflits_pg %>%
+  mutate(genre_idsexu = factor(genre_idsexu, levels = ordre_genre_idsexu))
+
+couleurs_genre_idsexu = c(
+  "Hétéro"    = "#0000FF",
+  "Bi"        = "#0038A8",
+  "Gay"       = "#26CEAA",
+  "Hétéra"    = "#FFC0CB",
+  "Bie"       = "#D60270",
+  "Lesbienne" = "#FF9B55"
+)
+
+# Dodge manuel : position numérique de chaque sujet + décalage par groupe
+dodge_width = 0.7
+n_groupes = length(ordre_genre_idsexu)
+
+base_conflits_pg = base_conflits_pg %>%
+  mutate(
+    sujet_num = as.numeric(sujet),
+    # décalage centré autour de 0, réparti sur dodge_width
+    decalage = (as.numeric(genre_idsexu) - (n_groupes + 1) / 2) * (dodge_width / n_groupes),
+    y_pos = sujet_num + decalage
+  )
+
+graphique_conflits_pg = ggplot(base_conflits_pg,
+                                aes(x = y_pos, y = pct, color = genre_idsexu)) +
+  geom_segment(aes(xend = y_pos, yend = 0), 
+               linewidth = 0.5, alpha = 0.5, linetype = "solid") +
+  geom_point(size = 2.5) +
+  coord_flip() +
+  scale_x_continuous(
+    breaks = sort(unique(base_conflits_pg$sujet_num)),
+    labels = levels(base_conflits_pg$sujet)
+  ) +
+  scale_color_manual(values = couleurs_genre_idsexu, 
+                     name = NULL, 
+                     guide = guide_legend(nrow = 1)) +
+  scale_y_continuous(limits = c(0, 60), breaks = seq(0, 60, by = 20)) + 
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+    panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+    axis.text   = element_text(family = "serif", size = 12, color = "black"),
+    axis.title  = element_blank(),
+    legend.position = "bottom",
+    legend.text = element_text(family = "serif", size = 12)
+  )
+graphique_conflits_pg
+```
+
+## Des sujets de conflits structurés par le sexe du partenaire
+```{r}
+#| label: fig-sujets-conflits-lgbt-typecpl
+#| fig-cap: "Sujets de conflits selon le type de couple. Virage LGBT (non pondéré)."
+#| fig-width: 11
+#| fig-height: 11
+#| fig-dpi: 300
+
+lgbtn_conjugal = lgbtn_conjugal %>%
+  mutate(
+    typecplbi_sexe = case_when(
+      typecplbi == "Homo en couple" & genre == "Un homme" ~ "Gay en couple",
+      typecplbi == "Homo en couple" & genre == "Une femme"  ~ "Lesbienne en couple",
+      typecplbi == "Bi en couple de même sexe" & genre == "Un homme" ~ "Bi en couple de même sexe",
+      typecplbi == "Bi en couple de même sexe" & genre == "Une femme" ~ "Bie en couple de même sexe",
+      typecplbi == "Bi en couple de sexe différent" & genre == "Un homme" ~ "Bi en couple de sexe différent",
+      typecplbi == "Bi en couple de sexe différent" & genre == "Une femme" ~ "Bie en couple de sexe différent",
+      TRUE ~ NA_character_
+    )
+  )
+
+ordre_typecplbi = c("Gay en couple", "Bi en couple de même sexe", "Bi en couple de sexe différent", "Lesbienne en couple", "Bie en couple de même sexe", "Bie en couple de sexe différent")
+
+# Fonction générique : % de "Oui" pour chaque variable de conflit, par modalité de groupe
+base_conflits_groupe = function(data, var_groupe, ordre_groupe, poids = NULL){
+  map_dfr(conflit_vars, function(var){
+    d = data %>%
+      mutate(
+        modalite = .data[[var]],
+        groupe   = factor(.data[[var_groupe]], levels = ordre_groupe)
+      ) %>%
+      filter(!is.na(modalite), !is.na(groupe))
+
+    if(is.null(poids)){
+      d = d %>%
+        count(groupe, modalite) %>%
+        group_by(groupe) %>%
+        mutate(pct = n * 100 / sum(n))
+    } else {
+      d = d %>%
+        group_by(groupe, modalite) %>%
+        summarise(eff = sum(.data[[poids]]), .groups = "drop_last") %>%
+        mutate(pct = eff * 100 / sum(eff))
+    }
+
+    d %>%
+      filter(modalite == "Oui") %>%
+      transmute(groupe, sujet = var, pct)
+  }) %>%
+    mutate(
+      sujet  = recode(sujet, !!!conflit_labels),
+      sujet  = factor(sujet, levels = rev(unname(conflit_labels)))
+    )
+}
+
+base_conflits_typecpl = base_conflits_groupe(lgbtn_conjugal, "typecplbi_sexe", ordre_typecplbi)
+
+couleurs_typecplbi = c(
+  "Gay en couple"                     = "#26CEAA",
+  "Lesbienne en couple"               = "#FF9B55",
+  "Bi en couple de même sexe"         = "#9B4F96",
+  "Bie en couple de même sexe"        = "#D60270",
+  "Bi en couple de sexe différent"    = "#0038A8",
+  "Bie en couple de sexe différent"   = "#51AFF7"
+)
+
+# Dodge manuel (position numérique) : évite l'effet "arbre" de position_dodge() + geom_segment
+dodge_width = 0.7
+n_groupes = length(ordre_typecplbi)
+
+base_conflits_typecpl = base_conflits_typecpl %>%
+  mutate(
+    sujet_num = as.numeric(sujet),
+    decalage  = (as.numeric(groupe) - (n_groupes + 1) / 2) * (dodge_width / n_groupes),
+    y_pos     = sujet_num + decalage
+  )
+
+graphique_conflits_typecpl = ggplot(base_conflits_typecpl,
+                                     aes(x = y_pos, y = pct, color = groupe)) +
+  geom_segment(aes(xend = y_pos, yend = 0),
+               linewidth = 0.5, alpha = 0.5, linetype = "solid") +
+  geom_point(size = 2.5) +
+  coord_flip() +
+  scale_x_continuous(
+    breaks = sort(unique(base_conflits_typecpl$sujet_num)),
+    labels = levels(base_conflits_typecpl$sujet)
+  ) +
+  scale_color_manual(values = couleurs_typecplbi, 
+                     name = NULL, 
+                     guide = guide_legend(nrow = 2)) +
+  scale_y_continuous(limits = c(0, 80), breaks = seq(0, 80, by = 20)) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+    panel.grid.minor.y = element_line(color = "grey85", linewidth = 0.1),
+    axis.text   = element_text(family = "serif", size = 12, color = "black"),
+    axis.title  = element_blank(),
+    legend.position = "bottom",
+    legend.text = element_text(family = "serif", size = 12)
+  )
+graphique_conflits_typecpl
+```

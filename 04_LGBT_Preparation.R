@@ -7,23 +7,12 @@
 
 # Préparer les données pour l'analyse
 # - Filtre sur les 20-69 ans (comparable à Virage PG)
-# - Filtre sur identification Homo / Bi (les Hétéros et NSP/NVPD sont peu
-#   nombreux dans LGBT et ne sont pas analysés dans le tableau 2a)
-# - Recodage des variables sociodémo dans les mêmes catégories que PG
-# - Variables de situation conjugale (pour tableau 3 mémoire) :
-#     * Sur l'ensemble (lgbtn) : etatmat, couple12mois, statutcouple, nb_enf_ego
-#     * Sur les pers. en couple > 4 mois dans les 12 derniers mois (lgbtn_conjugal) :
-#       cohabitation, nb_enf_couple
-# /!\ Les noms des variables conjugales (Etatmat, Situmat, FCPL, FCOHAB, Enf1,
-#     ENF2) sont supposés identiques à PG (convention INED). Si l'un d'eux
-#     n'existe pas dans le volet LGBT ou a un libellé différent, adapter le
-#     recodage ci-dessous.
-
-#### Notes sur la reconstruction des variables conjugales ---- 
-
-# Le document INED "Variables Construites - Enquête Virage Principale"
-# (24 mars 2017, sections 5.2.2 et 5.3.1) fournit les règles de construction
-# que l'on applique ici en LGBT à partir des variables brutes.
+# - Filtre sur identification Homo / Bi 
+# - Recodage des variables dans les mêmes catégories que PG 
+#
+# Voir document INED "Variables Construites - Enquête Virage Principale" pour 
+# les règles de construction des variables conjugales, appliquées ici en LGBT 
+# à partir des variables brutes 
 #
 # ETATMAT (état matrimonial légal) :
 #   01 célibataire : q7a=01 ou q9a=01 ou q13a=01 ou q6=04
@@ -60,17 +49,16 @@ library(questionr) # fonctions utiles
 
 #### Sous-pop principale et recodage variables ----
 
-## Sous-population qui repose sur l'identification sexuelle
-## Pour le tableau 2a de Trachman & Lejbowicz on garde Homo + Bi
-## (les effectifs Hétéro sont très faibles dans le volet LGBT).
 lgbtn = lgbt %>%
   select(
+    ID, 
     Q1,
     SEX10,
     Q19E_age_rec, # âge ego en tranches 
     Q29E_rec,
     CS_E_rec,
     Q25E,
+    Q25C, 
     Q3_rec, 
     Q22E_01,
     Q22E_02,
@@ -78,27 +66,28 @@ lgbtn = lgbt %>%
     EA1, 
     EA2, 
     REV2, # Revenu individuel
+    REV3, 
     REV4, # Revenu subjectif
     Q2_rec, # Reconstruire territoire
     Q3_rec,  # Reconstruire territoire
-    # ↓ Variables brutes pour reconstruire ETATMAT et SITUMAT
+    # Variables brutes pour reconstruire ETATMAT et SITUMAT
     Q6, Q6a,
     Q7, Q7a,
     Q9, Q9a,
     Q13, Q13a,
-    # ↓ Variables brutes pour reconstruire Enf1
+    # Variables brutes pour reconstruire Enf1
     ENF1a, ENF1a1_rec, ENF1b_rec,
-    # ↓ Variables construites déjà disponibles en LGBT
+    # Variables construites déjà disponibles en LGBT
     FCOHAB,
     Q11_duree_rec, # Durée relation 
     Q19C_rec, # âge conjoint en tranches 
     ENF2_rec,
-    # ↓ Variables brutes pour reconstruire FSEXCJT et TYPECPL
+    # Variables brutes pour reconstruire FSEXCJT et TYPECPL
     FCPL, 
     Q12, 
     Q36, 
     Q17,
-    # ↓ Styles de conjugalité 
+    # Styles de conjugalité 
     CF1a, # tout faire ensemble
     CF1b, # compromis 
     SOC1a, 
@@ -112,7 +101,7 @@ lgbtn = lgbt %>%
     CF2, # tâches ménagères
     CF3, # s'occuper des enfants
     
-    # ↓ Satisfaction relation  
+    # Satisfaction relation  
     C1,
     C1a,
     C1a1,
@@ -120,7 +109,7 @@ lgbtn = lgbt %>%
     S2a_02, 
     LGBT1e, 
     
-    # ↓ Sujets de conflits 
+    # Sujets de conflits 
     CF5a, 
     CF5b,
     CF5c1,
@@ -135,14 +124,22 @@ lgbtn = lgbt %>%
     CF5k, 
     CF5l, 
     
-    # ↓ Situation avec parents 
+    # Situation avec parents 
     EA9a, 
     EA9b, 
     EA9c, 
     EA9d, 
     EA9e, 
     EA9f, 
-    EA9g
+    EA9g,
+    
+    # Violences
+    C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12, C13, 
+    C15,C16,C14a,C14b,
+    C18a,C18b, C18c,C18d,C18e,C18f,C18g,
+    C24,C26, 
+    C20,C21,C22, C23,
+    C30,C31, C34
   ) %>%
   filter(
     !SEX10 %in% c("01", "88", "99", ""), # retire NSP/NVPD + hétéros
@@ -157,7 +154,7 @@ lgbtn = lgbt %>%
       ) %>%
       fct_relevel("Homo", "Bi") %>% set_variable_labels("Identification sexuelle"),
     
-    # ↓ Nouvelle variable croisée genre et identification sexuelle 
+    # Nouvelle variable croisée genre et identification sexuelle 
     genre_idsexu = case_when(
       genre == "Un homme" & idsexu == "Bi" ~ "Bi", 
       genre == "Un homme" & idsexu == "Homo" ~ "Gay",
@@ -166,7 +163,7 @@ lgbtn = lgbt %>%
     ) %>% 
       fct_relevel ("Bi", "Bie", "Gay", "Lesbienne"),
     
-    # ↓ tranches d'âge alignées sur PG (4 modalités : 20-29, 30-39, 40-49, 50-69)
+    # tranches d'âge alignées sur PG (4 modalités : 20-29, 30-39, 40-49, 50-69)
     age = as_factor(Q19E_age_rec),
     age = case_when(
       age %in% c("20-24", "25-29") ~ "20-29",
@@ -177,9 +174,9 @@ lgbtn = lgbt %>%
       fct_relevel("20-29", "30-39", "40-49", "50-69") %>%
       set_variable_labels("Groupe d'âge"),
     
-    # ↓ Recodage classe
+    # Recodage classe
     
-    # diplôme recodé en 5 modalités comme dans le tableau 2a
+    # diplôme recodé en 5 modalités 
     # Q29E_rec est très détaillé, on regroupe selon le niveau
     diplome = as_factor(Q29E_rec),
     diplome = case_when(
@@ -287,6 +284,34 @@ lgbtn = lgbt %>%
     ) %>%
       fct_relevel("Actif·ve", "Inactif·ve", "NSP/NVPD") %>% 
       set_variable_labels("En activité"),
+    
+    statut_act2_conjoint = fct_recode( #filtré FCPL 01, 02, 03, 04
+      as_factor(Q25C),
+      "Actif·ve" = "En emploi (y compris intérim, congé de maternité/paternité, arrêt maladie, mais pas étudiant en stage rémunéré)",
+      "Actif·ve" = "Au chômage avec indemnités",
+      "Actif·ve" = "Au chômage sans indemnités",
+      "Inactif·ve" = "A la retraite",
+      "Inactif·ve" = "Etudiant-e, élève",
+      "Inactif·ve" = "Etudiant-e, élève avec emploi y compris petit boulot ou stage rémunéré",
+      "Inactif·ve" = "Etudiant-e, élève avec stage non rémunéré",
+      "Inactif·ve" = "Inactif-ve ou au foyer ayant déjà travaillé (ayant eu un contrat de travail y compris congé maladie longue durée de 5 ans ou plus)",
+      "Inactif·ve" = "Inactif-ve ou au foyer n'ayant jamais travaillé (n'ayant jamais eu de contrat de travail)",
+      "Inactif·ve" = "En congé parental, de solidarité familiale",
+      "Inactif·ve" = "Autre congé de longue durée (Anné sabbatique, congé de création d'entreprise, congé LONGUE MALADIE de moins de 5 ans)",
+      NULL = "NSP",
+      NULL = "NVPD", 
+      NULL = ""
+    ) %>%
+      fct_relevel("Actif·ve", "Inactif·ve") %>% 
+      set_variable_labels("Conjoint-e en activité"), 
+    
+    # Statut d'activité comparé couple 
+    statut_act_compare = case_when(
+      statut_act2 == "Actif·ve" & statut_act2_conjoint == "Actif·ve" ~ "Couple actif", 
+      statut_act2 == "Actif·ve" & statut_act2_conjoint == "Inactif·ve" ~ "Ego actif / Partenaire inactif", 
+      statut_act2 == "Inactif·ve" & statut_act2_conjoint == "Actif·ve" ~ "Ego inactif / Partenaire actif", 
+      statut_act2 == "Inactif·ve" & statut_act2_conjoint == "Inactif·ve" ~ "Couple inactif"
+    ),
    
      # Revenu individuel 
     revenu = fct_recode(
@@ -319,7 +344,22 @@ lgbtn = lgbt %>%
     ) %>% 
       set_variable_labels("Situation financière"), 
     
-    # ↓ Territoire 
+    # Revenu du ménage (REV3), en tranches. Champ : ménage cohabitant
+    #   (FCOHAB=01..04 ou FCOHAB=05 avec un autre membre du ménage).
+    revenu_menage = case_when(
+      REV3 %in% c("00", "01", "02", "03") ~ "Moins de 1 800€",
+      REV3 %in% c("04", "05")       ~ "De 1 800 à moins de 3 000€",
+      REV3 %in% c("06")             ~ "De 3 000 à moins de 4 000€", 
+      REV3 %in% c("07", "08")       ~ "4 000€ et plus",
+      REV3 %in% c("10", "88", "99") ~ "Pas de budget commun/NVPD/NSP",
+      TRUE                          ~ NA_character_
+    ) %>%
+      factor(levels = c("Moins de 1 800€", "De 1 800 à moins de 3 000€",
+                        "De 3 000 à moins de 4 000€", "4 000€ et plus",
+                        "Pas de budget commun/NVPD/NSP")) %>%
+      set_variable_labels("Revenu du ménage"),
+    
+    # Territoire 
     taille_agglo = fct_recode(
       as_factor(Q3_rec),
       "200 000 et plus" = "",  #Paris et petite couronne sont les manquants 
@@ -358,10 +398,8 @@ lgbtn = lgbt %>%
                   "Immigré·e, descendant·e ou né·e dans un DOM",
                   "Indeterminé"), 
     
-    #Reconstruction des variables conjugales absentes du LGBT
-    
-    # On s'assure d'avoir les valeurs en caractère pour pouvoir tester
-    # explicitement les codes "01", "02", etc.
+    #Reconstruction des variables conjugales absentes LGBT
+
     Q6_chr   = as.character(Q6),
     Q6a_chr  = as.character(Q6a),
     Q7_chr   = as.character(Q7),
@@ -371,7 +409,7 @@ lgbtn = lgbt %>%
     Q13_chr  = as.character(Q13),
     Q13a_chr = as.character(Q13a),
     
-    # ↓ ETATMAT reconstruite (état matrimonial légal)
+    # ETATMAT reconstruite (état matrimonial légal)
     # Règle INED : on prend la 1re modalité non vide selon l'ordre du document
     Etatmat = case_when(
       Q7a_chr == "01" | Q9a_chr == "01" | Q13a_chr == "01" |
@@ -400,7 +438,7 @@ lgbtn = lgbt %>%
     ) %>%
       fct_relevel("Célibataire", "Marié.e", "Divorcé.e", "Veuf.ve", "NVPD/NSP"),
     
-    # ↓ SITUMAT reconstruite (situation de couple au moment de l'enquête)
+    # SITUMAT reconstruite (situation de couple au moment de l'enquête)
     Situmat = case_when(
       Q6_chr %in% c("03", "04")                                    ~ "01",
       Q7_chr == "01" | Q9_chr == "01" | Q13_chr == "01"            ~ "02",
@@ -410,7 +448,7 @@ lgbtn = lgbt %>%
       TRUE                                                         ~ "99"
     ),
     
-    # ↓ SEXCONJOINT reconstruite (sexe conjoint-e)
+    # SEXCONJOINT reconstruite (sexe conjoint-e)
     Sexcjt = case_when(
       Q1 == "01" & FCPL %in% c("05", "06") ~ "Pas en couple",
       
@@ -447,7 +485,7 @@ lgbtn = lgbt %>%
       Q1 == "02" & FCPL == "04" & Q17 %in% c("88", "99") ~ "NSP/NVPD"
     ),
     
-    # ↓ TYPECPL reconstruite (en couple homo ou hétéro, selon sexe ego)
+    # TYPECPL reconstruite (en couple homo ou hétéro, selon sexe ego)
     typecpl = case_when(
       Q1 == "01" & Sexcjt == "Un homme" ~ "En couple de même sexe", 
       Q1 == "01" & Sexcjt == "Une femme" ~ "En couple de sexe différent", 
@@ -460,18 +498,18 @@ lgbtn = lgbt %>%
     ) %>% 
       set_variable_labels("Type de couple"),
     
-    # ↓ TYPECPL bi
+    # TYPECPL bi
     typecplbi = case_when(
       idsexu == "Bi" & typecpl == "En couple de même sexe" ~ "Bi en couple de même sexe",
       idsexu == "Bi" & typecpl == "En couple de sexe différent" ~ "Bi en couple de sexe différent",
       idsexu == "Bi" & typecpl == "Pas en couple" ~ "Bi célibataire", 
       idsexu == "Homo" & typecpl == "En couple de même sexe" ~ "Homo en couple", 
       idsexu == "Homo" & typecpl == "Pas en couple" ~ "Homo célibataire", 
-      TRUE ~ NA_character_
+      TRUE ~ NA_character_ # on perd 37 homo en couple de sexe différent et 5 NVPD/NSP et 11 Bi NVPD/NSP
     ) %>% 
       set_variable_labels("Type de couple"),
     
-    # ↓ Statut couple au moment de l'enquête (ensemble)
+    # Statut couple au moment de l'enquête (ensemble)
     statutcouple = fct_recode(
       factor(Situmat, levels = c("01", "02", "03", "04", "88", "99")),
       "Pas en couple" = "01",
@@ -483,7 +521,7 @@ lgbtn = lgbt %>%
     ) %>%
       fct_relevel("Pas en couple", "Marié.e", "Pacsé.e", "Union libre", "NVPD/NSP"),
     
-    # ↓ Statut couple au moment de l'enquête : oui / non (ensemble)
+    # Statut couple au moment de l'enquête : oui / non (ensemble)
     couple_enq = fct_recode(
       as_factor(Situmat),
       "Oui" = "02", 
@@ -496,7 +534,7 @@ lgbtn = lgbt %>%
       fct_relevel("Oui", "Non") %>% 
       set_variable_labels("En couple au moment de l'enquête"), 
 
-    # ↓ Couple > 4 mois au cours des 12 derniers mois (à partir de FCPL)
+    # Couple > 4 mois au cours des 12 derniers mois (à partir de FCPL)
     couple12mois = case_when(
       as.character(FCPL) %in% c("01", "02", "03", "04") ~ "Oui",
       as.character(FCPL) %in% c("05", "06")             ~ "Non",
@@ -505,7 +543,7 @@ lgbtn = lgbt %>%
       factor(levels = c("Oui", "Non")) %>% 
       set_variable_labels("En couple au cours des 12 derniers mois (> 4 mois)"), 
     
-    # ↓ Cohabitation (à partir de FCOHAB)
+    # Cohabitation (à partir de FCOHAB)
     # FCOHAB codes LGBT (identiques à PG) :
     # 01-04 = couple cohabitant ; 05 = autre cas (= pas en couple OU couple non cohabitant)
     # On utilise FCPL pour distinguer "couple non cohabitant" (FCPL=01..04) de
@@ -546,24 +584,24 @@ lgbtn = lgbt %>%
     enf_ego = factor(Enf1, levels = c("Oui", "Non")) %>% 
       set_variable_labels("A des enfants"), 
     
-    # ↓ Nombre d'enfants du couple (à partir de ENF2_REC qui existe en LGBT)
+    # (filtré sur pers. en couple à l'enquête et avec au moins 1 enfant)
     enf_couple = fct_recode(
       as_factor(ENF2_rec),
-      NULL    = "",
-      NULL = "NC", 
-      "0"     = "00",
-      "1"     = "01",
-      "2"     = "02",
-      "3+"     = "03",
-      "3+"    = "4 et plus",
+      "Sans enfant" = "",
+      "Enfant(s) d'une précédente union" = "00",
+      "Enfant(s) dans le couple" = "01",
+      "Enfant(s) dans le couple" = "02",
+      "Enfant(s) dans le couple" = "03",
+      "Enfant(s) dans le couple" = "4 et plus",
       NULL = "NVPD",
       NULL = "NSP"
     ) %>%
-      fct_relevel("0", "1", "2", "3+"), 
+      fct_relevel("Sans enfant", "Enfant(s) dans le couple", "Enfant(s) d'une précédente union") %>% 
+      set_variable_labels("Situation parentale"),
     
-    # ↓ Durée de la relation actuelle (en mois → années, catégorisée)
+    # Durée de la relation actuelle 
     # Q11_DUREE_REC est en caractère pour LGBT. Pour FCPL=01,02 = relation
-    # principale actuelle. Hors univers → NA naturellement.
+    # principale actuelle. Hors univers : NA
     dur_rel_mois = as.numeric(as.character(Q11_duree_rec)),
     duree_rel = case_when(
       is.na(dur_rel_mois)  ~ NA_character_,
@@ -576,11 +614,10 @@ lgbtn = lgbt %>%
       factor(levels = c("Moins de 1 an", "1-4 ans", "5-9 ans",
                         "10-19 ans", "20 ans ou plus")),
     
-    # ↓ Écart d'âge avec le/la conjoint·e (5 catégories ego-centriques)
+    # Écart d'âge avec le/la conjoint·e (5 catégories)
     # Q19E_age_rec et Q19C_REC sont en tranches quinquennales (codes "1"-"14",
     # "88" pour NVPD). L'écart est calculé en nombre de tranches.
-    # APPROXIMATION : 1 tranche ≈ 5 ans (en moyenne, peut osciller 0-9 ans).
-    # À mentionner en note de tableau.
+    # APPROXIMATION : 1 tranche = 5 ans (en moyenne, peut osciller 0-9 ans).
     age_ego_grp = case_when(
       as.character(Q19E_age_rec) %in% as.character(1:14)
       ~ as.integer(as.character(Q19E_age_rec)),
@@ -606,7 +643,7 @@ lgbtn = lgbt %>%
                         "Conjoint·e plus jeune (5-9 ans)",
                         "Conjoint·e plus jeune (10+ ans)")),
     
-    # ↓ Styles de conjugalité
+    # Styles de conjugalité
     fusion = fct_recode( # non filtrée
       as_factor(CF1a), 
       "D'accord" = "Tout à fait d'accord", 
@@ -704,7 +741,7 @@ lgbtn = lgbt %>%
     ) %>% set_variable_labels("Répartition tâches enfants foyer"),
     
     
-    # ↓ Satisfaction conjugale 
+    # Satisfaction conjugale 
     satisfaction = fct_recode(
       as_factor(C1), # filtrée FCPL = 01, 02
       NULL = "", 
@@ -766,7 +803,7 @@ lgbtn = lgbt %>%
     ) %>% 
       set_variable_labels("Le/la partenaire a connaissance de votre bisexualité"),
     
-    # ↓ Sujets de conflits
+    # Sujets de conflits
     conflit_taches = fct_recode(
       as_factor(CF5a), # filtrée FCOHAB 01, 02, 03, 04
       NULL = "",
@@ -878,7 +915,7 @@ lgbtn = lgbt %>%
     ) %>% 
       set_variable_labels("Sexualité de couple"), 
     
-    # ↓ Situation avec parents 
+    # Situation avec parents 
     privation = fct_recode(
       as_factor(EA9a), 
       NULL = "Non concerné-e",
@@ -933,6 +970,65 @@ lgbtn = lgbt %>%
          -Q6_chr, -Q6a_chr, -Q7_chr, -Q7a_chr,
          -Q9_chr, -Q9a_chr, -Q13_chr, -Q13a_chr)
 
+## recodage violence 
+
+# Fonction générique : binarise un item Virage (00=Non, 01-05=Oui, 77/88/99/NA -> NA)
+recode_item_virage <- function(x) {
+  case_when(
+    x == "00" ~ 0L,
+    x %in% c("01","02","03","04","05") ~ 1L,
+    x %in% c("77","88","99") ~ NA_integer_,
+    is.na(x) ~ NA_integer_,
+    TRUE ~ NA_integer_
+  )
+}
+
+items_psy <- c("C2","C3","C4","C5","C6","C7","C8","C9","C10","C11","C12",
+               "C15","C16","C14a","C14b",
+               "C18a","C18b","C18c","C18d","C18e","C18f","C18g",
+               "C24","C26")
+
+items_phy <- c("C20","C21","C22","C23")
+items_sex <- c("C30","C31")
+
+lgbt_violence <- lgbtn %>%
+  mutate(across(all_of(c(items_psy, items_phy, items_sex)),
+                recode_item_virage, .names = "{.col}_bin"))
+
+lgbt_violence <- lgbt_violence %>%
+  mutate(
+    psy_oui  = case_when(
+      rowSums(across(all_of(paste0(items_psy, "_bin"))), na.rm = TRUE) > 0 ~ "Oui",
+      rowSums(!is.na(across(all_of(paste0(items_psy, "_bin"))))) == 0 ~ NA_character_,
+      TRUE ~ "Non"
+    ), 
+    phy_oui  = case_when(
+      rowSums(across(all_of(paste0(items_phy, "_bin"))), na.rm = TRUE) > 0 ~ "Oui",
+      rowSums(!is.na(across(all_of(paste0(items_phy, "_bin"))))) == 0 ~ NA_character_,
+      TRUE ~ "Non"
+    ), 
+    sex_oui  = case_when(
+      rowSums(across(all_of(paste0(items_sex, "_bin"))), na.rm = TRUE) > 0 ~ "Oui",
+      rowSums(!is.na(across(all_of(paste0(items_sex, "_bin"))))) == 0 ~ NA_character_,
+      TRUE ~ "Non"
+    )
+  )
+
+lgbtf_violence = lgbt_violence %>% 
+  filter(genre == "Une femme")
+
+lgbth_violence = lgbt_violence %>% 
+  filter(genre == "Un homme")
+
+lgbt_violence_conjugal = lgbt_violence %>%
+  filter(FCPL %in% c("01", "02", "03", "04")) 
+
+lgbtf_violence_conjugal = lgbtf_violence %>%
+  filter(FCPL %in% c("01", "02", "03", "04"))
+
+lgbth_violence_conjugal = lgbth_violence %>%
+  filter(FCPL %in% c("01", "02", "03", "04"))
+
 ## Sous-populations femmes et hommes (Virage LGBT)
 
 lgbtnf = lgbtn %>%
@@ -941,76 +1037,8 @@ lgbtnf = lgbtn %>%
 lgbtnh = lgbtn %>%
   filter(genre == "Un homme")
 
-# #### Sous-pop sans filtre sur l'identification (id-attir-prat) ----
-# 
-# lgbt_aip = lgbt %>%
-#   select(Q1, SEX10, Q19E_age_rec, SEX2F, SEX2H, SEX8a, SEX9, SEX9a) %>%
-#   filter(!Q19E_age_rec %in% c("1", "12", "13", "14")) %>%  # 20-69 ans
-#   mutate(
-#     genre = fct_drop(as_factor(Q1)),
-#     
-#     # ↓ Identification : libellés alignés sur pg_aip
-#     idsexu = fct_recode(
-#       as_factor(SEX10),
-#       "Homo" = "Homosexuel-le",
-#       "Bi" = "Bisexuel-le",
-#       "Hétéro" = "Hétérosexuel-le",
-#       "NSP/NVPD" = "NSP",
-#       "NSP/NVPD" = "NVPD", 
-#       "NSP/NVPD" = ""
-#     ) %>%
-#       fct_relevel("Homo", "Bi", "Hétéro", "NSP/NVPD"),
-#     
-#     # ↓ Attirance (logique de lgbtcritères, libellés alignés sur pg_aip)
-#     SEX2F = as_factor(SEX2F),
-#     SEX2H = as_factor(SEX2H),
-#     attirance = case_when(
-#       SEX2F == "Uniquement par des hommes" |
-#         SEX2H == "Uniquement par des femmes"
-#       ~ "Hétéro",
-#       SEX2F %in% c("Surtout par des hommes mais aussi par des femmes",
-#                    "Autant par des hommes que des femmes",
-#                    "Surtout par des femmes mais aussi par des hommes") |
-#         SEX2H %in% c("Surtout par des femmes mais aussi par des hommes",
-#                      "Autant par des femmes que des hommes",
-#                      "Surtout par des hommes mais aussi par des femmes")
-#       ~ "Bi",
-#       SEX2F == "Uniquement par des femmes" |
-#         SEX2H == "Uniquement par des hommes"
-#       ~ "Homo",
-#       TRUE ~ "Pas d'attirance/NSP/NVPD"
-#     ) %>%
-#       fct_relevel("Homo", "Bi", "Hétéro", "Pas d'attirance/NSP/NVPD"),
-#     
-#     # ↓ Pratique (logique de lgbtcritères, libellés alignés sur pg_aip)
-#     SEX8a = as_factor(SEX8a),
-#     SEX9a = as_factor(SEX9a),
-#     pratique = case_when(
-#       genre == "Une femme" & SEX8a == "Une femme" & SEX9 == "001" |
-#         genre == "Une femme" & SEX9 > "001" & SEX9a == "Uniquement des femmes" |
-#         genre == "Un homme" & SEX8a == "Un homme" & SEX9 == "001" |
-#         genre == "Un homme" & SEX9 > "001" & SEX9a == "Uniquement des hommes"
-#       ~ "Homo",
-#       genre == "Une femme" & SEX8a == "Un homme" & SEX9 == "001" |
-#         genre == "Une femme" & SEX9 == "000" & SEX9a == "Uniquement des hommes" |
-#         genre == "Une femme" & SEX9 > "001" & SEX9a == "Uniquement des hommes" |
-#         genre == "Un homme" & SEX8a == "Une femme" & SEX9 == "001" |
-#         genre == "Un homme" & SEX9 == "000" & SEX9a == "Uniquement des femmes" |
-#         genre == "Un homme" & SEX9 > "001" & SEX9a == "Uniquement des femmes"
-#       ~ "Hétéro",
-#       SEX9 > "001" & SEX9a == "Des hommes et des femmes"
-#       ~ "Bi",
-#       TRUE ~ "Pas de rapport/NSP/NVPD"
-#     ) %>%
-#       fct_relevel("Homo", "Bi", "Hétéro", "Pas de rapport/NSP/NVPD") %>% 
-#       factor(levels = c("Homo", "Bi", "Hétéro", "Pas de rapport/NSP/NVPD"))
-#   )
-# 
-# lgbt_aip_f = lgbt_aip %>% filter(genre == "Une femme")
-# lgbt_aip_h = lgbt_aip %>% filter(genre == "Un homme")
-# 
-# #### Sous-pop en couple > 4 mois dans 12 DERNIERS MOIS (tableau 3b) ----
-# lgbtn_conjugal = lgbtn filtrée sur FCPL %in% c("01","02", "03", "04") # en couple > 4 mois dans les 12 DERNIERS MOIS.
+# #### Sous-pop en couple > 4 mois dans 12 DERNIERS MOIS ----
+# lgbtn_conjugal = lgbtn filtrée sur FCPL %in% c("01","02", "03", "04") 
 
 lgbtn_conjugal = lgbtn %>%
   filter(FCPL %in% c("01", "02", "03", "04")) %>%
@@ -1029,8 +1057,6 @@ lgbtnh_conjugal = lgbtn_conjugal %>%
 # lgbtn_couple = lgbtn filtrée sur FCPL %in% c("01", "02") + 
 # filtre NA satisfaction/amoureux/rupture. C'est la base appropriée pour les
 # questions posées aux personnes en couple AU MOMENT de l'enquête. 
-# /!\ On la conserve telle quelle pour ne pas casser les analyses existantes
-#     sur la satisfaction. 
 
 lgbtn_couple = lgbtn %>%
   filter(FCPL %in% c("01", "02"))

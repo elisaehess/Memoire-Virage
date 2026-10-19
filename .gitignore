@@ -7,6 +7,8 @@
 # --- DONNÉES SENSIBLES ---
 # Exclure tout le dossier de données 
 Data/
+# Exclure le dossier archive
+OLD/
 
 
 # Exclure des formats de fichiers spécifiques s'ils traînent à la racine
